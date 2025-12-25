@@ -1,0 +1,218 @@
+{
+  "deliveryChallans": [
+    {
+      "id": "1",
+      "challanNumber": "DC-00001",
+      "referenceNumber": "321123",
+      "date": "2025-12-10",
+      "customerId": "1",
+      "customerName": "CYBAEM TECH PRIVATE LIMITED ",
+      "challanType": "supply_on_approval",
+      "billingAddress": {
+        "street": "Hinjewadi",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "shippingAddress": {
+        "street": "Hinjewadi",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "placeOfSupply": "",
+      "gstin": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "Cloud Server",
+          "description": "",
+          "hsnSac": "998315",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 500,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 90,
+          "taxName": "GST18",
+          "amount": 590
+        }
+      ],
+      "subTotal": 500,
+      "cgst": 45,
+      "sgst": 45,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 590,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "DELIVERED",
+      "invoiceStatus": "INVOICED",
+      "invoiceId": "1765512535378",
+      "createdAt": "2025-12-18T10:00:00.000Z",
+      "updatedAt": "2025-12-19T08:42:27.646Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-18T10:00:00.000Z",
+          "action": "created",
+          "description": "Delivery challan DC-00001 created",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2025-12-10T06:59:12.937Z",
+          "action": "converted",
+          "description": "Converted to invoice INV-00002",
+          "user": "Admin User"
+        },
+        {
+          "id": "3",
+          "timestamp": "2025-12-12T04:08:46.216Z",
+          "action": "updated",
+          "description": "Delivery challan updated",
+          "user": "Admin User"
+        },
+        {
+          "id": "4",
+          "timestamp": "2025-12-12T04:08:55.378Z",
+          "action": "converted",
+          "description": "Converted to invoice INV-00008",
+          "user": "Admin User"
+        },
+        {
+          "id": "5",
+          "timestamp": "2025-12-12T10:00:22.942Z",
+          "action": "status_changed",
+          "description": "Status changed to OPEN",
+          "user": "Admin User"
+        },
+        {
+          "id": "6",
+          "timestamp": "2025-12-12T10:05:31.511Z",
+          "action": "status_changed",
+          "description": "Status changed to DELIVERED",
+          "user": "Admin User"
+        },
+        {
+          "id": "7",
+          "timestamp": "2025-12-12T10:06:13.157Z",
+          "action": "status_changed",
+          "description": "Status changed to OPEN",
+          "user": "Admin User"
+        },
+        {
+          "id": "8",
+          "timestamp": "2025-12-19T08:42:27.646Z",
+          "action": "status_changed",
+          "description": "Status changed to DELIVERED",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
+      "id": "1766379554480",
+      "challanNumber": "DC-00002",
+      "referenceNumber": "",
+      "date": "2025-12-22",
+      "customerId": "8",
+      "customerName": "CYBAEM TECH PRIVATE LIMITED ",
+      "challanType": "supply_on_approval",
+      "billingAddress": {
+        "street": "Hinjewadi",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "shippingAddress": {
+        "street": "Hinjewadi",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "placeOfSupply": "",
+      "gstin": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "hsnSac": "1006",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 10.799999999999999,
+          "taxName": "GST18",
+          "amount": 70.8
+        },
+        {
+          "id": "2",
+          "itemId": "2",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "hsnSac": "1006",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 10.799999999999999,
+          "taxName": "GST18",
+          "amount": 70.8
+        }
+      ],
+      "subTotal": 120,
+      "cgst": 10.799999999999999,
+      "sgst": 10.799999999999999,
+      "igst": 0,
+      "adjustment": 1000,
+      "total": 1141.6,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "OPEN",
+      "invoiceStatus": "INVOICED",
+      "invoiceId": "1766379779207",
+      "createdAt": "2025-12-22T04:59:14.480Z",
+      "updatedAt": "2025-12-23T05:11:32.111Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-22T04:59:14.480Z",
+          "action": "created",
+          "description": "Delivery challan DC-00002 created",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2025-12-22T05:02:56.303Z",
+          "action": "status_changed",
+          "description": "Status changed to OPEN",
+          "user": "Admin User"
+        },
+        {
+          "id": "3",
+          "timestamp": "2025-12-22T05:02:59.207Z",
+          "action": "converted",
+          "description": "Converted to invoice INV-00028",
+          "user": "Admin User"
+        },
+        {
+          "id": "4",
+          "timestamp": "2025-12-23T05:11:32.111Z",
+          "action": "updated",
+          "description": "Delivery challan updated",
+          "user": "Admin User"
+        }
+      ]
+    }
+  ],
+  "nextChallanNumber": 3
+}

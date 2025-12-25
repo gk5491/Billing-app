@@ -1,0 +1,33 @@
+import { sql } from "drizzle-orm";
+import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+});
+
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  password: true,
+});
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type User = typeof users.$inferSelect;
+
+// Organization Branding Schema
+export const organizationBrandingSchema = z.object({
+  id: z.string().default("default"),
+  logo: z.object({
+    url: z.string().nullable().optional(),
+    fileName: z.string().optional(),
+    uploadedAt: z.string().optional(),
+    fileSize: z.number().optional(),
+  }).nullable().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+});
+
+export type OrganizationBranding = z.infer<typeof organizationBrandingSchema>;
