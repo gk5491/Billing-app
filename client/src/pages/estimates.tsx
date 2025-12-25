@@ -390,10 +390,18 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
         </div>
       </div>
 
-      <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-end">
+      <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-end">
         <div className="flex items-center gap-2">
           <Label htmlFor="pdf-view" className="text-sm text-slate-500">Show PDF View</Label>
-          <Switch id="pdf-view" checked={showPdfView} onCheckedChange={setShowPdfView} />
+          <Switch
+            id="pdf-view"
+            checked={showPdfView}
+            onCheckedChange={(checked) => {
+              console.log('Switch toggled:', checked);
+              setShowPdfView(checked);
+            }}
+            data-testid="switch-pdf-view"
+          />
         </div>
       </div>
 

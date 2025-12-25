@@ -4,17 +4,49 @@
  */
 
 /**
+ * Check if a value contains unsupported color formats
+ * html2canvas doesn't support oklch, oklab, lch, lab, hwb
+ */
+function hasUnsupportedColorFunction(value: string): boolean {
+    const unsupportedFunctions = ['oklch', 'oklab', 'lch(', 'lab(', 'hwb(', 'color('];
+    return unsupportedFunctions.some(fn => value.includes(fn));
+}
+
+/**
+ * Convert or filter out unsupported color formats
+ * Returns null if the value should be skipped entirely
+ */
+function safeColorValue(value: string, propName: string): string | null {
+    // If it contains unsupported color functions, skip this property
+    if (hasUnsupportedColorFunction(value)) {
+        // For critical properties, try to provide a fallback
+        if (propName === 'color') return 'rgb(0, 0, 0)'; // black text
+        if (propName === 'background-color') return 'rgb(255, 255, 255)'; // white background
+        if (propName.includes('border-color')) return 'rgb(0, 0, 0)'; // black border
+        // For other properties, skip them
+        return null;
+    }
+    return value;
+}
+
+/**
  * Deeply copy all computed styles to inline styles
  */
 function copyComputedStylesToInline(element: HTMLElement, sourceElement: HTMLElement) {
     const computed = window.getComputedStyle(sourceElement);
-    
+
     // Copy ALL computed style properties
     for (let i = 0; i < computed.length; i++) {
         const prop = computed[i];
-        const value = computed.getPropertyValue(prop);
+        let value = computed.getPropertyValue(prop);
+
         if (value) {
-            element.style.setProperty(prop, value, 'important');
+            // Filter out or convert unsupported color formats
+            const safeValue = safeColorValue(value, prop);
+            if (safeValue) {
+                element.style.setProperty(prop, safeValue, 'important');
+            }
+            // If safeValue is null, skip this property entirely
         }
     }
 }
@@ -24,14 +56,14 @@ function copyComputedStylesToInline(element: HTMLElement, sourceElement: HTMLEle
  */
 function createStyledClone(element: HTMLElement): HTMLElement {
     const clone = element.cloneNode(false) as HTMLElement;
-    
+
     // Copy all computed styles to inline
     copyComputedStylesToInline(clone, element);
-    
+
     // Remove class and id to prevent CSS matching
     clone.removeAttribute('class');
     clone.removeAttribute('id');
-    
+
     // Recursively clone children
     Array.from(element.childNodes).forEach(child => {
         if (child.nodeType === Node.ELEMENT_NODE) {
@@ -41,7 +73,7 @@ function createStyledClone(element: HTMLElement): HTMLElement {
             clone.appendChild(child.cloneNode(true));
         }
     });
-    
+
     return clone;
 }
 
@@ -154,17 +186,24 @@ export async function printPDFView(elementId: string, title: string): Promise<vo
 
     allElements.forEach((el) => {
         if (el instanceof HTMLElement) {
-            const computed = window.getComputedStyle(el);
             let inlineStyle = '';
-            
+
+            const computed = window.getComputedStyle(el);
+
             for (let i = 0; i < computed.length; i++) {
                 const prop = computed[i];
-                const value = computed.getPropertyValue(prop);
+                let value = computed.getPropertyValue(prop);
+
                 if (value && value !== 'none' && value !== 'auto') {
-                    inlineStyle += `${prop}: ${value}; `;
+                    // Filter out unsupported color formats
+                    const safeValue = safeColorValue(value, prop);
+                    if (safeValue) {
+                        inlineStyle += `${prop}: ${safeValue}; `;
+                    }
+                    // If safeValue is null, skip this property
                 }
             }
-            
+
             styleMap.set(el, inlineStyle);
         }
     });
@@ -172,7 +211,7 @@ export async function printPDFView(elementId: string, title: string): Promise<vo
     // Clone and apply inline styles
     const clone = printContent.cloneNode(true) as HTMLElement;
     const cloneElements = [clone, ...Array.from(clone.querySelectorAll('*'))];
-    
+
     cloneElements.forEach((el, index) => {
         if (el instanceof HTMLElement) {
             const originalEl = allElements[index];
@@ -219,14 +258,5 @@ export async function printPDFView(elementId: string, title: string): Promise<vo
         setTimeout(() => {
             printWindow.print();
         }, 250);
-    };
-}
-    </html>
-  `);
-    printWindow.document.close();
-
-    // Wait for content to load before printing
-    printWindow.onload = () => {
-        printWindow.print();
     };
 }
