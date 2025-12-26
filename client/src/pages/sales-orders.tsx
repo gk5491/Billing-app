@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
@@ -425,15 +426,11 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white" data-testid="text-order-number">{order.salesOrderNumber}</h2>
           <p className="text-sm text-slate-500">{order.customerName}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={showPdfPreview ? "default" : "ghost"}
-            size="icon"
-            onClick={() => setShowPdfPreview(!showPdfPreview)}
-            data-testid="button-pdf-view"
-          >
-            <FileText className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 dark:text-slate-400">Show PDF View</span>
+            <Switch checked={showPdfPreview} onCheckedChange={setShowPdfPreview} />
+          </div>
           <Button variant="ghost" size="icon" onClick={onClose} data-testid="button-close-panel">
             <X className="h-4 w-4" />
           </Button>

@@ -959,16 +959,11 @@ export default function Invoices() {
                         <h2 className="text-xl font-semibold text-slate-900" data-testid="text-invoice-number">
                             {selectedInvoice.invoiceNumber}
                         </h2>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant={showPdfPreview ? "default" : "ghost"}
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => setShowPdfPreview(!showPdfPreview)}
-                                data-testid="button-pdf-view"
-                            >
-                                <FileText className="h-4 w-4" />
-                            </Button>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-slate-500 dark:text-slate-400">Show PDF View</span>
+                                <Switch checked={showPdfPreview} onCheckedChange={setShowPdfPreview} />
+                            </div>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleClosePanel} data-testid="button-close-panel">
                                 <X className="h-4 w-4" />
                             </Button>

@@ -140,3 +140,4 @@
 [x] 140. Added billingAddress and shippingAddress to quote data being sent to API in both create and edit pages (Dec 26, 2025)
 [x] 141. Workflow restarted and verified - full address details now reflected in Quote PDF view and downloads (Dec 26, 2025 - FINAL COMPLETE)
 [x] 142. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
+[x] 143. Added "Show PDF View" toggle switch to Invoices and Sales Orders pages to match Quotes design (Dec 26, 2025 - COMPLETE)
