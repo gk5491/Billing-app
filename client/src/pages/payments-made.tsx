@@ -273,7 +273,61 @@ export default function PaymentsMade() {
   };
 
   const handlePrint = () => {
-    window.print();
+    const content = document.getElementById('payment-receipt-content')?.innerHTML;
+    if (!content) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Payment Receipt - ${getPaymentNumberString(selectedPayment?.paymentNumber)}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background-color: white !important;
+            }
+            @media print {
+              @page { margin: 10mm; }
+              body { margin: 0; padding: 0; }
+              .no-print { display: none !important; }
+              #payment-receipt-content { 
+                border: none !important; 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                max-width: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+              }
+            }
+            /* Fix for oklch in tailwind cdn */
+            * {
+              --tw-ring-color: transparent !important;
+              --tw-ring-offset-color: transparent !important;
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="payment-receipt-content" class="w-full">
+            ${content}
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleDownloadPDF = async () => {
@@ -597,7 +651,7 @@ export default function PaymentsMade() {
           {/* Detail Content */}
           <div className="flex-1 overflow-y-auto p-6 bg-slate-100 dark:bg-slate-950">
             {/* Receipt Preview */}
-            <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] min-h-[1000px] relative p-12 text-slate-800 dark:text-slate-200">
+            <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] relative p-10 text-slate-800 dark:text-slate-200">
               {/* Paid Badge Overlay */}
               <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none">
                 <div className="bg-green-500 text-white text-[10px] font-bold py-1 px-10 absolute top-4 -left-8 -rotate-45 shadow-sm uppercase tracking-wider">
@@ -606,44 +660,42 @@ export default function PaymentsMade() {
               </div>
 
               {/* Company Header */}
-              <div className="flex justify-between items-start mb-12">
+              <div className="flex justify-between items-start mb-8">
                 <div className="flex-1">
                   {branding?.logo?.url ? (
                     <img
                       src={branding.logo.url}
                       alt="Company Logo"
-                      className="h-14 w-auto mb-4"
+                      className="h-12 w-auto mb-2"
                       data-testid="img-payment-made-logo"
                     />
                   ) : (
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">S</span>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-base">S</span>
                       </div>
-                      <span className="text-2xl font-bold text-slate-900 dark:text-white">SkilltonIT</span>
+                      <span className="text-xl font-bold text-slate-900 dark:text-white">SkilltonIT</span>
                     </div>
                   )}
                 </div>
-                <div className="text-right text-[11px] leading-relaxed text-slate-500 max-w-[250px]">
-                  <p className="font-bold text-slate-900 dark:text-white mb-1">SkilltonIT</p>
+                <div className="text-right text-[10px] leading-tight text-slate-500 max-w-[200px]">
+                  <p className="font-bold text-slate-900 dark:text-white mb-0.5">SkilltonIT</p>
                   <p>Hinjewadi - Wakad road</p>
-                  <p>Hinjewadi</p>
-                  <p>Pune Maharashtra 411057</p>
-                  <p>India</p>
+                  <p>Hinjewadi, Pune</p>
+                  <p>Maharashtra 411057, India</p>
                   <p>GSTIN 27AZCPA5145K1ZH</p>
                   <p>Sales.SkilltonIT@skilltonit.com</p>
-                  <p>www.skilltonit.com</p>
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 mb-8"></div>
+              <div className="border-t border-slate-100 mb-6"></div>
 
               {/* Title */}
-              <h3 className="text-center text-sm font-semibold tracking-[0.2em] mb-12 uppercase text-slate-700 dark:text-slate-300">PAYMENTS MADE</h3>
+              <h3 className="text-center text-xs font-semibold tracking-[0.2em] mb-8 uppercase text-slate-700 dark:text-slate-300">PAYMENTS MADE</h3>
 
-              <div className="flex gap-12 mb-16">
+              <div className="flex gap-8 mb-8">
                 {/* Left Column - Details */}
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-3">
                   {[
                     { label: "Payment#", value: getPaymentNumberString(selectedPayment.paymentNumber) },
                     { label: "Payment Date", value: formatDate(selectedPayment.paymentDate) },
@@ -654,9 +706,9 @@ export default function PaymentsMade() {
                     { label: "Paid Through", value: getPaidThroughLabel(selectedPayment.paidThrough) },
                     { label: "Amount Paid In Words", value: numberToWords(selectedPayment.paymentAmount) },
                   ].map((row, i) => (
-                    <div key={i} className="flex border-b border-slate-50 pb-2">
-                      <div className="w-40 text-[11px] text-slate-400">{row.label}</div>
-                      <div className={`flex-1 text-[11px] font-medium ${row.highlight ? 'text-blue-600' : 'text-slate-800 dark:text-slate-200'}`}>
+                    <div key={i} className="flex border-b border-slate-50 pb-1.5">
+                      <div className="w-32 text-[10px] text-slate-400">{row.label}</div>
+                      <div className={`flex-1 text-[10px] font-medium ${row.highlight ? 'text-blue-600' : 'text-slate-800 dark:text-slate-200'}`}>
                         {row.value}
                       </div>
                     </div>
@@ -664,18 +716,18 @@ export default function PaymentsMade() {
                 </div>
 
                 {/* Right Column - Amount Box */}
-                <div className="w-48 pt-4">
-                  <div className="bg-[#82b366] text-white p-6 rounded-sm text-center shadow-sm">
-                    <div className="text-[11px] mb-1 opacity-90">Amount Paid</div>
-                    <div className="text-xl font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
+                <div className="w-40 pt-2">
+                  <div className="bg-[#82b366] text-white p-4 rounded-sm text-center shadow-sm">
+                    <div className="text-[10px] mb-0.5 opacity-90">Amount Paid</div>
+                    <div className="text-lg font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
                   </div>
                 </div>
               </div>
 
               {/* Paid To Section */}
-              <div className="mb-16">
-                <h4 className="text-[11px] font-semibold text-slate-400 mb-4">Paid To</h4>
-                <div className="text-[11px] space-y-1 text-slate-700 dark:text-slate-300">
+              <div className="mb-8">
+                <h4 className="text-[10px] font-semibold text-slate-400 mb-2">Paid To</h4>
+                <div className="text-[10px] space-y-0.5 text-slate-700 dark:text-slate-300">
                   <p className="font-bold text-slate-900 dark:text-white uppercase">{selectedPayment.vendorName}</p>
                   {(() => {
                     const vendor = getVendorDetails(selectedPayment);
@@ -687,7 +739,7 @@ export default function PaymentsMade() {
                             <p>{[vendor.city, vendor.state, vendor.pincode].filter(Boolean).join(', ')}</p>
                           )}
                           {vendor.country && <p>{vendor.country}</p>}
-                          {vendor.gstin && <p className="mt-2 text-slate-500 uppercase">GSTIN {vendor.gstin}</p>}
+                          {vendor.gstin && <p className="mt-1 text-slate-500 uppercase">GSTIN {vendor.gstin}</p>}
                         </>
                       );
                     }
@@ -696,28 +748,28 @@ export default function PaymentsMade() {
                 </div>
               </div>
 
-              <div className="border-t border-slate-100 mb-8"></div>
+              <div className="border-t border-slate-100 mb-6"></div>
 
               {/* Payment for Section */}
               {getBillPaymentsArray(selectedPayment).length > 0 && (
                 <div>
-                  <h4 className="text-sm font-bold mb-6 text-slate-800 dark:text-slate-200">Payment for</h4>
-                  <table className="w-full text-[11px]">
+                  <h4 className="text-xs font-bold mb-4 text-slate-800 dark:text-slate-200">Payment for</h4>
+                  <table className="w-full text-[10px]">
                     <thead>
                       <tr className="bg-slate-50 dark:bg-slate-800/50">
-                        <th className="px-4 py-3 text-left font-semibold text-slate-500">Bill Number</th>
-                        <th className="px-4 py-3 text-left font-semibold text-slate-500">Bill Date</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-500">Bill Amount</th>
-                        <th className="px-4 py-3 text-right font-semibold text-slate-500">Payment Amount</th>
+                        <th className="px-3 py-2 text-left font-semibold text-slate-500">Bill Number</th>
+                        <th className="px-3 py-2 text-left font-semibold text-slate-500">Bill Date</th>
+                        <th className="px-3 py-2 text-right font-semibold text-slate-500">Bill Amount</th>
+                        <th className="px-3 py-2 text-right font-semibold text-slate-500">Payment Amount</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {getBillPaymentsArray(selectedPayment).map((bp, index) => (
                         <tr key={index}>
-                          <td className="px-4 py-3 text-blue-600 font-medium">{bp.billNumber}</td>
-                          <td className="px-4 py-3 text-slate-600">{formatDate(bp.billDate)}</td>
-                          <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
-                          <td className="px-4 py-3 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount)}</td>
+                          <td className="px-3 py-2 text-blue-600 font-medium">{bp.billNumber}</td>
+                          <td className="px-3 py-2 text-slate-600">{formatDate(bp.billDate)}</td>
+                          <td className="px-3 py-2 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
+                          <td className="px-3 py-2 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount)}</td>
                         </tr>
                       ))}
                     </tbody>
