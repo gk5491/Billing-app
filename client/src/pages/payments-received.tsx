@@ -477,28 +477,25 @@ function PaymentDetailPanel({
                         <TableHead className="text-xs text-right">CREDIT</TableHead>
                       </TableRow>
                     </TableHeader>
-                          <TableHead className="text-xs text-right">CREDIT</TableHead>
+                    <TableBody>
+                      {payment.journalEntries.map((entry, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="text-sm">{entry.account}</TableCell>
+                          <TableCell className="text-sm text-right">{entry.debit > 0 ? formatCurrency(entry.debit).replace('₹', '') : '0.00'}</TableCell>
+                          <TableCell className="text-sm text-right">{entry.credit > 0 ? formatCurrency(entry.credit).replace('₹', '') : '0.00'}</TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {payment.journalEntries.map((entry, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="text-sm">{entry.account}</TableCell>
-                            <TableCell className="text-sm text-right">{entry.debit > 0 ? formatCurrency(entry.debit).replace('₹', '') : '0.00'}</TableCell>
-                            <TableCell className="text-sm text-right">{entry.credit > 0 ? formatCurrency(entry.credit).replace('₹', '') : '0.00'}</TableCell>
-                          </TableRow>
-                        ))}
-                        <TableRow className="border-t-2">
-                          <TableCell className="font-semibold">Total</TableCell>
-                          <TableCell className="font-semibold text-right">
-                            {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.debit, 0)).replace('₹', '')}
-                          </TableCell>
-                          <TableCell className="font-semibold text-right">
-                            {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.credit, 0)).replace('₹', '')}
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
+                      ))}
+                      <TableRow className="border-t-2">
+                        <TableCell className="font-semibold">Total</TableCell>
+                        <TableCell className="font-semibold text-right">
+                          {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.debit, 0)).replace('₹', '')}
+                        </TableCell>
+                        <TableCell className="font-semibold text-right">
+                          {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.credit, 0)).replace('₹', '')}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
                 </div>
               )}
             </div>
