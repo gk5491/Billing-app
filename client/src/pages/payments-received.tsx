@@ -128,92 +128,124 @@ function formatDate(dateString: string): string {
 
 function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; branding?: any }) {
   const receiptContent = (
-    <div className="bg-white" style={{ width: '210mm', marginRight: '-210px', minHeight: '297mm' }}>
-      <div className="p-12 text-black">
-        {/* Header with Logo */}
-        <div className="mb-8">
-          <div>
-            {branding?.logo?.url ? (
-              <img
-                src={branding.logo.url}
-                alt="Company Logo"
-                className="h-12 w-auto mb-2"
-                data-testid="img-payment-logo"
-              />
-            ) : (
-              <div className="mb-4">
-                <span className="text-xl font-bold text-blue-600">Cybaem</span>
-                <br />
-                <span className="text-xl font-bold text-blue-600">tech</span>
+    <div className="bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
+      <div className="p-12 text-black text-sm">
+        {/* Header with Logo and Company Details */}
+        <div className="mb-6 pb-4 border-b border-gray-300">
+          <div className="flex justify-between items-start">
+            <div>
+              {branding?.logo?.url ? (
+                <img
+                  src={branding.logo.url}
+                  alt="Company Logo"
+                  className="h-16 w-auto mb-2"
+                  data-testid="img-payment-logo"
+                />
+              ) : (
+                <div className="mb-2">
+                  <span className="text-xl font-bold text-slate-900">Your Company</span>
+                </div>
+              )}
+              <div className="text-xs text-gray-600 space-y-0.5 mt-2">
+                <p>Hingewadi - Wakad road</p>
+                <p>Hingewadi</p>
+                <p>Pune, Maharashtra 411057</p>
+                <p>India</p>
+                <p className="mt-2"><strong>GSTIN:</strong> 27AZCPA5145K1ZH</p>
+                <p><strong>Sales:</strong> sales@company.com</p>
+                <p><strong>Website:</strong> www.company.com</p>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-center mb-8 text-black">PAYMENT RECEIPT</h2>
-
-        {/* Payment Details */}
-        <div className="space-y-4 mb-8">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Payment Date</span>
-            <span className="font-semibold text-blue-600">{formatDate(payment.date)}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Reference Number</span>
-            <span className="font-semibold text-black">{payment.referenceNumber || '-'}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">Payment Mode</span>
-            <span className="font-semibold text-blue-600">{payment.mode}</span>
-          </div>
-        </div>
-
-        {/* Amount Section */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div>
-            <p className="text-sm text-blue-600 font-semibold mb-2">
-              Amount Received In Words
-            </p>
-            <p className="font-semibold text-black">
-              {payment.amountInWords}
-            </p>
-          </div>
-
-          <div className="flex justify-end items-start">
-            <div className="bg-green-500 text-white px-6 py-4 rounded-lg text-center max-w-[180px]">
-              <div className="text-xs font-medium mb-1">Amount Received</div>
-              <div className="text-xl font-bold">
-                {formatCurrency(payment.amount)}
-              </div>
+            </div>
+            <div className="text-right">
+              <h1 className="text-2xl font-bold text-slate-900">PAYMENT RECEIPT</h1>
             </div>
           </div>
         </div>
 
+        {/* Payment Details Section */}
+        <div className="mb-8 space-y-2">
+          <div className="flex justify-between">
+            <span className="text-gray-600">Payment Date</span>
+            <span className="font-semibold text-slate-900">{formatDate(payment.date)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Reference Number</span>
+            <span className="font-semibold text-slate-900">{payment.referenceNumber || '-'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-600">Payment Mode</span>
+            <span className="font-semibold text-slate-900">{payment.mode}</span>
+          </div>
+        </div>
 
-        {/* Received From Section */}
-        <div className="grid grid-cols-2 gap-8 mb-16">
+        {/* Amount Received and In Words Section */}
+        <div className="mb-8 grid grid-cols-2 gap-8">
           <div>
-            <h4 className="text-sm font-semibold text-blue-600 mb-3">RECEIVED FROM</h4>
-            <p className="font-bold text-blue-600 text-lg mb-1">{payment.customerName}</p>
-            <p className="text-sm text-gray-600">{payment.placeOfSupply || '(MH) - Maharashtra'}</p>
-            <p className="text-sm text-gray-600">India</p>
+            <p className="text-gray-600 text-xs font-semibold mb-2">Amount Received In Words</p>
+            <p className="font-semibold text-slate-900">{payment.amountInWords}</p>
           </div>
           <div className="flex justify-end items-start">
-            <div className="text-3xl font-bold text-green-600">{formatCurrency(payment.amount)}</div>
+            <div className="bg-green-500 text-white px-8 py-3 rounded text-center">
+              <div className="text-xs font-medium">Amount Received</div>
+              <div className="text-2xl font-bold">{formatCurrency(payment.amount)}</div>
+            </div>
           </div>
         </div>
 
-        {/* Signature Section */}
-        <div className="mb-16">
-          <p className="text-sm text-gray-600">Authorised Signatory</p>
+        {/* Received From and Signature Section */}
+        <div className="mb-8 grid grid-cols-2 gap-12">
+          <div>
+            <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">RECEIVED FROM</h4>
+            <p className="font-bold text-slate-900 mb-2">{payment.customerName}</p>
+            <div className="text-xs text-gray-600 space-y-0.5">
+              <p>{payment.placeOfSupply || '(MH) - Maharashtra'}</p>
+              <p>India</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end justify-between">
+            <div className="text-right">
+              <p className="text-xs text-gray-600 mb-12">Authorized Signature</p>
+              {branding?.signature?.url && (
+                <img src={branding.signature.url} alt="Signature" className="h-12 w-auto mb-1" />
+              )}
+            </div>
+          </div>
         </div>
 
+        {/* Payment For Table */}
+        {payment.invoices && payment.invoices.length > 0 && (
+          <div className="mb-8">
+            <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Payment For</h4>
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-300">
+                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Number</th>
+                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Date</th>
+                  <th className="text-right py-2 px-2 font-semibold text-gray-700">Invoice Amount</th>
+                  <th className="text-right py-2 px-2 font-semibold text-gray-700">Payment Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payment.invoices.map((invoice: any, index: number) => (
+                  <tr key={index} className="border-b border-gray-200">
+                    <td className="py-2 px-2 text-gray-900">{invoice.invoiceNumber || '-'}</td>
+                    <td className="py-2 px-2 text-gray-900">{invoice.date ? formatDate(invoice.date) : '-'}</td>
+                    <td className="py-2 px-2 text-right text-gray-900">{formatCurrency(invoice.amount || 0)}</td>
+                    <td className="py-2 px-2 text-right text-gray-900">{formatCurrency(invoice.paymentAmount || invoice.amount || 0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         {/* Over Payment Section */}
-        <div className="border-t border-gray-300 pt-6 text-center">
-          <p className="text-sm text-gray-600 mb-2">Over payment</p>
-          <p className="text-2xl font-bold text-black">{formatCurrency(payment.unusedAmount)}</p>
-        </div>
+        {payment.unusedAmount > 0 && (
+          <div className="pt-4 border-t border-gray-300 text-center">
+            <p className="text-xs text-gray-600 mb-1">Over payment</p>
+            <p className="text-xl font-bold text-slate-900">{formatCurrency(payment.unusedAmount)}</p>
+          </div>
+        )}
       </div>
     </div>
   );
