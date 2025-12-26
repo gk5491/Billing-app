@@ -403,11 +403,15 @@ function PurchaseOrderDetailPanel({
         <div className="flex items-center gap-4 text-sm">
           <span>
             <span className="text-slate-500">Receive Status:</span>{' '}
-            <span className="text-amber-600 font-medium">{purchaseOrder.receiveStatus || 'YET TO BE RECEIVED'}</span>
+            <span className={`${purchaseOrder.receiveStatus === 'RECEIVED' ? 'text-green-600' : 'text-amber-600'} font-medium`}>
+              {purchaseOrder.receiveStatus || 'YET TO BE RECEIVED'}
+            </span>
           </span>
           <span>
             <span className="text-slate-500">Bill Status:</span>{' '}
-            <span className="text-amber-600 font-medium">{purchaseOrder.billedStatus || 'YET TO BE BILLED'}</span>
+            <span className={`${purchaseOrder.billedStatus === 'BILLED' ? 'text-green-600' : 'text-amber-600'} font-medium`}>
+              {purchaseOrder.billedStatus || 'YET TO BE BILLED'}
+            </span>
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -654,9 +658,13 @@ export default function PurchaseOrders() {
         // Update local state with the updated PO from server
         setPurchaseOrders(prev =>
           prev.map(po =>
-            po.id === poId ? { ...data.data, receiveStatus: 'RECEIVED' } : po
+            po.id === poId ? data.data : po
           )
         );
+        // Also update selected PO if it's the one being received
+        if (selectedPO?.id === poId) {
+          setSelectedPO(data.data);
+        }
         toast({ title: "Purchase Order Received", description: "Status updated successfully" });
       } else {
         throw new Error('Failed to update status');

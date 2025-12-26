@@ -49,12 +49,12 @@
       "notes": "",
       "termsAndConditions": "",
       "attachments": [],
-      "status": "ISSUED",
+      "status": "RECEIVED",
       "receiveStatus": "YET TO BE RECEIVED",
       "billedStatus": "BILLED",
       "pdfTemplate": "Standard Template",
       "createdAt": "2025-12-25T03:34:52.116Z",
-      "updatedAt": "2025-12-25T03:34:58.439Z",
+      "updatedAt": "2025-12-26T03:08:21.578Z",
       "createdBy": "Admin User",
       "activityLogs": [
         {
@@ -69,6 +69,13 @@
           "timestamp": "2025-12-25T03:34:58.439Z",
           "action": "converted_to_bill",
           "description": "Purchase Order converted to Bill",
+          "user": "Admin User"
+        },
+        {
+          "id": "3",
+          "timestamp": "2025-12-26T03:08:21.578Z",
+          "action": "received",
+          "description": "Status changed to RECEIVED",
           "user": "Admin User"
         }
       ]

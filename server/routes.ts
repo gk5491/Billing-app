@@ -3638,8 +3638,12 @@ export async function registerRoutes(
       if (newStatus === 'ISSUED') actionDescription = 'Purchase Order has been issued';
       if (newStatus === 'CLOSED') actionDescription = 'Purchase Order has been closed';
       if (newStatus === 'CANCELLED') actionDescription = 'Purchase Order has been cancelled';
+      if (newStatus === 'RECEIVED') actionDescription = 'Purchase Order has been received';
 
       existingPO.status = newStatus;
+      if (newStatus === 'RECEIVED') {
+        existingPO.receiveStatus = 'RECEIVED';
+      }
       existingPO.updatedAt = now;
       existingPO.activityLogs.push({
         id: String(existingPO.activityLogs.length + 1),
