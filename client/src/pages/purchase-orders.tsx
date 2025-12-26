@@ -282,22 +282,23 @@ function PurchaseOrderDetailPanel({
       styleTag.innerHTML = `
         * { 
           color-scheme: light !important;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
-        .pdf-container, .pdf-container * {
-          border-color: #e2e8f0 !important;
-          outline-color: #e2e8f0 !important;
-          color: #000000 !important;
-          background-color: transparent !important;
+        .pdf-container {
+          background-color: white !important;
         }
-        .bg-slate-50 { background-color: #f8fafc !important; }
-        .text-slate-900 { color: #0f172a !important; }
-        .text-slate-600 { color: #475569 !important; }
-        .text-slate-500 { color: #64748b !important; }
-        .text-blue-600 { color: #2563eb !important; }
-        .text-green-600 { color: #16a34a !important; }
-        .text-amber-600 { color: #d97706 !important; }
-        .text-red-600 { color: #dc2626 !important; }
-        .border-slate-200 { border-color: #e2e8f0 !important; }
+        .pdf-container h1 { color: #b91c1c !important; }
+        .pdf-container h2 { color: #b91c1c !important; }
+        .pdf-container th { 
+          background-color: #b91c1c !important; 
+          color: white !important;
+          -webkit-print-color-adjust: exact !important;
+        }
+        .pdf-container p[style*="color: rgb(29, 78, 216)"],
+        .pdf-container p[style*="color: #1d4ed8"] {
+          color: #1d4ed8 !important;
+        }
         /* Reset any OKLCH variables commonly used in shadcn/tailwind */
         :root {
           --background: 0 0% 100%;
