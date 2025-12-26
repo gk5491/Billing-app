@@ -131,3 +131,4 @@
 [x] 131. Fixed PDF download styling to match "Show PDF View" display by extracting computed styles (Dec 26, 2025)
 [x] 132. Fixed oklch/oklab color parsing errors in PDF download by creating clean clone without classes (Dec 26, 2025)
 [x] 133. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
+[x] 134. Fixed Quotes PDF download to use formatted "Show PDF View" layout with html2canvas + jsPDF (Dec 26, 2025 - COMPLETE)

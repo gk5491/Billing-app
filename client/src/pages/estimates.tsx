@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   Plus,
   ChevronDown,
@@ -585,24 +587,106 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
   };
 
   const handleDownloadPDF = async () => {
-    try {
-      // Import the unified PDF utility
-      const { generatePDFFromElement } = await import("@/lib/pdf-utils");
+    const element = document.getElementById("pdf-content");
+    if (!element || !quote) return;
 
-      // Generate PDF from the existing PDF view
-      await generatePDFFromElement("pdf-content", `Quote-${quote.quoteNumber}.pdf`);
+    const originalStyle = element.style.cssText;
+
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#0f172a";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
+
+    try {
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
+        }
+      `;
+      document.head.appendChild(polyfillStyles);
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 800,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById("pdf-content");
+          if (clonedElement) {
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#0f172a";
+
+            const clonedAll = clonedDoc.querySelectorAll("*");
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
+              }
+
+              const computed = window.getComputedStyle(htmlEl);
+              
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && (value.includes('oklch') || value.includes('oklab'))) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow-colored", "none", "important");
+            });
+          }
+        },
+      });
+
+      document.head.removeChild(polyfillStyles);
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST",
+      );
+      pdf.save(`Quote-${quote.quoteNumber}.pdf`);
 
       toast({
         title: "PDF Downloaded",
-        description: `${quote.quoteNumber}.pdf has been downloaded successfully.`
+        description: `Quote-${quote.quoteNumber}.pdf has been downloaded successfully.`
       });
     } catch (error) {
-      console.error("PDF generation error:", error);
-      toast({
-        title: "Failed to download PDF",
-        description: "Please try again.",
-        variant: "destructive"
-      });
+      console.error('Download error:', error);
+      toast({ title: "Failed to download PDF", variant: "destructive" });
+    } finally {
+      element.style.cssText = originalStyle;
     }
   };
 
