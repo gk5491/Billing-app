@@ -286,12 +286,41 @@ export default function PaymentsMade() {
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
+      // Polyfill for oklch which html2canvas doesn't support
+      const style = document.createElement('style');
+      style.innerHTML = `
+        * {
+          --tw-ring-color: rgba(59, 130, 246, 0.5) !important;
+          --tw-ring-offset-color: #fff !important;
+          outline-color: rgba(59, 130, 246, 0.5) !important;
+        }
+      `;
+      document.head.appendChild(style);
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('payment-receipt-content');
+          if (clonedElement) {
+            // Remove oklch variables that cause html2canvas to fail
+            const allElements = clonedElement.getElementsByTagName('*');
+            for (let i = 0; i < allElements.length; i++) {
+              const el = allElements[i] as HTMLElement;
+              const styles = window.getComputedStyle(el);
+              if (styles.color.includes('oklch') || styles.backgroundColor.includes('oklch') || styles.borderColor.includes('oklch')) {
+                // Force standard colors if oklch is detected
+                el.style.color = 'inherit';
+                el.style.borderColor = 'inherit';
+              }
+            }
+          }
+        }
       });
+
+      document.head.removeChild(style);
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
