@@ -129,3 +129,4 @@
 [x] 129. Implemented proper PDF download/print for Vendor Credits using Bills page logic pattern (Dec 26, 2025)
 [x] 130. Added PDF view toggle and download/print to Quotes module with professional PDF formatting (Dec 26, 2025)
 [x] 131. Fixed PDF download styling to match "Show PDF View" display by extracting computed styles (Dec 26, 2025)
+[x] 132. Fixed oklch/oklab color parsing errors in PDF download by creating clean clone without classes (Dec 26, 2025)
