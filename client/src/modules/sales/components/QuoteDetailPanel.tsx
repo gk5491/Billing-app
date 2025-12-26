@@ -279,73 +279,99 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
     const element = document.getElementById("quote-pdf-content");
     if (!element) return;
 
-    const originalHTML = element.innerHTML;
-    
+    const originalStyle = element.style.cssText;
+
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#0f172a";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
+
     try {
-      // Create a temporary container for processing
-      const tempContainer = document.createElement('div');
-      tempContainer.innerHTML = element.innerHTML;
-      tempContainer.id = "quote-pdf-content";
-      tempContainer.style.position = 'absolute';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '800px';
-      tempContainer.style.backgroundColor = '#ffffff';
-      tempContainer.style.color = '#0f172a';
-      tempContainer.style.padding = '32px';
-      tempContainer.style.fontFamily = 'Inter, system-ui, -apple-system, sans-serif';
-      document.body.appendChild(tempContainer);
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
+        }
+      `;
+      document.head.appendChild(polyfillStyles);
 
-      // Recursively clean all elements of oklch/oklab colors
-      const cleanElement = (el: HTMLElement) => {
-        // Remove class and style that might contain oklch
-        el.removeAttribute('class');
-        
-        // Set explicit colors to avoid computed oklch values
-        const styles: Record<string, string> = {
-          backgroundColor: '#ffffff',
-          color: '#0f172a',
-          borderColor: '#e2e8f0',
-          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        };
-
-        // Apply safe colors
-        Object.entries(styles).forEach(([key, value]) => {
-          (el.style as any)[key] = value;
-        });
-
-        // Process children
-        Array.from(el.children).forEach((child) => {
-          cleanElement(child as HTMLElement);
-        });
-      };
-
-      cleanElement(tempContainer);
-
-      // Capture the cleaned element
-      const canvas = await html2canvas(tempContainer, {
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
         windowWidth: 800,
-        allowTaint: true,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById("quote-pdf-content");
+          if (clonedElement) {
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#0f172a";
+
+            const clonedAll = clonedDoc.querySelectorAll("*");
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
+              }
+
+              const computed = window.getComputedStyle(htmlEl);
+              
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && (value.includes('oklch') || value.includes('oklab'))) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow-colored", "none", "important");
+            });
+          }
+        },
       });
 
-      // Remove temp container
-      document.body.removeChild(tempContainer);
+      document.head.removeChild(polyfillStyles);
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST",
+      );
       pdf.save(`Quote-${quote.quoteNumber}.pdf`);
       toast({ title: 'PDF Downloaded', description: `Quote-${quote.quoteNumber}.pdf downloaded successfully` });
     } catch (error) {
       console.error('Download error:', error);
       toast({ title: 'Failed to download PDF', variant: 'destructive' });
+    } finally {
+      element.style.cssText = originalStyle;
     }
   };
 

@@ -132,3 +132,4 @@
 [x] 132. Fixed oklch/oklab color parsing errors in PDF download by creating clean clone without classes (Dec 26, 2025)
 [x] 133. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
 [x] 134. Fixed Quotes PDF download to use formatted "Show PDF View" layout with html2canvas + jsPDF (Dec 26, 2025 - COMPLETE)
+[x] 135. Updated QuoteDetailPanel.tsx PDF download with vendor-credits approach - preserves formatting and styling (Dec 26, 2025 - FINAL COMPLETE)
