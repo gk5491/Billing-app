@@ -1112,7 +1112,8 @@ export default function Invoices() {
                                 </div>
                             </div>
                         </div>
-                    ) : (
+                    </div>
+                ) : (
                         <div className="flex-1 overflow-auto">
                             <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-200 overflow-x-auto">
                                 <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={handleEditInvoice} data-testid="button-edit-invoice">
