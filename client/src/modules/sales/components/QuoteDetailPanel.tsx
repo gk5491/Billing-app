@@ -319,6 +319,10 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
             const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
+              const tagName = htmlEl.tagName.toLowerCase();
+              
+              // Preserve table header styling
+              const isTableHeader = tagName === 'thead' || tagName === 'th';
               
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
@@ -332,11 +336,28 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
                 const value = computed[prop as any];
                 if (value && (value.includes('oklch') || value.includes('oklab'))) {
                   if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
-                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'backgroundColor') {
+                    // For table headers, preserve dark background
+                    if (isTableHeader) {
+                      htmlEl.style.setProperty('background-color', '#1e293b', 'important');
+                      htmlEl.style.setProperty('color', '#ffffff', 'important');
+                    } else {
+                      htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                    }
+                  }
                   else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
                   else htmlEl.style.setProperty(prop, 'inherit', 'important');
                 }
               });
+
+              // For table headers with classes, apply dark styling
+              if (isTableHeader) {
+                const classList = htmlEl.className || '';
+                if (classList.includes('bg-slate-900') || classList.includes('text-white')) {
+                  htmlEl.style.setProperty('background-color', '#1e293b', 'important');
+                  htmlEl.style.setProperty('color', '#ffffff', 'important');
+                }
+              }
               
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");

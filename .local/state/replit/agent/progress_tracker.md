@@ -133,3 +133,4 @@
 [x] 133. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
 [x] 134. Fixed Quotes PDF download to use formatted "Show PDF View" layout with html2canvas + jsPDF (Dec 26, 2025 - COMPLETE)
 [x] 135. Updated QuoteDetailPanel.tsx PDF download with vendor-credits approach - preserves formatting and styling (Dec 26, 2025 - FINAL COMPLETE)
+[x] 136. Fixed table header colors in Quote PDF download - preserves dark background (bg-slate-900) and white text for table headers (Dec 26, 2025 - COMPLETE)
