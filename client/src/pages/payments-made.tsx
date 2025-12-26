@@ -304,11 +304,18 @@ export default function PaymentsMade() {
                 padding: 0 !important;
                 margin: 0 !important;
               }
+              /* Hide the Paid badge during print */
+              .paid-badge-overlay {
+                display: none !important;
+              }
             }
             /* Fix for oklch in tailwind cdn */
             * {
               --tw-ring-color: transparent !important;
               --tw-ring-offset-color: transparent !important;
+              --tw-ring-shadow: none !important;
+              --tw-shadow: none !important;
+              --tw-shadow-colored: none !important;
             }
           </style>
         </head>
@@ -353,6 +360,10 @@ export default function PaymentsMade() {
           caret-color: transparent !important;
           accent-color: transparent !important;
         }
+        /* Hide badge for PDF generation */
+        .pdf-hide-badge {
+          display: none !important;
+        }
       `;
       document.head.appendChild(polyfillStyles);
 
@@ -367,6 +378,10 @@ export default function PaymentsMade() {
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('payment-receipt-content');
           if (clonedElement) {
+            // Hide the badge in the clone
+            const badge = clonedElement.querySelector('.paid-badge-overlay');
+            if (badge) (badge as HTMLElement).style.display = 'none';
+
             // Find ALL elements in the cloned document
             const allElements = clonedDoc.querySelectorAll('*');
             allElements.forEach((el) => {
@@ -653,7 +668,7 @@ export default function PaymentsMade() {
             {/* Receipt Preview */}
             <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] relative p-10 text-slate-800 dark:text-slate-200">
               {/* Paid Badge Overlay */}
-              <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none">
+              <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none paid-badge-overlay">
                 <div className="bg-green-500 text-white text-[10px] font-bold py-1 px-10 absolute top-4 -left-8 -rotate-45 shadow-sm uppercase tracking-wider">
                   Paid
                 </div>
