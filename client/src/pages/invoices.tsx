@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { jsPDF } from "jspdf";
 import { addLogotoPDF, addSignaturetoPDF } from "@/lib/logo-utils";
@@ -219,6 +219,7 @@ export default function Invoices() {
     const [refundMode, setRefundMode] = useState("Cash");
     const [refundReason, setRefundReason] = useState("");
     const [branding, setBranding] = useState<any>(null);
+    const invoicePdfRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         fetchInvoices();
