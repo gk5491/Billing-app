@@ -263,10 +263,11 @@ function PurchaseOrderDetailPanel({
 }) {
   const [showPdfView, setShowPdfView] = useState(true);
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   const handleDownloadPDF = async () => {
     if (!pdfRef.current) return;
-    const toastId = toast({ title: "Generating PDF...", description: "Please wait while we prepare your document." });
+    const toastResult = toast({ title: "Generating PDF...", description: "Please wait while we prepare your document." });
     try {
       const element = pdfRef.current;
       
@@ -304,10 +305,10 @@ function PurchaseOrderDetailPanel({
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${purchaseOrder.purchaseOrderNumber}.pdf`);
-      toast({ title: "Success", description: "PDF downloaded successfully" });
+      toastResult.update({ id: toastResult.id, title: "Success", description: "PDF downloaded successfully" });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast({ title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
+      toastResult.update({ id: toastResult.id, title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
     }
   };
 

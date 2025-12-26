@@ -117,4 +117,5 @@
 [x] 117. Verified all PDF views (Quotes, Sales Orders, Bills, Invoices, Purchase Orders, etc.) have consistent layout with branding (Dec 25, 2025 - COMPLETE)
 [x] 118. Session restart - reinstalled cross-env and verified application running (Dec 25, 2025 - current session)
 [x] 119. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025)
-[x] 120. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
+[x] 120. Fixed PDF download in Purchase Orders section (Dec 26, 2025)
+[x] 121. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - latest session)
