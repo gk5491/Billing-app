@@ -970,10 +970,109 @@ export default function Invoices() {
                         </div>
                     </div>
 
+                    <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-200 overflow-x-auto bg-white dark:bg-slate-900">
+                        <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={handleEditInvoice} data-testid="button-edit-invoice">
+                            <Pencil className="h-3.5 w-3.5" />
+                            Edit
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 gap-1.5" data-testid="button-send-dropdown">
+                                    <Mail className="h-3.5 w-3.5" />
+                                    Send
+                                    <ChevronDown className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={handleSendInvoice}>Send Email</DropdownMenuItem>
+                                <DropdownMenuItem>Send WhatsApp</DropdownMenuItem>
+                                <DropdownMenuItem>Send SMS</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={handleShare} data-testid="button-share-invoice">
+                            <Share2 className="h-3.5 w-3.5" />
+                            Share
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 gap-1.5" data-testid="button-pdf-print">
+                                    <FileText className="h-3.5 w-3.5" />
+                                    PDF/Print
+                                    <ChevronDown className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={handleDownloadPDFLocal}>
+                                    <Download className="mr-2 h-4 w-4" /> Download PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handlePrint}>
+                                    <Printer className="mr-2 h-4 w-4" /> Print
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={() => setPaymentDialogOpen(true)} data-testid="button-record-payment">
+                            <CreditCard className="h-3.5 w-3.5" />
+                            Record Payment
+                        </Button>
+                        {(selectedInvoice?.amountPaid || 0) > 0 && (
+                            <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={() => {
+                                setRefundAmount("");
+                                setRefundReason("");
+                                setRefundDialogOpen(true);
+                            }} data-testid="button-refund">
+                                <RotateCcw className="h-3.5 w-3.5" />
+                                Refund
+                            </Button>
+                        )}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8" data-testid="button-more-actions">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuItem onClick={handleMarkAsSent} data-testid="menu-mark-as-sent">
+                                    <CheckCircle className="mr-2 h-4 w-4 text-blue-600" />
+                                    <span className="text-blue-600 font-medium">Mark As Sent</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleMakeRecurring} data-testid="menu-make-recurring">
+                                    <Repeat className="mr-2 h-4 w-4" /> Make Recurring
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleCreateCreditNote} data-testid="menu-create-credit-note">
+                                    <FileCheck className="mr-2 h-4 w-4" /> Create Credit Note
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleAddEWayBillDetails} data-testid="menu-add-eway-bill">
+                                    <Truck className="mr-2 h-4 w-4" /> Add e-Way Bill Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleCloneInvoice} data-testid="menu-clone">
+                                    <Copy className="mr-2 h-4 w-4" /> Clone
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setVoidDialogOpen(true)} data-testid="menu-void">
+                                    <Ban className="mr-2 h-4 w-4" /> Void
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleViewJournal} data-testid="menu-view-journal">
+                                    <BookOpen className="mr-2 h-4 w-4" /> View Journal
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    onClick={handleDeleteClick}
+                                    data-testid="menu-delete-invoice"
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleInvoicePreferences} data-testid="menu-invoice-preferences">
+                                    <Settings className="mr-2 h-4 w-4" /> Invoice Preferences
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
                     {showPdfPreview ? (
                         <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-8">
                             <div className="max-w-4xl mx-auto shadow-lg bg-white dark:bg-white">
-                                <div id="invoice-pdf-content" className="bg-white" style={{ width: '210mm', minHeight: '297mm', border: '1px solid #cbd5e1' }}>
+                                        <div id="invoice-pdf-content" ref={invoicePdfRef} className="bg-white" style={{ width: '210mm', minHeight: '297mm', border: '1px solid #cbd5e1' }}>
                                     <div className="p-12 text-black">
                                         {/* Header Section */}
                                         <div className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200">
@@ -1001,219 +1100,130 @@ export default function Invoices() {
                                             </div>
                                         </div>
 
-                                    {/* Bill To and Invoice Details */}
-                                    <div className="grid grid-cols-2 gap-12 mb-8">
-                                        <div>
-                                            <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">BILL TO</p>
-                                            <p className="font-bold text-blue-600 mb-2 text-base">{selectedInvoice.customerName}</p>
-                                            <div className="text-sm text-slate-700 space-y-0.5">
-                                                {formatAddress(selectedInvoice.billingAddress).map((line, i) => (
-                                                    <p key={i}>{line}</p>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="text-sm">
-                                            <div className="space-y-3">
-                                                <div className="flex justify-between border-b border-slate-100 pb-2">
-                                                    <span className="text-slate-600 font-medium">Invoice Date</span>
-                                                    <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.date)}</span>
-                                                </div>
-                                                <div className="flex justify-between border-b border-slate-100 pb-2">
-                                                    <span className="text-slate-600 font-medium">Terms</span>
-                                                    <span className="font-semibold text-slate-900">{selectedInvoice.paymentTerms || 'Due on Receipt'}</span>
-                                                </div>
-                                                <div className="flex justify-between border-b border-slate-100 pb-2">
-                                                    <span className="text-slate-600 font-medium">Due Date</span>
-                                                    <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.dueDate)}</span>
+                                        {/* Bill To and Invoice Details */}
+                                        <div className="grid grid-cols-2 gap-12 mb-8">
+                                            <div>
+                                                <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">BILL TO</p>
+                                                <p className="font-bold text-blue-600 mb-2 text-base">{selectedInvoice.customerName}</p>
+                                                <div className="text-sm text-slate-700 space-y-0.5">
+                                                    {formatAddress(selectedInvoice.billingAddress).map((line, i) => (
+                                                        <p key={i}>{line}</p>
+                                                    ))}
                                                 </div>
                                             </div>
+                                            <div className="text-sm">
+                                                <div className="space-y-3">
+                                                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                        <span className="text-slate-600 font-medium">Invoice Date</span>
+                                                        <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.date)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                        <span className="text-slate-600 font-medium">Terms</span>
+                                                        <span className="font-semibold text-slate-900">{selectedInvoice.paymentTerms || 'Due on Receipt'}</span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                        <span className="text-slate-600 font-medium">Due Date</span>
+                                                        <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.dueDate)}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Items Table */}
-                                    <div className="mb-8">
-                                        <table className="w-full">
-                                            <thead>
-                                                <tr className="bg-slate-100 border-y-2 border-slate-300">
-                                                    <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">#</th>
-                                                    <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">ITEM & DESCRIPTION</th>
-                                                    <th className="py-3 px-3 text-center text-xs font-bold text-slate-700 uppercase tracking-wide">QTY</th>
-                                                    <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">RATE</th>
-                                                    <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">AMOUNT</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {(selectedInvoice.items || []).map((item: any, index: number) => (
-                                                    <tr key={item.id || index} className="border-b border-slate-200">
-                                                        <td className="py-4 px-3 text-sm text-slate-900">{index + 1}</td>
-                                                        <td className="py-4 px-3">
-                                                            <p className="text-sm font-semibold text-slate-900">{item.name}</p>
-                                                            {item.description && (
-                                                                <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>
-                                                            )}
-                                                        </td>
-                                                        <td className="py-4 px-3 text-sm text-center text-slate-900">{item.quantity}</td>
-                                                        <td className="py-4 px-3 text-sm text-right text-slate-900">{formatCurrency(item.rate)}</td>
-                                                        <td className="py-4 px-3 text-sm text-right font-semibold text-slate-900">{formatCurrency(item.amount)}</td>
+                                        {/* Items Table */}
+                                        <div className="mb-8">
+                                            <table className="w-full">
+                                                <thead>
+                                                    <tr className="bg-slate-100 border-y-2 border-slate-300">
+                                                        <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">#</th>
+                                                        <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">ITEM & DESCRIPTION</th>
+                                                        <th className="py-3 px-3 text-center text-xs font-bold text-slate-700 uppercase tracking-wide">QTY</th>
+                                                        <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">RATE</th>
+                                                        <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">AMOUNT</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </thead>
+                                                <tbody>
+                                                    {(selectedInvoice.items || []).map((item: any, index: number) => (
+                                                        <tr key={item.id || index} className="border-b border-slate-200">
+                                                            <td className="py-4 px-3 text-sm text-slate-900">{index + 1}</td>
+                                                            <td className="py-4 px-3">
+                                                                <p className="text-sm font-semibold text-slate-900">{item.name}</p>
+                                                                {item.description && (
+                                                                    <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>
+                                                                )}
+                                                            </td>
+                                                            <td className="py-4 px-3 text-sm text-center text-slate-900">{item.quantity}</td>
+                                                            <td className="py-4 px-3 text-sm text-right text-slate-900">{formatCurrency(item.rate)}</td>
+                                                            <td className="py-4 px-3 text-sm text-right font-semibold text-slate-900">{formatCurrency(item.amount)}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
 
-                                    {/* Totals Section */}
-                                    <div className="flex justify-end mb-8">
-                                        <div className="w-96 border border-slate-200 rounded-lg overflow-hidden">
-                                            <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
-                                                <p className="text-xs font-bold text-slate-700 uppercase tracking-wide">Summary</p>
-                                            </div>
-                                            <div className="p-4 space-y-3 text-sm">
-                                                <div className="flex justify-between">
-                                                    <span className="text-slate-600">Sub Total</span>
-                                                    <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.subTotal || selectedInvoice.total)}</span>
+                                        {/* Totals Section */}
+                                        <div className="flex justify-end mb-8">
+                                            <div className="w-96 border border-slate-200 rounded-lg overflow-hidden">
+                                                <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
+                                                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wide">Summary</p>
                                                 </div>
-                                                {selectedInvoice.cgst > 0 && (
+                                                <div className="p-4 space-y-3 text-sm">
                                                     <div className="flex justify-between">
-                                                        <span className="text-slate-600">CGST</span>
-                                                        <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.cgst)}</span>
+                                                        <span className="text-slate-600">Sub Total</span>
+                                                        <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.subTotal || selectedInvoice.total)}</span>
                                                     </div>
-                                                )}
-                                                {selectedInvoice.sgst > 0 && (
-                                                    <div className="flex justify-between">
-                                                        <span className="text-slate-600">SGST</span>
-                                                        <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.sgst)}</span>
+                                                    {selectedInvoice.cgst > 0 && (
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-600">CGST</span>
+                                                            <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.cgst)}</span>
+                                                        </div>
+                                                    )}
+                                                    {selectedInvoice.sgst > 0 && (
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-600">SGST</span>
+                                                            <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.sgst)}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex justify-between py-3 border-t-2 border-slate-300 text-base font-bold">
+                                                        <span className="text-slate-900">Total</span>
+                                                        <span className="text-slate-900">{formatCurrency(selectedInvoice.total)}</span>
                                                     </div>
-                                                )}
-                                                <div className="flex justify-between py-3 border-t-2 border-slate-300 text-base font-bold">
-                                                    <span className="text-slate-900">Total</span>
-                                                    <span className="text-slate-900">{formatCurrency(selectedInvoice.total)}</span>
-                                                </div>
-                                                {selectedInvoice.amountPaid > 0 && (
-                                                    <div className="flex justify-between text-green-600">
-                                                        <span className="font-medium">Payment Made</span>
-                                                        <span className="font-semibold">(-) {formatCurrency(selectedInvoice.amountPaid)}</span>
+                                                    {selectedInvoice.amountPaid > 0 && (
+                                                        <div className="flex justify-between text-green-600">
+                                                            <span className="font-medium">Payment Made</span>
+                                                            <span className="font-semibold">(-) {formatCurrency(selectedInvoice.amountPaid)}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex justify-between py-3 border-t-2 border-slate-300 text-lg font-bold">
+                                                        <span className="text-slate-900">Balance Due</span>
+                                                        <span className="text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</span>
                                                     </div>
-                                                )}
-                                                <div className="flex justify-between py-3 border-t-2 border-slate-300 text-lg font-bold">
-                                                    <span className="text-slate-900">Balance Due</span>
-                                                    <span className="text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Notes Section */}
-                                    {selectedInvoice.customerNotes && (
-                                        <div className="mt-8 pt-6 border-t-2 border-slate-200">
-                                            <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">NOTES</p>
-                                            <p className="text-sm text-slate-700 leading-relaxed">{selectedInvoice.customerNotes}</p>
-                                        </div>
-                                    )}
+                                        {/* Notes Section */}
+                                        {selectedInvoice.customerNotes && (
+                                            <div className="mt-8 pt-6 border-t-2 border-slate-200">
+                                                <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">NOTES</p>
+                                                <p className="text-sm text-slate-700 leading-relaxed">{selectedInvoice.customerNotes}</p>
+                                            </div>
+                                        )}
+
+                                        {/* Signature Section */}
+                                        {branding?.signature?.url && (
+                                            <div className="mt-12 flex justify-end">
+                                                <div className="text-center">
+                                                    <img src={branding.signature.url} alt="Authorized Signature" className="h-16 w-auto mb-2" />
+                                                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wide border-t border-slate-200 pt-2">Authorized Signature</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ) : (
+                    ) : (
                         <div className="flex-1 overflow-auto">
-                            <div className="flex items-center gap-2 px-6 py-3 border-b border-slate-200 overflow-x-auto">
-                                <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={handleEditInvoice} data-testid="button-edit-invoice">
-                                    <Pencil className="h-3.5 w-3.5" />
-                                    Edit
-                                </Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="h-8 gap-1.5" data-testid="button-send-dropdown">
-                                            <Mail className="h-3.5 w-3.5" />
-                                            Send
-                                            <ChevronDown className="h-3 w-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={handleSendInvoice}>Send Email</DropdownMenuItem>
-                                        <DropdownMenuItem>Send WhatsApp</DropdownMenuItem>
-                                        <DropdownMenuItem>Send SMS</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                                <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={handleShare} data-testid="button-share-invoice">
-                                    <Share2 className="h-3.5 w-3.5" />
-                                    Share
-                                </Button>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm" className="h-8 gap-1.5" data-testid="button-pdf-print">
-                                            <FileText className="h-3.5 w-3.5" />
-                                            PDF/Print
-                                            <ChevronDown className="h-3 w-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuItem onClick={handleDownloadPDFLocal}>
-                                            <Download className="mr-2 h-4 w-4" /> Download PDF
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handlePrint}>
-                                            <Printer className="mr-2 h-4 w-4" /> Print
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                                <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={() => setPaymentDialogOpen(true)} data-testid="button-record-payment">
-                                    <CreditCard className="h-3.5 w-3.5" />
-                                    Record Payment
-                                </Button>
-                                {(selectedInvoice?.amountPaid || 0) > 0 && (
-                                    <Button variant="outline" size="sm" className="h-8 gap-1.5" onClick={() => {
-                                        setRefundAmount("");
-                                        setRefundReason("");
-                                        setRefundDialogOpen(true);
-                                    }} data-testid="button-refund">
-                                        <RotateCcw className="h-3.5 w-3.5" />
-                                        Refund
-                                    </Button>
-                                )}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" size="sm" className="h-8" data-testid="button-more-actions">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-56">
-                                        <DropdownMenuItem onClick={handleMarkAsSent} data-testid="menu-mark-as-sent">
-                                            <CheckCircle className="mr-2 h-4 w-4 text-blue-600" />
-                                            <span className="text-blue-600 font-medium">Mark As Sent</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleMakeRecurring} data-testid="menu-make-recurring">
-                                            <Repeat className="mr-2 h-4 w-4" /> Make Recurring
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleCreateCreditNote} data-testid="menu-create-credit-note">
-                                            <FileCheck className="mr-2 h-4 w-4" /> Create Credit Note
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleAddEWayBillDetails} data-testid="menu-add-eway-bill">
-                                            <Truck className="mr-2 h-4 w-4" /> Add e-Way Bill Details
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleCloneInvoice} data-testid="menu-clone">
-                                            <Copy className="mr-2 h-4 w-4" /> Clone
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={() => setVoidDialogOpen(true)} data-testid="menu-void">
-                                            <Ban className="mr-2 h-4 w-4" /> Void
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={handleViewJournal} data-testid="menu-view-journal">
-                                            <BookOpen className="mr-2 h-4 w-4" /> View Journal
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            className="text-destructive focus:text-destructive"
-                                            onClick={handleDeleteClick}
-                                            data-testid="menu-delete-invoice"
-                                        >
-                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem onClick={handleInvoicePreferences} data-testid="menu-invoice-preferences">
-                                            <Settings className="mr-2 h-4 w-4" /> Invoice Preferences
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-
                             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
                                 <div className="px-6 bg-white border-b border-slate-200">
                                     <TabsList className="h-auto p-0 bg-transparent gap-4">
