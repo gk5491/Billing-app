@@ -265,6 +265,13 @@ export default function PaymentsMade() {
     setSelectedPayment(payment);
   };
 
+  const calculateUnusedAmount = (payment: PaymentMade) => {
+    if (payment.unusedAmount !== undefined) return payment.unusedAmount;
+    const billPayments = getBillPaymentsArray(payment);
+    const usedAmount = billPayments.reduce((sum, bp) => sum + (bp.paymentAmount || 0), 0);
+    return Math.max(0, payment.paymentAmount - usedAmount);
+  };
+
   const handlePrint = () => {
     window.print();
   };
