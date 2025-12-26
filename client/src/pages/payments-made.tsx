@@ -286,16 +286,24 @@ export default function PaymentsMade() {
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
-      // Polyfill for oklch which html2canvas doesn't support
-      const style = document.createElement('style');
-      style.innerHTML = `
+      // Create a style element for polyfills to remove oklch variables site-wide
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
         * {
-          --tw-ring-color: rgba(59, 130, 246, 0.5) !important;
-          --tw-ring-offset-color: #fff !important;
-          outline-color: rgba(59, 130, 246, 0.5) !important;
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
         }
       `;
-      document.head.appendChild(style);
+      document.head.appendChild(polyfillStyles);
+
+      // Force a re-layout and wait a bit
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -305,22 +313,45 @@ export default function PaymentsMade() {
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('payment-receipt-content');
           if (clonedElement) {
-            // Remove oklch variables that cause html2canvas to fail
-            const allElements = clonedElement.getElementsByTagName('*');
-            for (let i = 0; i < allElements.length; i++) {
-              const el = allElements[i] as HTMLElement;
-              const styles = window.getComputedStyle(el);
-              if (styles.color.includes('oklch') || styles.backgroundColor.includes('oklch') || styles.borderColor.includes('oklch')) {
-                // Force standard colors if oklch is detected
-                el.style.color = 'inherit';
-                el.style.borderColor = 'inherit';
+            // Find ALL elements in the cloned document
+            const allElements = clonedDoc.querySelectorAll('*');
+            allElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              // 1. Clear any inline styles that might use oklch
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/oklch\([^)]+\)/g, 'inherit'));
               }
-            }
+
+              // 2. Clear known Tailwind 4 variables that often hold oklch
+              htmlEl.style.setProperty('--tw-ring-color', 'transparent', 'important');
+              htmlEl.style.setProperty('--tw-ring-offset-color', 'transparent', 'important');
+              htmlEl.style.setProperty('--tw-ring-shadow', 'none', 'important');
+              htmlEl.style.setProperty('--tw-shadow', 'none', 'important');
+              htmlEl.style.setProperty('--tw-shadow-colored', 'none', 'important');
+              
+              // 3. Force computed styles to fall back
+              const computed = window.getComputedStyle(htmlEl);
+              
+              // Check all potential color properties
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && value.includes('oklch')) {
+                  // Standard fallbacks
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+            });
           }
         }
       });
 
-      document.head.removeChild(style);
+      document.head.removeChild(polyfillStyles);
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({

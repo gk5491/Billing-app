@@ -831,66 +831,25 @@ function BillDetailPanel({
     element.style.maxWidth = "none";
 
     try {
-      // Find all elements and replace oklch colors with rgb/hex if found
-      // This is a common issue with Tailwind 4+ and html2canvas
-      const allElements = element.querySelectorAll("*");
-      const oklchElements: { element: HTMLElement; originalColor: string }[] =
-        [];
-
-      allElements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        const style = window.getComputedStyle(htmlEl);
-        const hasOklch =
-          style.backgroundColor.includes("oklch") ||
-          style.color.includes("oklch") ||
-          style.borderColor.includes("oklch");
-
-        if (hasOklch) {
-          oklchElements.push({
-            element: htmlEl,
-            originalColor: htmlEl.style.cssText,
-          });
-
-          // Force fallback colors for common bill elements
-          if (htmlEl.classList.contains("bg-slate-800"))
-            htmlEl.style.setProperty(
-              "background-color",
-              "#1e293b",
-              "important",
-            );
-          if (htmlEl.classList.contains("text-slate-900"))
-            htmlEl.style.setProperty("color", "#0f172a", "important");
-          if (htmlEl.classList.contains("text-slate-600"))
-            htmlEl.style.setProperty("color", "#475569", "important");
-          if (htmlEl.classList.contains("text-slate-500"))
-            htmlEl.style.setProperty("color", "#64748b", "important");
-          if (htmlEl.classList.contains("text-slate-400"))
-            htmlEl.style.setProperty("color", "#94a3b8", "important");
-
-          // Fallback for border-slate-900 and others
-          if (htmlEl.classList.contains("border-slate-900"))
-            htmlEl.style.setProperty("border-color", "#0f172a", "important");
-          if (htmlEl.classList.contains("border-slate-200"))
-            htmlEl.style.setProperty("border-color", "#e2e8f0", "important");
-          if (htmlEl.classList.contains("border-slate-100"))
-            htmlEl.style.setProperty("border-color", "#f1f5f9", "important");
-
-          // Ensure backgrounds are solid for capture
-          if (htmlEl.classList.contains("bg-slate-50"))
-            htmlEl.style.setProperty(
-              "background-color",
-              "#f8fafc",
-              "important",
-            );
-          if (htmlEl.classList.contains("bg-white"))
-            htmlEl.style.setProperty(
-              "background-color",
-              "#ffffff",
-              "important",
-            );
+      // Create global polyfill for oklch
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
         }
-      });
+      `;
+      document.head.appendChild(polyfillStyles);
 
+      // Find all elements and replace oklch colors with rgb/hex if found
+      const allElements = element.querySelectorAll("*");
+      
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -906,24 +865,41 @@ function BillDetailPanel({
             clonedElement.style.color = "#0f172a";
 
             // Further ensure no oklch in the clone
-            const clonedAll = clonedElement.querySelectorAll("*");
+            const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              const computed = window.getComputedStyle(htmlEl);
-              if (computed.backgroundColor.includes("oklch"))
-                htmlEl.style.setProperty("background-color", "#ffffff", "important");
-              if (computed.color.includes("oklch"))
-                htmlEl.style.setProperty("color", "#0f172a", "important");
-              if (computed.borderColor.includes("oklch"))
-                htmlEl.style.setProperty("border-color", "#e2e8f0", "important");
               
-              // Add more common oklch variables used in TW4
+              // Clear inline oklch
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/oklch\([^)]+\)/g, 'inherit'));
+              }
+
+              const computed = window.getComputedStyle(htmlEl);
+              
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && value.includes('oklch')) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              // Force standard fallback for TW variables
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow-colored", "none", "important");
             });
           }
         },
       });
+
+      document.head.removeChild(polyfillStyles);
 
       const imgData = canvas.toDataURL("image/png", 1.0);
       const pdf = new jsPDF("p", "mm", "a4");
