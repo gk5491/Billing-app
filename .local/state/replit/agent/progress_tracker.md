@@ -134,3 +134,8 @@
 [x] 134. Fixed Quotes PDF download to use formatted "Show PDF View" layout with html2canvas + jsPDF (Dec 26, 2025 - COMPLETE)
 [x] 135. Updated QuoteDetailPanel.tsx PDF download with vendor-credits approach - preserves formatting and styling (Dec 26, 2025 - FINAL COMPLETE)
 [x] 136. Fixed table header colors in Quote PDF download - preserves dark background (bg-slate-900) and white text for table headers (Dec 26, 2025 - COMPLETE)
+[x] 137. Fixed Quote BILL TO address details - now captures full customer billing and shipping address from customer data (Dec 26, 2025 - COMPLETE)
+[x] 138. Updated QuoteCreatePage.tsx to capture billingAddress and shippingAddress when customer is selected (Dec 26, 2025)
+[x] 139. Updated QuoteEditPage.tsx to capture billingAddress and shippingAddress when customer is selected (Dec 26, 2025)
+[x] 140. Added billingAddress and shippingAddress to quote data being sent to API in both create and edit pages (Dec 26, 2025)
+[x] 141. Workflow restarted and verified - full address details now reflected in Quote PDF view and downloads (Dec 26, 2025 - FINAL COMPLETE)

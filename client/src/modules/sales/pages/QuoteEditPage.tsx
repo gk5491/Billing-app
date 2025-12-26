@@ -104,6 +104,8 @@ export default function QuoteEditPage() {
   const [formData, setFormData] = useState({
     customerId: "",
     customerName: "",
+    billingAddress: {},
+    shippingAddress: {},
     quoteNumber: "",
     referenceNumber: "",
     quoteDate: new Date().toISOString().split('T')[0],
@@ -259,7 +261,9 @@ export default function QuoteEditPage() {
       setFormData(prev => ({
         ...prev,
         customerId,
-        customerName: customer.name
+        customerName: customer.name,
+        billingAddress: customer.billingAddress || {},
+        shippingAddress: customer.shippingAddress || customer.billingAddress || {}
       }));
     }
   };
@@ -353,6 +357,9 @@ export default function QuoteEditPage() {
       const quoteData = {
         customerId: formData.customerId,
         customerName: formData.customerName,
+        billingAddress: formData.billingAddress || {},
+        shippingAddress: formData.shippingAddress || formData.billingAddress || {},
+        quoteNumber: formData.quoteNumber,
         referenceNumber: formData.referenceNumber,
         date: formData.quoteDate,
         expiryDate: formData.expiryDate,
