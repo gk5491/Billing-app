@@ -280,26 +280,42 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
     if (!element) return;
 
     const originalStyle = element.style.cssText;
-    element.style.backgroundColor = "#ffffff";
-    element.style.color = "#0f172a";
-    element.style.width = "800px";
-    element.style.maxWidth = "none";
-
+    
     try {
-      const polyfillStyles = document.createElement('style');
-      polyfillStyles.innerHTML = `
-        * {
-          --tw-ring-color: transparent !important;
-          --tw-ring-offset-color: transparent !important;
-          --tw-ring-shadow: none !important;
-          --tw-shadow: none !important;
-          --tw-shadow-colored: none !important;
-          outline-color: transparent !important;
-          caret-color: transparent !important;
-          accent-color: transparent !important;
+      // Apply explicit styles to ensure proper rendering
+      element.style.backgroundColor = "#ffffff";
+      element.style.color = "#0f172a";
+      element.style.width = "800px";
+      element.style.maxWidth = "none";
+      element.style.padding = "32px";
+      element.style.margin = "0";
+      element.style.fontFamily = "Inter, system-ui, -apple-system, sans-serif";
+      element.style.lineHeight = "1.5";
+
+      // Apply styles to all child elements
+      const allElements = element.querySelectorAll("*");
+      allElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const computed = window.getComputedStyle(htmlEl);
+        
+        // Get computed colors and apply them as inline styles
+        const bgColor = computed.backgroundColor;
+        const textColor = computed.color;
+        const borderColor = computed.borderColor;
+        
+        // Convert rgb to hex if needed, or use computed value
+        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)' && !bgColor.includes('transparent')) {
+          htmlEl.style.backgroundColor = bgColor;
         }
-      `;
-      document.head.appendChild(polyfillStyles);
+        
+        if (textColor && textColor !== 'rgba(0, 0, 0, 0)') {
+          htmlEl.style.color = textColor;
+        }
+        
+        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+          htmlEl.style.borderColor = borderColor;
+        }
+      });
 
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -307,44 +323,20 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
         logging: false,
         backgroundColor: "#ffffff",
         windowWidth: 800,
+        allowTaint: true,
         onclone: (clonedDoc: Document) => {
           const clonedElement = clonedDoc.getElementById("quote-pdf-content");
           if (clonedElement) {
-            clonedElement.style.width = "800px";
-            clonedElement.style.maxWidth = "none";
+            // Preserve all styles on the cloned element
             clonedElement.style.backgroundColor = "#ffffff";
             clonedElement.style.color = "#0f172a";
-
-            const clonedAll = clonedDoc.querySelectorAll("*");
-            clonedAll.forEach((el) => {
-              const htmlEl = el as HTMLElement;
-              
-              const inlineStyle = htmlEl.getAttribute('style') || '';
-              if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
-                htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
-              }
-
-              const computed = window.getComputedStyle(htmlEl);
-              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke'];
-              colorProps.forEach(prop => {
-                const value = computed[prop as any];
-                if (value && (value.includes('oklch') || value.includes('oklab'))) {
-                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
-                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
-                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
-                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
-                }
-              });
-              
-              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
-              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
-              htmlEl.style.setProperty("--tw-shadow", "none", "important");
-            });
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.padding = "32px";
+            clonedElement.style.margin = "0";
           }
         },
       });
-
-      document.head.removeChild(polyfillStyles);
 
       const imgData = canvas.toDataURL("image/png", 1.0);
       const pdf = new jsPDF("p", "mm", "a4");
