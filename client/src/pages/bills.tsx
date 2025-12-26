@@ -169,7 +169,7 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
   const paymentStatus = getPaymentStatus(bill);
 
   return (
-    <div className="bg-white max-w-4xl mx-auto" id="bill-pdf-content">
+    <div className="bg-white max-w-4xl mx-auto" id="bill-pdf-content" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>
       <div className="p-8 pt-12">
         {/* Header Section */}
         <div className="flex justify-between items-start mb-12">
@@ -178,14 +178,14 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
               <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-2 object-contain self-start" data-testid="img-bill-logo" />
             ) : (
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center">
+                <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center" style={{ backgroundColor: '#1e293b' }}>
                   <span className="text-white font-bold text-sm">S</span>
                 </div>
-                <span className="text-xl font-bold text-slate-900 tracking-tight">SKILLTON IT</span>
+                <span className="text-xl font-bold tracking-tight" style={{ color: '#0f172a' }}>SKILLTON IT</span>
               </div>
-            )}
-            <div className="text-[13px] text-slate-600 leading-relaxed">
-              <p className="font-semibold text-slate-900 text-sm">SkilltonIT</p>
+            ) }
+            <div className="text-[13px] leading-relaxed" style={{ color: '#475569' }}>
+              <p className="font-semibold text-sm" style={{ color: '#0f172a' }}>SkilltonIT</p>
               <p>Hinjewadi - Wakad road</p>
               <p>Hinjewadi</p>
               <p>Pune Maharashtra 411057</p>
@@ -196,11 +196,11 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
             </div>
           </div>
           <div className="text-right">
-            <h1 className="text-4xl font-light text-slate-900 mb-1 tracking-tight">BILL</h1>
-            <p className="text-slate-600 font-medium mb-4">Bill# {bill.billNumber}</p>
+            <h1 className="text-4xl font-light mb-1 tracking-tight" style={{ color: '#0f172a' }}>BILL</h1>
+            <p className="font-medium mb-4" style={{ color: '#475569' }}>Bill# {bill.billNumber}</p>
             <div className="mt-4">
-              <p className="text-[13px] text-slate-500 font-medium uppercase tracking-wider mb-1">Balance Due</p>
-              <p className="text-2xl font-bold text-slate-900">{formatCurrency(bill.balanceDue)}</p>
+              <p className="text-[13px] font-medium uppercase tracking-wider mb-1" style={{ color: '#64748b' }}>Balance Due</p>
+              <p className="text-2xl font-bold" style={{ color: '#0f172a' }}>{formatCurrency(bill.balanceDue)}</p>
             </div>
           </div>
         </div>
@@ -208,9 +208,9 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Bill From & Details Section */}
         <div className="grid grid-cols-2 gap-12 mb-10">
           <div>
-            <h4 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Bill From</h4>
-            <div className="text-[14px] text-slate-700 leading-relaxed">
-              <p className="font-bold text-slate-900 mb-1 uppercase">{bill.vendorName}</p>
+            <h4 className="text-[13px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94a3b8' }}>Bill From</h4>
+            <div className="text-[14px] leading-relaxed" style={{ color: '#334155' }}>
+              <p className="font-bold mb-1 uppercase" style={{ color: '#0f172a' }}>{bill.vendorName}</p>
               {bill.vendorAddress && (
                 <>
                   {bill.vendorAddress.street1 && <p>{bill.vendorAddress.street1}</p>}
@@ -221,21 +221,21 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
                   </p>
                   {bill.vendorAddress.pinCode && <p>{bill.vendorAddress.pinCode}</p>}
                   {bill.vendorAddress.country && <p>{bill.vendorAddress.country}</p>}
-                  {bill.vendorAddress.gstin && <p className="mt-1 font-medium">GSTIN {bill.vendorAddress.gstin}</p>}
+                  {bill.vendorAddress.gstin && <p className="mt-1 font-medium" style={{ color: '#0f172a' }}>GSTIN {bill.vendorAddress.gstin}</p>}
                 </>
               )}
             </div>
           </div>
           <div className="flex justify-end">
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
-              <div className="text-slate-500 font-medium">Bill Date :</div>
-              <div className="text-slate-900 font-medium text-right">{formatDate(bill.billDate)}</div>
+              <div className="font-medium" style={{ color: '#64748b' }}>Bill Date :</div>
+              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{formatDate(bill.billDate)}</div>
               
-              <div className="text-slate-500 font-medium">Due Date :</div>
-              <div className="text-slate-900 font-medium text-right">{formatDate(bill.dueDate)}</div>
+              <div className="font-medium" style={{ color: '#64748b' }}>Due Date :</div>
+              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{formatDate(bill.dueDate)}</div>
               
-              <div className="text-slate-500 font-medium">Terms :</div>
-              <div className="text-slate-900 font-medium text-right">{bill.paymentTerms || 'Due on Receipt'}</div>
+              <div className="font-medium" style={{ color: '#64748b' }}>Terms :</div>
+              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{bill.paymentTerms || 'Due on Receipt'}</div>
             </div>
           </div>
         </div>
@@ -243,27 +243,27 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Items Table */}
         <table className="w-full mb-8 border-collapse">
           <thead>
-            <tr className="bg-slate-800 text-white border-b-2 border-slate-900">
-              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider w-12">#</th>
-              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider">Item & Description</th>
-              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider">HSN/SAC</th>
-              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider">Qty</th>
-              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider">Rate</th>
-              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider">Amount</th>
+            <tr className="text-white border-b-2" style={{ backgroundColor: '#1e293b', borderColor: '#0f172a' }}>
+              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider w-12" style={{ color: '#ffffff' }}>#</th>
+              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Item & Description</th>
+              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>HSN/SAC</th>
+              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Qty</th>
+              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Rate</th>
+              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Amount</th>
             </tr>
           </thead>
           <tbody>
             {bill.items.map((item, index) => (
-              <tr key={item.id} className="border-b border-slate-200">
-                <td className="px-4 py-4 text-[14px] text-slate-700 align-top">{index + 1}</td>
+              <tr key={item.id} className="border-b" style={{ borderColor: '#e2e8f0' }}>
+                <td className="px-4 py-4 text-[14px] align-top" style={{ color: '#334155' }}>{index + 1}</td>
                 <td className="px-4 py-4 align-top">
-                  <p className="font-semibold text-slate-900 text-[14px]">{item.itemName}</p>
-                  {item.description && <p className="text-[13px] text-slate-500 mt-1 leading-relaxed">{item.description}</p>}
+                  <p className="font-semibold text-[14px]" style={{ color: '#0f172a' }}>{item.itemName}</p>
+                  {item.description && <p className="text-[13px] mt-1 leading-relaxed" style={{ color: '#64748b' }}>{item.description}</p>}
                 </td>
-                <td className="px-4 py-4 text-center text-[14px] text-slate-700 align-top">998315</td>
-                <td className="px-4 py-4 text-center text-[14px] text-slate-700 align-top">{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-4 text-right text-[14px] text-slate-700 align-top">{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-4 text-right text-[14px] text-slate-900 font-semibold align-top">{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 text-center text-[14px] align-top" style={{ color: '#334155' }}>998315</td>
+                <td className="px-4 py-4 text-center text-[14px] align-top" style={{ color: '#334155' }}>{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 text-right text-[14px] align-top" style={{ color: '#334155' }}>{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 text-right text-[14px] font-semibold align-top" style={{ color: '#0f172a' }}>{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
@@ -272,65 +272,65 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Totals Section */}
         <div className="flex justify-end mb-12">
           <div className="w-72 space-y-4">
-            <div className="flex justify-between text-[14px] text-slate-600 font-medium pr-2">
+            <div className="flex justify-between text-[14px] font-medium pr-2" style={{ color: '#475569' }}>
               <span>Sub Total</span>
-              <span className="text-slate-900">{bill.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              <span style={{ color: '#0f172a' }}>{bill.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
             </div>
             
             {bill.taxAmount && bill.taxAmount > 0 && (
-              <div className="flex justify-between text-[14px] text-slate-600 font-medium pr-2">
+              <div className="flex justify-between text-[14px] font-medium pr-2" style={{ color: '#475569' }}>
                 <span>IGST18 (18%)</span>
-                <span className="text-slate-900">{bill.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span style={{ color: '#0f172a' }}>{bill.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
             )}
             
-            <div className="flex justify-between text-[16px] font-bold text-slate-900 pr-2 pt-2 border-t border-slate-100">
+            <div className="flex justify-between text-[16px] font-bold pr-2 pt-2 border-t" style={{ color: '#0f172a', borderColor: '#f1f5f9' }}>
               <span>Total</span>
               <span>{formatCurrency(bill.total)}</span>
             </div>
 
             {bill.paymentsMadeApplied && bill.paymentsMadeApplied.length > 0 && (
-              <div className="flex justify-between text-[14px] text-red-600 font-semibold pr-2">
+              <div className="flex justify-between text-[14px] font-semibold pr-2" style={{ color: '#dc2626' }}>
                 <span>Payments Made</span>
                 <span>(-) {bill.paymentsMadeApplied.reduce((sum, p) => sum + p.amount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
             )}
 
-            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-sm text-[16px] font-bold text-slate-900 border-l-4 border-slate-800">
-          <span>Balance Due</span>
-          <span>{formatCurrency(bill.balanceDue)}</span>
-        </div>
-      </div>
-    </div>
-
-    {/* Footer Section */}
-    <div className="mt-20 px-8">
-      <div className="w-1/2">
-        <div className="relative">
-          {branding?.signature?.url ? (
-            <div className="mb-2">
-              <img
-                src={branding.signature.url}
-                alt="Authorized Signature"
-                className="max-h-16 w-auto object-contain mix-blend-multiply"
-              />
+            <div className="flex justify-between items-center p-3 rounded-sm text-[16px] font-bold border-l-4" style={{ backgroundColor: '#f8fafc', color: '#0f172a', borderLeftColor: '#1e293b' }}>
+              <span>Balance Due</span>
+              <span>{formatCurrency(bill.balanceDue)}</span>
             </div>
-          ) : (
-            <div className="h-16 mb-2"></div>
-          )}
-          <div className="border-t-2 border-slate-900 w-full pt-2">
-            <p className="text-[13px] font-bold text-slate-900">Authorized Signature</p>
           </div>
         </div>
+
+        {/* Footer Section */}
+        <div className="mt-20 px-8">
+          <div className="w-1/2">
+            <div className="relative">
+              {branding?.signature?.url ? (
+                <div className="mb-2">
+                  <img
+                    src={branding.signature.url}
+                    alt="Authorized Signature"
+                    className="max-h-16 w-auto object-contain mix-blend-multiply"
+                  />
+                </div>
+              ) : (
+                <div className="h-16 mb-2"></div>
+              )}
+              <div className="border-t-2 w-full pt-2" style={{ borderColor: '#0f172a' }}>
+                <p className="text-[13px] font-bold" style={{ color: '#0f172a' }}>Authorized Signature</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page Number (Visual only for PDF match) */}
+        <div className="mt-16 text-right border-t pt-4 px-8 pb-8" style={{ borderColor: '#f1f5f9' }}>
+          <span className="text-[12px]" style={{ color: '#94a3b8' }}>1</span>
+        </div>
       </div>
     </div>
-
-    {/* Page Number (Visual only for PDF match) */}
-    <div className="mt-16 text-right border-t border-slate-100 pt-4 px-8 pb-8">
-      <span className="text-[12px] text-slate-400">1</span>
-    </div>
-  </div>
-</div>
   );
 }
 
@@ -543,12 +543,50 @@ function BillDetailPanel({
     const element = document.getElementById('bill-pdf-content');
     if (!element) return;
     
-    // Temporarily apply print styles for high-quality capture
+    // Polyfill for oklch which html2canvas doesn't support
     const originalStyle = element.style.cssText;
+    
+    // Explicitly set background color to avoid transparent issues
+    element.style.backgroundColor = '#ffffff';
+    element.style.color = '#0f172a';
     element.style.width = '800px';
     element.style.maxWidth = 'none';
     
     try {
+      // Find all elements and replace oklch colors with rgb/hex if found
+      // This is a common issue with Tailwind 4+ and html2canvas
+      const allElements = element.querySelectorAll('*');
+      const oklchElements: { element: HTMLElement; originalColor: string }[] = [];
+      
+      allElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const style = window.getComputedStyle(htmlEl);
+        const hasOklch = style.backgroundColor.includes('oklch') || style.color.includes('oklch') || style.borderColor.includes('oklch');
+        
+        if (hasOklch) {
+          oklchElements.push({ 
+            element: htmlEl, 
+            originalColor: htmlEl.style.cssText 
+          });
+          
+          // Force fallback colors for common bill elements
+          if (htmlEl.classList.contains('bg-slate-800')) htmlEl.style.setProperty('background-color', '#1e293b', 'important');
+          if (htmlEl.classList.contains('text-slate-900')) htmlEl.style.setProperty('color', '#0f172a', 'important');
+          if (htmlEl.classList.contains('text-slate-600')) htmlEl.style.setProperty('color', '#475569', 'important');
+          if (htmlEl.classList.contains('text-slate-500')) htmlEl.style.setProperty('color', '#64748b', 'important');
+          if (htmlEl.classList.contains('text-slate-400')) htmlEl.style.setProperty('color', '#94a3b8', 'important');
+          
+          // Fallback for border-slate-900 and others
+          if (htmlEl.classList.contains('border-slate-900')) htmlEl.style.setProperty('border-color', '#0f172a', 'important');
+          if (htmlEl.classList.contains('border-slate-200')) htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+          if (htmlEl.classList.contains('border-slate-100')) htmlEl.style.setProperty('border-color', '#f1f5f9', 'important');
+          
+          // Ensure backgrounds are solid for capture
+          if (htmlEl.classList.contains('bg-slate-50')) htmlEl.style.setProperty('background-color', '#f8fafc', 'important');
+          if (htmlEl.classList.contains('bg-white')) htmlEl.style.setProperty('background-color', '#ffffff', 'important');
+        }
+      });
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -560,6 +598,18 @@ function BillDetailPanel({
           if (clonedElement) {
             clonedElement.style.width = '800px';
             clonedElement.style.maxWidth = 'none';
+            clonedElement.style.backgroundColor = '#ffffff';
+            clonedElement.style.color = '#0f172a';
+            
+            // Further ensure no oklch in the clone
+            const clonedAll = clonedElement.querySelectorAll('*');
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              const computed = window.getComputedStyle(htmlEl);
+              if (computed.backgroundColor.includes('oklch')) htmlEl.style.setProperty('background-color', '#ffffff', 'important');
+              if (computed.color.includes('oklch')) htmlEl.style.setProperty('color', '#0f172a', 'important');
+              if (computed.borderColor.includes('oklch')) htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+            });
           }
         }
       });
