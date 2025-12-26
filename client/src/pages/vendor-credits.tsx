@@ -159,7 +159,6 @@ export default function VendorCredits() {
   const [setAppliedOnDate, setSetAppliedOnDate] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const journalTabRef = useRef<HTMLButtonElement>(null);
-  const pdfContentRef = useRef<HTMLDivElement>(null);
 
   const { data: vendorCreditsData, isLoading, refetch } = useQuery<{ success: boolean; data: VendorCredit[] }>({
     queryKey: ['/api/vendor-credits'],
@@ -487,155 +486,147 @@ export default function VendorCredits() {
     return { entries, totalDebit, totalCredit };
   };
 
-  const handlePrintPDF = async () => {
-    if (!pdfContentRef.current || !selectedCredit) return;
-
-    try {
-      // Create a clone of the PDF content
-      const element = pdfContentRef.current.cloneNode(true) as HTMLElement;
-      
-      // Create a temporary container
-      const tempDiv = document.createElement('div');
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.width = '210mm';
-      tempDiv.style.padding = '0';
-      tempDiv.style.background = '#ffffff';
-      tempDiv.style.color = '#000000';
-      tempDiv.appendChild(element);
-      document.body.appendChild(tempDiv);
-
-      // Remove all class and style attributes that might contain unsupported colors
-      const allElements = tempDiv.querySelectorAll('*');
-      allElements.forEach((el: Element) => {
-        el.removeAttribute('style');
-        el.removeAttribute('class');
-      });
-
-      // Capture the content
-      const canvas = await html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        backgroundColor: '#ffffff',
-        imageTimeout: 0,
-      });
-
-      // Clean up temp element
-      document.body.removeChild(tempDiv);
-
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Add pages to PDF
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= 297; // A4 height in mm
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= 297;
-      }
-
-      // Open print dialog
-      const pdfBlob = pdf.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.contentWindow?.print();
-      
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-        URL.revokeObjectURL(url);
-      }, 250);
-    } catch (error) {
-      console.error('Print error:', error);
-      toast({ title: "Failed to print PDF", variant: "destructive" });
-    }
-  };
-
   const handleDownloadPDF = async () => {
-    if (!pdfContentRef.current || !selectedCredit) return;
+    const element = document.getElementById("vendor-credit-pdf-content");
+    if (!element || !selectedCredit) return;
+
+    const originalStyle = element.style.cssText;
+
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#0f172a";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
 
     try {
-      // Create a clone of the PDF content
-      const element = pdfContentRef.current.cloneNode(true) as HTMLElement;
-      
-      // Create a temporary container
-      const tempDiv = document.createElement('div');
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.width = '210mm';
-      tempDiv.style.padding = '0';
-      tempDiv.style.background = '#ffffff';
-      tempDiv.style.color = '#000000';
-      tempDiv.appendChild(element);
-      document.body.appendChild(tempDiv);
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
+        }
+      `;
+      document.head.appendChild(polyfillStyles);
 
-      // Remove all class and style attributes that might contain unsupported colors
-      const allElements = tempDiv.querySelectorAll('*');
-      allElements.forEach((el: Element) => {
-        el.removeAttribute('style');
-        el.removeAttribute('class');
-      });
-
-      // Capture the content
-      const canvas = await html2canvas(tempDiv, {
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        allowTaint: true,
         logging: false,
-        backgroundColor: '#ffffff',
-        imageTimeout: 0,
+        backgroundColor: "#ffffff",
+        windowWidth: 800,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById("vendor-credit-pdf-content");
+          if (clonedElement) {
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#0f172a";
+
+            const clonedAll = clonedDoc.querySelectorAll("*");
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
+              }
+
+              const computed = window.getComputedStyle(htmlEl);
+              
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && (value.includes('oklch') || value.includes('oklab'))) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow-colored", "none", "important");
+            });
+          }
+        },
       });
 
-      // Clean up temp element
-      document.body.removeChild(tempDiv);
+      document.head.removeChild(polyfillStyles);
 
-      // Create PDF
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Add pages to PDF
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= 297; // A4 height in mm
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= 297;
-      }
-
-      // Download PDF
-      pdf.save(`${selectedCredit.creditNumber}.pdf`);
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST",
+      );
+      pdf.save(`VendorCredit-${selectedCredit.creditNumber}.pdf`);
     } catch (error) {
       console.error('Download error:', error);
       toast({ title: "Failed to download PDF", variant: "destructive" });
+    } finally {
+      element.style.cssText = originalStyle;
     }
+  };
+
+  const handlePrintPDF = () => {
+    const content = document.getElementById("vendor-credit-pdf-content")?.innerHTML;
+    if (!content || !selectedCredit) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Vendor Credit ${selectedCredit.creditNumber}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            @media print {
+              body { margin: 0; padding: 0; }
+              #vendor-credit-pdf-content { border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; }
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="vendor-credit-pdf-content" class="w-full">
+            ${content}
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (
@@ -955,7 +946,7 @@ export default function VendorCredits() {
                         </Badge>
                       </div>
 
-                      <div className="p-6 pt-12" ref={pdfContentRef}>
+                      <div className="p-6 pt-12" id="vendor-credit-pdf-content">
                         <div className="flex justify-between items-start mb-8">
                           <div>
                             {branding?.logo?.url ? (
