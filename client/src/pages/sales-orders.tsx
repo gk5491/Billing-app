@@ -189,165 +189,118 @@ interface SalesOrderDetailPanelProps {
 
 function SalesOrderPdfPreview({ order, branding }: { order: SalesOrderDetail; branding?: any }) {
   return (
-    <div id="pdf-content" className="bg-white p-8 text-black min-h-full" style={{ fontFamily: 'Arial, sans-serif' }}>
-      <div className="max-w-3xl mx-auto">
-        <div className="flex justify-between items-start mb-8 border-b-2 border-blue-600 pb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-600">SALES ORDER</h1>
-            <p className="text-sm text-gray-600 mt-1">{order.salesOrderNumber}</p>
-          </div>
-          <div className="text-right">
-            {branding?.logo?.url ? (
-              <img
-                src={branding.logo.url}
-                alt="Company Logo"
-                className="h-12 w-auto mb-2"
-                data-testid="img-sales-order-logo"
-              />
-            ) : (
-              <>
-                <p className="font-semibold text-lg">Company Name</p>
-              </>
-            )}
+    <div id="sales-order-pdf-preview" className="bg-white p-8 text-black min-h-full" style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          {branding?.logo?.url ? (
+            <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-3" />
+          ) : (
+            <div className="text-xl font-bold text-slate-900">Company Logo</div>
+          )}
+        </div>
+        <div className="text-right">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">SALES ORDER</h1>
+          <p className="text-sm text-slate-600">{order.salesOrderNumber}</p>
+          <div className="mt-4 bg-blue-50 px-4 py-3 rounded">
+            <p className="text-xs text-slate-600">Total</p>
+            <p className="text-xl font-bold text-slate-900">{formatCurrency(order.total)}</p>
           </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Bill To</h3>
-            <p className="font-semibold">{order.customerName}</p>
-            <div className="text-sm text-gray-600">
-              {formatAddress(order.billingAddress).map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Ship To</h3>
-            <p className="font-semibold">{order.customerName}</p>
-            <div className="text-sm text-gray-600">
-              {formatAddress(order.shippingAddress).map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
-            </div>
-          </div>
+      <div className="grid grid-cols-2 gap-8 mb-8 text-sm">
+        <div>
+          <h3 className="font-semibold text-slate-900 mb-2">BILL TO</h3>
+          <p className="font-medium text-slate-900">{order.customerName}</p>
+          {formatAddress(order.billingAddress).map((line, i) => (
+            <p key={i} className="text-slate-600">{line}</p>
+          ))}
         </div>
-
-        <div className="grid grid-cols-4 gap-4 mb-8 bg-gray-50 p-4 rounded-md">
-          <div>
-            <p className="text-xs text-gray-500 uppercase">Order Date</p>
-            <p className="font-medium">{formatDate(order.date)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase">Expected Shipment</p>
-            <p className="font-medium">{formatDate(order.expectedShipmentDate)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase">Payment Terms</p>
-            <p className="font-medium">{order.paymentTerms}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 uppercase">Place of Supply</p>
-            <p className="font-medium">{order.placeOfSupply || '-'}</p>
-          </div>
+        <div>
+          <h3 className="font-semibold text-slate-900 mb-2">SHIP TO</h3>
+          <p className="font-medium text-slate-900">{order.customerName}</p>
+          {formatAddress(order.shippingAddress).map((line, i) => (
+            <p key={i} className="text-slate-600">{line}</p>
+          ))}
         </div>
+      </div>
 
-        <table className="w-full mb-8 text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-3 py-2 text-left font-semibold">#</th>
-              <th className="px-3 py-2 text-left font-semibold">Item & Description</th>
-              <th className="px-3 py-2 text-left font-semibold">HSN/SAC</th>
-              <th className="px-3 py-2 text-right font-semibold">Qty</th>
-              <th className="px-3 py-2 text-right font-semibold">Rate</th>
-              <th className="px-3 py-2 text-right font-semibold">Tax</th>
-              <th className="px-3 py-2 text-right font-semibold">Amount</th>
+      <div className="grid grid-cols-4 gap-4 mb-8 text-sm">
+        <div>
+          <p className="text-xs text-slate-600 font-medium">ORDER DATE</p>
+          <p className="font-medium text-slate-900">{formatDate(order.date)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-600 font-medium">EXPECTED SHIPMENT</p>
+          <p className="font-medium text-slate-900">{formatDate(order.expectedShipmentDate)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-600 font-medium">PAYMENT TERMS</p>
+          <p className="font-medium text-slate-900">{order.paymentTerms}</p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-600 font-medium">PLACE OF SUPPLY</p>
+          <p className="font-medium text-slate-900">{order.placeOfSupply || '-'}</p>
+        </div>
+      </div>
+
+      <div className="border rounded-lg overflow-hidden mb-6">
+        <table className="w-full">
+          <thead className="bg-slate-900 text-white">
+            <tr>
+              <th className="px-4 py-2 text-left text-xs font-medium">#</th>
+              <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
+              <th className="px-4 py-2 text-left text-xs font-medium">HSN/SAC</th>
+              <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
+              <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
+              <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
             </tr>
           </thead>
           <tbody>
             {order.items.map((item, index) => (
-              <tr key={item.id} className="border-b border-gray-200">
-                <td className="px-3 py-2">{index + 1}</td>
-                <td className="px-3 py-2">
-                  <p className="font-medium">{item.name}</p>
-                  {item.description && <p className="text-gray-600 text-xs">{item.description}</p>}
+              <tr key={item.id} className="border-b">
+                <td className="px-4 py-3 text-sm">{index + 1}</td>
+                <td className="px-4 py-3 text-sm">
+                  <div><p className="font-medium text-slate-900">{item.name}</p>{item.description && <p className="text-xs text-slate-600">{item.description}</p>}</div>
                 </td>
-                <td className="px-3 py-2">{item.hsnSac || '-'}</td>
-                <td className="px-3 py-2 text-right">{item.ordered} {item.unit}</td>
-                <td className="px-3 py-2 text-right">{formatCurrency(item.rate)}</td>
-                <td className="px-3 py-2 text-right">{item.taxName || `${item.tax}%`}</td>
-                <td className="px-3 py-2 text-right font-medium">{formatCurrency(item.amount)}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{item.hsnSac || '-'}</td>
+                <td className="px-4 py-3 text-sm text-center">{item.ordered}{item.unit}</td>
+                <td className="px-4 py-3 text-sm text-right text-slate-900">{formatCurrency(item.rate)}</td>
+                <td className="px-4 py-3 text-sm text-right font-medium text-slate-900">{formatCurrency(item.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
 
-        <div className="flex justify-end mb-8">
-          <div className="w-72">
-            <div className="flex justify-between py-2 border-b border-gray-200">
-              <span className="text-gray-600">Sub Total</span>
-              <span className="font-medium">{formatCurrency(order.subTotal)}</span>
-            </div>
-            {order.shippingCharges > 0 && (
-              <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">Shipping Charges</span>
-                <span className="font-medium">{formatCurrency(order.shippingCharges)}</span>
-              </div>
-            )}
-            {order.cgst > 0 && (
-              <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">CGST</span>
-                <span className="font-medium">{formatCurrency(order.cgst)}</span>
-              </div>
-            )}
-            {order.sgst > 0 && (
-              <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">SGST</span>
-                <span className="font-medium">{formatCurrency(order.sgst)}</span>
-              </div>
-            )}
-            {order.igst > 0 && (
-              <div className="flex justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">IGST</span>
-                <span className="font-medium">{formatCurrency(order.igst)}</span>
-              </div>
-            )}
-            <div className="flex justify-between py-3 text-lg font-bold bg-blue-50 px-3 rounded-md mt-2">
-              <span>Total</span>
-              <span>{formatCurrency(order.total)}</span>
-            </div>
-          </div>
+      <div className="flex justify-end mb-6">
+        <div className="w-64 space-y-2 text-sm">
+          <div className="flex justify-between"><span className="text-slate-600">Sub Total</span><span className="font-medium text-slate-900">{formatCurrency(order.subTotal)}</span></div>
+          {order.shippingCharges > 0 && <div className="flex justify-between"><span className="text-slate-600">Shipping Charges</span><span className="font-medium text-slate-900">{formatCurrency(order.shippingCharges)}</span></div>}
+          {order.cgst > 0 && <div className="flex justify-between"><span className="text-slate-600">CGST</span><span className="font-medium text-slate-900">{formatCurrency(order.cgst)}</span></div>}
+          {order.sgst > 0 && <div className="flex justify-between"><span className="text-slate-600">SGST</span><span className="font-medium text-slate-900">{formatCurrency(order.sgst)}</span></div>}
+          {order.igst > 0 && <div className="flex justify-between"><span className="text-slate-600">IGST</span><span className="font-medium text-slate-900">{formatCurrency(order.igst)}</span></div>}
+          <div className="flex justify-between border-t pt-2 font-semibold"><span className="text-slate-900">Total</span><span className="text-slate-900">{formatCurrency(order.total)}</span></div>
         </div>
+      </div>
 
-        {order.customerNotes && (
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Customer Notes</h3>
-            <p className="text-sm text-gray-600">{order.customerNotes}</p>
-          </div>
-        )}
-
-        {order.termsAndConditions && (
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase mb-2">Terms & Conditions</h3>
-            <p className="text-sm text-gray-600">{order.termsAndConditions}</p>
-          </div>
-        )}
-
-        <div className="mt-12 pt-8 border-t border-gray-300">
-          {branding?.signature?.url ? (
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src={branding.signature.url}
-                alt="Authorized Signature"
-                style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-              />
-              <p className="text-xs text-gray-500">Authorized Signature</p>
-            </div>
-          ) : (
-            <p className="text-center text-sm text-gray-500">Authorized Signature ____________________</p>
-          )}
-          <p className="text-center text-sm text-gray-500 mt-4">Thank you for your business!</p>
+      {order.customerNotes && (
+        <div className="border-t pt-4 mt-8 mb-6">
+          <p className="text-xs text-slate-600 font-medium uppercase mb-2">Customer Notes</p>
+          <p className="text-sm text-slate-600">{order.customerNotes}</p>
         </div>
+      )}
+
+      {order.termsAndConditions && (
+        <div className="border-t pt-4 mb-6">
+          <p className="text-xs text-slate-600 font-medium uppercase mb-2">Terms & Conditions</p>
+          <p className="text-sm text-slate-600">{order.termsAndConditions}</p>
+        </div>
+      )}
+
+      <div className="border-t pt-4 mt-8">
+        <p className="text-xs text-slate-600">Authorized Signature</p>
+        {branding?.signature?.url && <img src={branding.signature.url} alt="Signature" className="h-12 mt-2" />}
       </div>
     </div>
   );
@@ -363,23 +316,20 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
     if (printContent) {
       const printWindow = window.open('', '_blank');
       if (printWindow) {
+        const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+          .map(el => el.outerHTML)
+          .join('');
+        
         printWindow.document.write(`
           <html>
             <head>
               <title>Sales Order - ${order.salesOrderNumber}</title>
+              ${styles}
               <style>
-                body { font-family: sans-serif; padding: 20px; color: black; background-color: white; }
-                .p-8 { padding: 2rem; }
-                .flex { display: flex; }
-                .justify-between { justify-content: space-between; }
-                .text-right { text-align: right; }
-                .font-bold { font-weight: 700; }
-                .mb-8 { margin-bottom: 2rem; }
-                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-                th { background-color: #f8fafc !important; text-align: left; }
-                th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+                body { font-family: Arial, sans-serif; padding: 0; margin: 0; color: black; background-color: white; }
                 @media print {
-                  body { padding: 0; }
+                  body { padding: 0; margin: 0; }
+                  * { box-shadow: none !important; }
                 }
               </style>
             </head>
@@ -403,7 +353,7 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
       const { generatePDFFromElement } = await import("@/lib/pdf-utils");
 
       // Generate PDF from the existing PDF view
-      await generatePDFFromElement("pdf-content", `SalesOrder-${order.salesOrderNumber}.pdf`);
+      await generatePDFFromElement("sales-order-pdf-preview", `SalesOrder-${order.salesOrderNumber}.pdf`);
 
       toast({
         title: "PDF Downloaded",
