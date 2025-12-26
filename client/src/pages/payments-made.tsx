@@ -265,11 +265,46 @@ export default function PaymentsMade() {
     setSelectedPayment(payment);
   };
 
-  const calculateUnusedAmount = (payment: PaymentMade) => {
-    if (payment.unusedAmount !== undefined) return payment.unusedAmount;
-    const billPayments = getBillPaymentsArray(payment);
-    const usedAmount = billPayments.reduce((sum, bp) => sum + (bp.paymentAmount || 0), 0);
-    return Math.max(0, payment.paymentAmount - usedAmount);
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!selectedPayment) return;
+    
+    const element = document.getElementById('payment-receipt-content');
+    if (!element) return;
+
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Payment-${getPaymentNumberString(selectedPayment.paymentNumber)}.pdf`);
+      
+      toast({ title: "PDF downloaded successfully" });
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      toast({ title: "Failed to download PDF", variant: "destructive" });
+    }
   };
 
   return (
@@ -479,8 +514,8 @@ export default function PaymentsMade() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>Print</DropdownMenuItem>
-                  <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handlePrint}>Print</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadPDF}>Download PDF</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -493,138 +528,135 @@ export default function PaymentsMade() {
           </div>
 
           {/* Detail Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 bg-slate-100 dark:bg-slate-950">
             {/* Receipt Preview */}
-            <div className="bg-white dark:bg-slate-950 border rounded-lg shadow-sm">
-              {/* Paid Badge */}
-              <div className="relative">
-                <div className="absolute -top-3 -left-3 z-10">
-                  <div className="bg-green-500 text-white px-4 py-2 text-sm font-bold transform -rotate-12 shadow-lg">
-                    Paid
-                  </div>
+            <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] min-h-[1000px] relative p-12 text-slate-800 dark:text-slate-200">
+              {/* Paid Badge Overlay */}
+              <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none">
+                <div className="bg-green-500 text-white text-[10px] font-bold py-1 px-10 absolute top-4 -left-8 -rotate-45 shadow-sm uppercase tracking-wider">
+                  Paid
                 </div>
               </div>
 
               {/* Company Header */}
-              <div className="p-6 border-b">
-                <div className="flex justify-between items-start">
-                  <div>
-                    {branding?.logo?.url ? (
-                      <img
-                        src={branding.logo.url}
-                        alt="Company Logo"
-                        className="h-12 w-auto mb-3"
-                        data-testid="img-payment-made-logo"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">C</span>
-                        </div>
-                        <span className="text-lg font-bold text-green-600">Company Name</span>
+              <div className="flex justify-between items-start mb-12">
+                <div className="flex-1">
+                  {branding?.logo?.url ? (
+                    <img
+                      src={branding.logo.url}
+                      alt="Company Logo"
+                      className="h-14 w-auto mb-4"
+                      data-testid="img-payment-made-logo"
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">S</span>
                       </div>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    {/* Right side can be used for additional info if needed */}
+                      <span className="text-2xl font-bold text-slate-900 dark:text-white">SkilltonIT</span>
+                    </div>
+                  )}
+                </div>
+                <div className="text-right text-[11px] leading-relaxed text-slate-500 max-w-[250px]">
+                  <p className="font-bold text-slate-900 dark:text-white mb-1">SkilltonIT</p>
+                  <p>Hinjewadi - Wakad road</p>
+                  <p>Hinjewadi</p>
+                  <p>Pune Maharashtra 411057</p>
+                  <p>India</p>
+                  <p>GSTIN 27AZCPA5145K1ZH</p>
+                  <p>Sales.SkilltonIT@skilltonit.com</p>
+                  <p>www.skilltonit.com</p>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-100 mb-8"></div>
+
+              {/* Title */}
+              <h3 className="text-center text-sm font-semibold tracking-[0.2em] mb-12 uppercase text-slate-700 dark:text-slate-300">PAYMENTS MADE</h3>
+
+              <div className="flex gap-12 mb-16">
+                {/* Left Column - Details */}
+                <div className="flex-1 space-y-4">
+                  {[
+                    { label: "Payment#", value: getPaymentNumberString(selectedPayment.paymentNumber) },
+                    { label: "Payment Date", value: formatDate(selectedPayment.paymentDate) },
+                    { label: "Reference Number", value: selectedPayment.reference || '' },
+                    { label: "Paid To", value: selectedPayment.vendorName, highlight: true },
+                    { label: "Place Of Supply", value: selectedPayment.sourceOfSupply || '-' },
+                    { label: "Payment Mode", value: getPaymentModeLabel(selectedPayment.paymentMode) },
+                    { label: "Paid Through", value: getPaidThroughLabel(selectedPayment.paidThrough) },
+                    { label: "Amount Paid In Words", value: numberToWords(selectedPayment.paymentAmount) },
+                  ].map((row, i) => (
+                    <div key={i} className="flex border-b border-slate-50 pb-2">
+                      <div className="w-40 text-[11px] text-slate-400">{row.label}</div>
+                      <div className={`flex-1 text-[11px] font-medium ${row.highlight ? 'text-blue-600' : 'text-slate-800 dark:text-slate-200'}`}>
+                        {row.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Right Column - Amount Box */}
+                <div className="w-48 pt-4">
+                  <div className="bg-[#82b366] text-white p-6 rounded-sm text-center shadow-sm">
+                    <div className="text-[11px] mb-1 opacity-90">Amount Paid</div>
+                    <div className="text-xl font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Payment Details */}
-              <div className="p-6">
-                <h3 className="text-center text-lg font-bold mb-6">PAYMENTS MADE</h3>
-
-                <div className="flex gap-8">
-                  {/* Left Column - Details */}
-                  <div className="flex-1 space-y-4">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-muted-foreground">Payment#</div>
-                      <div className="font-medium">{getPaymentNumberString(selectedPayment.paymentNumber)}</div>
-
-                      <div className="text-muted-foreground">Payment Date</div>
-                      <div>{formatDate(selectedPayment.paymentDate)}</div>
-
-                      <div className="text-muted-foreground">Reference Number</div>
-                      <div>{selectedPayment.reference || '-'}</div>
-
-                      <div className="text-muted-foreground">Paid To</div>
-                      <div className="text-primary font-medium">{selectedPayment.vendorName}</div>
-
-                      <div className="text-muted-foreground">Place Of Supply</div>
-                      <div>{selectedPayment.sourceOfSupply || '-'}</div>
-
-                      <div className="text-muted-foreground">Payment Mode</div>
-                      <div className="font-medium">{getPaymentModeLabel(selectedPayment.paymentMode)}</div>
-
-                      <div className="text-muted-foreground">Paid Through</div>
-                      <div className="font-medium">{getPaidThroughLabel(selectedPayment.paidThrough)}</div>
-
-                      <div className="text-muted-foreground">Amount Paid In Words</div>
-                      <div className="text-primary font-medium">{numberToWords(selectedPayment.paymentAmount)}</div>
-                    </div>
-                  </div>
-
-                  {/* Right Column - Amount Box */}
-                  <div className="w-40">
-                    <div className="bg-green-500 text-white p-4 rounded-lg text-center">
-                      <div className="text-sm">Amount Paid</div>
-                      <div className="text-2xl font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
-                    </div>
-                  </div>
+              {/* Paid To Section */}
+              <div className="mb-16">
+                <h4 className="text-[11px] font-semibold text-slate-400 mb-4">Paid To</h4>
+                <div className="text-[11px] space-y-1 text-slate-700 dark:text-slate-300">
+                  <p className="font-bold text-slate-900 dark:text-white uppercase">{selectedPayment.vendorName}</p>
+                  {(() => {
+                    const vendor = getVendorDetails(selectedPayment);
+                    if (vendor) {
+                      return (
+                        <>
+                          {vendor.address && <p>{vendor.address}</p>}
+                          {(vendor.city || vendor.state || vendor.pincode) && (
+                            <p>{[vendor.city, vendor.state, vendor.pincode].filter(Boolean).join(', ')}</p>
+                          )}
+                          {vendor.country && <p>{vendor.country}</p>}
+                          {vendor.gstin && <p className="mt-2 text-slate-500 uppercase">GSTIN {vendor.gstin}</p>}
+                        </>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
+              </div>
 
-                {/* Paid To Section */}
-                <div className="mt-8 border-t pt-6">
-                  <h4 className="font-semibold mb-2">Paid To</h4>
-                  <div className="text-sm">
-                    <p className="font-bold">{selectedPayment.vendorName}</p>
-                    {(() => {
-                      const vendor = getVendorDetails(selectedPayment);
-                      if (vendor) {
-                        return (
-                          <>
-                            {vendor.address && <p>{vendor.address}</p>}
-                            {(vendor.city || vendor.state || vendor.pincode) && (
-                              <p>{[vendor.city, vendor.state, vendor.pincode].filter(Boolean).join(', ')}</p>
-                            )}
-                            {vendor.country && <p>{vendor.country}</p>}
-                            {vendor.gstin && <p className="mt-1">GSTIN {vendor.gstin}</p>}
-                          </>
-                        );
-                      }
-                      return null;
-                    })()}
-                  </div>
-                </div>
+              <div className="border-t border-slate-100 mb-8"></div>
 
-                {/* Payment for Section */}
-                {getBillPaymentsArray(selectedPayment).length > 0 && (
-                  <div className="mt-8 border-t pt-6">
-                    <h4 className="font-semibold mb-4">Payment for</h4>
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-100 dark:bg-slate-800">
-                        <tr>
-                          <th className="px-3 py-2 text-left">Bill Number</th>
-                          <th className="px-3 py-2 text-left">Bill Date</th>
-                          <th className="px-3 py-2 text-right">Bill Amount</th>
-                          <th className="px-3 py-2 text-right">Payment Amount</th>
+              {/* Payment for Section */}
+              {getBillPaymentsArray(selectedPayment).length > 0 && (
+                <div>
+                  <h4 className="text-sm font-bold mb-6 text-slate-800 dark:text-slate-200">Payment for</h4>
+                  <table className="w-full text-[11px]">
+                    <thead>
+                      <tr className="bg-slate-50 dark:bg-slate-800/50">
+                        <th className="px-4 py-3 text-left font-semibold text-slate-500">Bill Number</th>
+                        <th className="px-4 py-3 text-left font-semibold text-slate-500">Bill Date</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-500">Bill Amount</th>
+                        <th className="px-4 py-3 text-right font-semibold text-slate-500">Payment Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {getBillPaymentsArray(selectedPayment).map((bp, index) => (
+                        <tr key={index}>
+                          <td className="px-4 py-3 text-blue-600 font-medium">{bp.billNumber}</td>
+                          <td className="px-4 py-3 text-slate-600">{formatDate(bp.billDate)}</td>
+                          <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
+                          <td className="px-4 py-3 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount)}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {getBillPaymentsArray(selectedPayment).map((bp, index) => (
-                          <tr key={index} className="border-b">
-                            <td className="px-3 py-2 text-primary">{bp.billNumber}</td>
-                            <td className="px-3 py-2">{formatDate(bp.billDate)}</td>
-                            <td className="px-3 py-2 text-right">{formatCurrency(bp.billAmount)}</td>
-                            <td className="px-3 py-2 text-right">{formatCurrency(bp.paymentAmount)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
             {/* Journal Section */}

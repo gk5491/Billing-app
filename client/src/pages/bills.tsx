@@ -3,10 +3,30 @@ import { useLocation } from "wouter";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import {
-  Plus, Search, ChevronDown, MoreHorizontal, Pencil, Trash2,
-  X, Mail, FileText, Printer, Filter, Download,
-  Eye, Check, List, Grid3X3, CreditCard, Copy, Clock,
-  BookOpen, Ban, Upload, RefreshCw, Lightbulb
+  Plus,
+  Search,
+  ChevronDown,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  X,
+  Mail,
+  FileText,
+  Printer,
+  Filter,
+  Download,
+  Eye,
+  Check,
+  List,
+  Grid3X3,
+  CreditCard,
+  Copy,
+  Clock,
+  BookOpen,
+  Ban,
+  Upload,
+  RefreshCw,
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePagination } from "@/hooks/use-pagination";
@@ -140,52 +160,75 @@ interface Bill {
 
 function getPaymentStatus(bill: Bill): string {
   if (bill.balanceDue === 0 && bill.total > 0) {
-    return 'PAID';
+    return "PAID";
   } else if (bill.balanceDue > 0 && bill.balanceDue < bill.total) {
-    return 'PARTIALLY PAID';
-  } else if (bill.status === 'VOID') {
-    return 'VOID';
-  } else if (bill.status === 'OVERDUE') {
-    return 'OVERDUE';
+    return "PARTIALLY PAID";
+  } else if (bill.status === "VOID") {
+    return "VOID";
+  } else if (bill.status === "OVERDUE") {
+    return "OVERDUE";
   }
-  return bill.status || 'OPEN';
+  return bill.status || "OPEN";
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 2
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 2,
   }).format(amount);
 }
 
 function formatDate(dateString: string): string {
-  if (!dateString) return '-';
+  if (!dateString) return "-";
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }
 
 function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
   const paymentStatus = getPaymentStatus(bill);
 
   return (
-    <div className="bg-white max-w-4xl mx-auto" id="bill-pdf-content" style={{ backgroundColor: '#ffffff', color: '#0f172a' }}>
+    <div
+      className="bg-white max-w-4xl mx-auto"
+      id="bill-pdf-content"
+      style={{ backgroundColor: "#ffffff", color: "#0f172a" }}
+    >
       <div className="p-8 pt-12">
         {/* Header Section */}
         <div className="flex justify-between items-start mb-12">
           <div className="flex flex-col gap-1">
             {branding?.logo?.url ? (
-              <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-2 object-contain self-start" data-testid="img-bill-logo" />
+              <img
+                src={branding.logo.url}
+                alt="Company Logo"
+                className="h-12 w-auto mb-2 object-contain self-start"
+                data-testid="img-bill-logo"
+              />
             ) : (
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center" style={{ backgroundColor: '#1e293b' }}>
+                <div
+                  className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center"
+                  style={{ backgroundColor: "#1e293b" }}
+                >
                   <span className="text-white font-bold text-sm">S</span>
                 </div>
-                <span className="text-xl font-bold tracking-tight" style={{ color: '#0f172a' }}>SKILLTON IT</span>
+                <span
+                  className="text-xl font-bold tracking-tight"
+                  style={{ color: "#0f172a" }}
+                >
+                  SKILLTON IT
+                </span>
               </div>
-            ) }
-            <div className="text-[13px] leading-relaxed" style={{ color: '#475569' }}>
-              <p className="font-semibold text-sm" style={{ color: '#0f172a' }}>SkilltonIT</p>
+            )}
+            <div
+              className="text-[13px] leading-relaxed"
+              style={{ color: "#475569" }}
+            >
               <p>Hinjewadi - Wakad road</p>
               <p>Hinjewadi</p>
               <p>Pune Maharashtra 411057</p>
@@ -196,11 +239,25 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
             </div>
           </div>
           <div className="text-right">
-            <h1 className="text-4xl font-light mb-1 tracking-tight" style={{ color: '#0f172a' }}>BILL</h1>
-            <p className="font-medium mb-4" style={{ color: '#475569' }}>Bill# {bill.billNumber}</p>
+            <h1
+              className="text-4xl font-light mb-1 tracking-tight"
+              style={{ color: "#0f172a" }}
+            >
+              BILL
+            </h1>
+            <p className="font-medium mb-4" style={{ color: "#475569" }}>
+              Bill# {bill.billNumber}
+            </p>
             <div className="mt-4">
-              <p className="text-[13px] font-medium uppercase tracking-wider mb-1" style={{ color: '#64748b' }}>Balance Due</p>
-              <p className="text-2xl font-bold" style={{ color: '#0f172a' }}>{formatCurrency(bill.balanceDue)}</p>
+              <p
+                className="text-[13px] font-medium uppercase tracking-wider mb-1"
+                style={{ color: "#64748b" }}
+              >
+                Balance Due
+              </p>
+              <p className="text-2xl font-bold" style={{ color: "#0f172a" }}>
+                {formatCurrency(bill.balanceDue)}
+              </p>
             </div>
           </div>
         </div>
@@ -208,34 +265,84 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Bill From & Details Section */}
         <div className="grid grid-cols-2 gap-12 mb-10">
           <div>
-            <h4 className="text-[13px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94a3b8' }}>Bill From</h4>
-            <div className="text-[14px] leading-relaxed" style={{ color: '#334155' }}>
-              <p className="font-bold mb-1 uppercase" style={{ color: '#0f172a' }}>{bill.vendorName}</p>
+            <h4
+              className="text-[13px] font-semibold uppercase tracking-wider mb-2"
+              style={{ color: "#94a3b8" }}
+            >
+              Bill From
+            </h4>
+            <div
+              className="text-[14px] leading-relaxed"
+              style={{ color: "#334155" }}
+            >
+              <p
+                className="font-bold mb-1 uppercase"
+                style={{ color: "#0f172a" }}
+              >
+                {bill.vendorName}
+              </p>
               {bill.vendorAddress && (
                 <>
-                  {bill.vendorAddress.street1 && <p>{bill.vendorAddress.street1}</p>}
-                  {bill.vendorAddress.street2 && <p>{bill.vendorAddress.street2}</p>}
+                  {bill.vendorAddress.street1 && (
+                    <p>{bill.vendorAddress.street1}</p>
+                  )}
+                  {bill.vendorAddress.street2 && (
+                    <p>{bill.vendorAddress.street2}</p>
+                  )}
                   <p>
-                    {bill.vendorAddress.city && `${bill.vendorAddress.city}${bill.vendorAddress.state ? ', ' : ''}`}
+                    {bill.vendorAddress.city &&
+                      `${bill.vendorAddress.city}${bill.vendorAddress.state ? ", " : ""}`}
                     {bill.vendorAddress.state}
                   </p>
-                  {bill.vendorAddress.pinCode && <p>{bill.vendorAddress.pinCode}</p>}
-                  {bill.vendorAddress.country && <p>{bill.vendorAddress.country}</p>}
-                  {bill.vendorAddress.gstin && <p className="mt-1 font-medium" style={{ color: '#0f172a' }}>GSTIN {bill.vendorAddress.gstin}</p>}
+                  {bill.vendorAddress.pinCode && (
+                    <p>{bill.vendorAddress.pinCode}</p>
+                  )}
+                  {bill.vendorAddress.country && (
+                    <p>{bill.vendorAddress.country}</p>
+                  )}
+                  {bill.vendorAddress.gstin && (
+                    <p
+                      className="mt-1 font-medium"
+                      style={{ color: "#0f172a" }}
+                    >
+                      GSTIN {bill.vendorAddress.gstin}
+                    </p>
+                  )}
                 </>
               )}
             </div>
           </div>
           <div className="flex justify-end">
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
-              <div className="font-medium" style={{ color: '#64748b' }}>Bill Date :</div>
-              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{formatDate(bill.billDate)}</div>
-              
-              <div className="font-medium" style={{ color: '#64748b' }}>Due Date :</div>
-              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{formatDate(bill.dueDate)}</div>
-              
-              <div className="font-medium" style={{ color: '#64748b' }}>Terms :</div>
-              <div className="font-medium text-right" style={{ color: '#0f172a' }}>{bill.paymentTerms || 'Due on Receipt'}</div>
+              <div className="font-medium" style={{ color: "#64748b" }}>
+                Bill Date :
+              </div>
+              <div
+                className="font-medium text-right"
+                style={{ color: "#0f172a" }}
+              >
+                {formatDate(bill.billDate)}
+              </div>
+
+              <div className="font-medium" style={{ color: "#64748b" }}>
+                Due Date :
+              </div>
+              <div
+                className="font-medium text-right"
+                style={{ color: "#0f172a" }}
+              >
+                {formatDate(bill.dueDate)}
+              </div>
+
+              <div className="font-medium" style={{ color: "#64748b" }}>
+                Terms :
+              </div>
+              <div
+                className="font-medium text-right"
+                style={{ color: "#0f172a" }}
+              >
+                {bill.paymentTerms || "Due on Receipt"}
+              </div>
             </div>
           </div>
         </div>
@@ -243,27 +350,107 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Items Table */}
         <table className="w-full mb-8 border-collapse">
           <thead>
-            <tr className="text-white border-b-2" style={{ backgroundColor: '#1e293b', borderColor: '#0f172a' }}>
-              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider w-12" style={{ color: '#ffffff' }}>#</th>
-              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Item & Description</th>
-              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>HSN/SAC</th>
-              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Qty</th>
-              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Rate</th>
-              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#ffffff' }}>Amount</th>
+            <tr
+              className="text-white border-b-2"
+              style={{ backgroundColor: "#1e293b", borderColor: "#0f172a" }}
+            >
+              <th
+                className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider w-12"
+                style={{ color: "#ffffff" }}
+              >
+                #
+              </th>
+              <th
+                className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider"
+                style={{ color: "#ffffff" }}
+              >
+                Item & Description
+              </th>
+              <th
+                className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider"
+                style={{ color: "#ffffff" }}
+              >
+                HSN/SAC
+              </th>
+              <th
+                className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider"
+                style={{ color: "#ffffff" }}
+              >
+                Qty
+              </th>
+              <th
+                className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider"
+                style={{ color: "#ffffff" }}
+              >
+                Rate
+              </th>
+              <th
+                className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider"
+                style={{ color: "#ffffff" }}
+              >
+                Amount
+              </th>
             </tr>
           </thead>
           <tbody>
             {bill.items.map((item, index) => (
-              <tr key={item.id} className="border-b" style={{ borderColor: '#e2e8f0' }}>
-                <td className="px-4 py-4 text-[14px] align-top" style={{ color: '#334155' }}>{index + 1}</td>
-                <td className="px-4 py-4 align-top">
-                  <p className="font-semibold text-[14px]" style={{ color: '#0f172a' }}>{item.itemName}</p>
-                  {item.description && <p className="text-[13px] mt-1 leading-relaxed" style={{ color: '#64748b' }}>{item.description}</p>}
+              <tr
+                key={item.id}
+                className="border-b"
+                style={{ borderColor: "#e2e8f0" }}
+              >
+                <td
+                  className="px-4 py-4 text-[14px] align-top"
+                  style={{ color: "#334155" }}
+                >
+                  {index + 1}
                 </td>
-                <td className="px-4 py-4 text-center text-[14px] align-top" style={{ color: '#334155' }}>998315</td>
-                <td className="px-4 py-4 text-center text-[14px] align-top" style={{ color: '#334155' }}>{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-4 text-right text-[14px] align-top" style={{ color: '#334155' }}>{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                <td className="px-4 py-4 text-right text-[14px] font-semibold align-top" style={{ color: '#0f172a' }}>{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 align-top">
+                  <p
+                    className="font-semibold text-[14px]"
+                    style={{ color: "#0f172a" }}
+                  >
+                    {item.itemName}
+                  </p>
+                  {item.description && (
+                    <p
+                      className="text-[13px] mt-1 leading-relaxed"
+                      style={{ color: "#64748b" }}
+                    >
+                      {item.description}
+                    </p>
+                  )}
+                </td>
+                <td
+                  className="px-4 py-4 text-center text-[14px] align-top"
+                  style={{ color: "#334155" }}
+                >
+                  998315
+                </td>
+                <td
+                  className="px-4 py-4 text-center text-[14px] align-top"
+                  style={{ color: "#334155" }}
+                >
+                  {item.quantity.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
+                </td>
+                <td
+                  className="px-4 py-4 text-right text-[14px] align-top"
+                  style={{ color: "#334155" }}
+                >
+                  {item.rate.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
+                </td>
+                <td
+                  className="px-4 py-4 text-right text-[14px] font-semibold align-top"
+                  style={{ color: "#0f172a" }}
+                >
+                  {item.amount.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -272,31 +459,64 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
         {/* Totals Section */}
         <div className="flex justify-end mb-12">
           <div className="w-72 space-y-4">
-            <div className="flex justify-between text-[14px] font-medium pr-2" style={{ color: '#475569' }}>
+            <div
+              className="flex justify-between text-[14px] font-medium pr-2"
+              style={{ color: "#475569" }}
+            >
               <span>Sub Total</span>
-              <span style={{ color: '#0f172a' }}>{bill.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              <span style={{ color: "#0f172a" }}>
+                {bill.subTotal.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
             </div>
-            
+
             {bill.taxAmount && bill.taxAmount > 0 && (
-              <div className="flex justify-between text-[14px] font-medium pr-2" style={{ color: '#475569' }}>
+              <div
+                className="flex justify-between text-[14px] font-medium pr-2"
+                style={{ color: "#475569" }}
+              >
                 <span>IGST18 (18%)</span>
-                <span style={{ color: '#0f172a' }}>{bill.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span style={{ color: "#0f172a" }}>
+                  {bill.taxAmount.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             )}
-            
-            <div className="flex justify-between text-[16px] font-bold pr-2 pt-2 border-t" style={{ color: '#0f172a', borderColor: '#f1f5f9' }}>
+
+            <div
+              className="flex justify-between text-[16px] font-bold pr-2 pt-2 border-t"
+              style={{ color: "#0f172a", borderColor: "#f1f5f9" }}
+            >
               <span>Total</span>
               <span>{formatCurrency(bill.total)}</span>
             </div>
 
-            {bill.paymentsMadeApplied && bill.paymentsMadeApplied.length > 0 && (
-              <div className="flex justify-between text-[14px] font-semibold pr-2" style={{ color: '#dc2626' }}>
-                <span>Payments Made</span>
-                <span>(-) {bill.paymentsMadeApplied.reduce((sum, p) => sum + p.amount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              </div>
-            )}
+            {bill.paymentsMadeApplied &&
+              bill.paymentsMadeApplied.length > 0 && (
+                <div
+                  className="flex justify-between text-[14px] font-semibold pr-2"
+                  style={{ color: "#dc2626" }}
+                >
+                  <span>Payments Made</span>
+                  <span>
+                    (-){" "}
+                    {bill.paymentsMadeApplied
+                      .reduce((sum, p) => sum + p.amount, 0)
+                      .toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
 
-            <div className="flex justify-between items-center p-3 rounded-sm text-[16px] font-bold border-l-4" style={{ backgroundColor: '#f8fafc', color: '#0f172a', borderLeftColor: '#1e293b' }}>
+            <div
+              className="flex justify-between items-center p-3 rounded-sm text-[16px] font-bold border-l-4"
+              style={{
+                backgroundColor: "#f8fafc",
+                color: "#0f172a",
+                borderLeftColor: "#1e293b",
+              }}
+            >
               <span>Balance Due</span>
               <span>{formatCurrency(bill.balanceDue)}</span>
             </div>
@@ -318,16 +538,29 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
               ) : (
                 <div className="h-16 mb-2"></div>
               )}
-              <div className="border-t-2 w-full pt-2" style={{ borderColor: '#0f172a' }}>
-                <p className="text-[13px] font-bold" style={{ color: '#0f172a' }}>Authorized Signature</p>
+              <div
+                className="border-t-2 w-full pt-2"
+                style={{ borderColor: "#0f172a" }}
+              >
+                <p
+                  className="text-[13px] font-bold"
+                  style={{ color: "#0f172a" }}
+                >
+                  Authorized Signature
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Page Number (Visual only for PDF match) */}
-        <div className="mt-16 text-right border-t pt-4 px-8 pb-8" style={{ borderColor: '#f1f5f9' }}>
-          <span className="text-[12px]" style={{ color: '#94a3b8' }}>1</span>
+        <div
+          className="mt-16 text-right border-t pt-4 px-8 pb-8"
+          style={{ borderColor: "#f1f5f9" }}
+        >
+          <span className="text-[12px]" style={{ color: "#94a3b8" }}>
+            1
+          </span>
         </div>
       </div>
     </div>
@@ -342,14 +575,21 @@ function BillDetailView({ bill }: { bill: Bill }) {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold mb-1">BILL</h2>
-          <p className="text-slate-600">Bill# <span className="font-semibold">{bill.billNumber}</span></p>
+          <p className="text-slate-600">
+            Bill# <span className="font-semibold">{bill.billNumber}</span>
+          </p>
           <Badge
-            className={`mt-2 ${paymentStatus === 'PAID' ? 'bg-green-500 text-white' :
-              paymentStatus === 'PARTIALLY PAID' ? 'bg-amber-500 text-white' :
-                paymentStatus === 'OVERDUE' ? 'bg-red-500 text-white' :
-                  paymentStatus === 'VOID' ? 'bg-slate-500 text-white' :
-                    'bg-blue-500 text-white'
-              }`}
+            className={`mt-2 ${
+              paymentStatus === "PAID"
+                ? "bg-green-500 text-white"
+                : paymentStatus === "PARTIALLY PAID"
+                  ? "bg-amber-500 text-white"
+                  : paymentStatus === "OVERDUE"
+                    ? "bg-red-500 text-white"
+                    : paymentStatus === "VOID"
+                      ? "bg-slate-500 text-white"
+                      : "bg-blue-500 text-white"
+            }`}
           >
             {paymentStatus}
           </Badge>
@@ -359,9 +599,15 @@ function BillDetailView({ bill }: { bill: Bill }) {
           <p className="font-semibold text-blue-600">{bill.vendorName}</p>
           {bill.vendorAddress && (
             <div className="text-sm text-slate-600 mt-1">
-              {bill.vendorAddress.street1 && <p>{bill.vendorAddress.street1}</p>}
-              <p>{bill.vendorAddress.city}, {bill.vendorAddress.state}</p>
-              <p>{bill.vendorAddress.country} - {bill.vendorAddress.pinCode}</p>
+              {bill.vendorAddress.street1 && (
+                <p>{bill.vendorAddress.street1}</p>
+              )}
+              <p>
+                {bill.vendorAddress.city}, {bill.vendorAddress.state}
+              </p>
+              <p>
+                {bill.vendorAddress.country} - {bill.vendorAddress.pinCode}
+              </p>
             </div>
           )}
         </div>
@@ -377,7 +623,9 @@ function BillDetailView({ bill }: { bill: Bill }) {
           <p className="font-medium">{formatDate(bill.dueDate)}</p>
         </div>
         <div>
-          <span className="text-slate-500 uppercase text-xs">Payment Terms</span>
+          <span className="text-slate-500 uppercase text-xs">
+            Payment Terms
+          </span>
           <p className="font-medium">{bill.paymentTerms}</p>
         </div>
         <div className="col-span-3">
@@ -403,8 +651,12 @@ function BillDetailView({ bill }: { bill: Bill }) {
                 <TableCell className="text-blue-600">{item.itemName}</TableCell>
                 <TableCell>{item.account}</TableCell>
                 <TableCell className="text-center">{item.quantity}</TableCell>
-                <TableCell className="text-right">{item.rate.toFixed(2)}</TableCell>
-                <TableCell className="text-right">{item.amount.toFixed(2)}</TableCell>
+                <TableCell className="text-right">
+                  {item.rate.toFixed(2)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {item.amount.toFixed(2)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -435,9 +687,14 @@ function BillDetailView({ bill }: { bill: Bill }) {
           </div>
           {bill.creditsApplied && bill.creditsApplied.length > 0 && (
             <div className="border-t pt-2 space-y-1">
-              <p className="text-xs text-slate-500 font-semibold">Credits Applied:</p>
+              <p className="text-xs text-slate-500 font-semibold">
+                Credits Applied:
+              </p>
               {bill.creditsApplied.map((credit, index) => (
-                <div key={index} className="flex justify-between text-sm text-green-600">
+                <div
+                  key={index}
+                  className="flex justify-between text-sm text-green-600"
+                >
                   <span>Credit {credit.creditNumber}</span>
                   <span>- {formatCurrency(credit.amount)}</span>
                 </div>
@@ -446,10 +703,17 @@ function BillDetailView({ bill }: { bill: Bill }) {
           )}
           {bill.paymentsMadeApplied && bill.paymentsMadeApplied.length > 0 && (
             <div className="border-t pt-2 space-y-1">
-              <p className="text-xs text-slate-500 font-semibold">Payment Made:</p>
+              <p className="text-xs text-slate-500 font-semibold">
+                Payment Made:
+              </p>
               {bill.paymentsMadeApplied.map((payment, index) => (
-                <div key={index} className="flex justify-between text-sm text-blue-600">
-                  <span>Payment {payment.paymentNumber || payment.paymentId}</span>
+                <div
+                  key={index}
+                  className="flex justify-between text-sm text-blue-600"
+                >
+                  <span>
+                    Payment {payment.paymentNumber || payment.paymentId}
+                  </span>
                   <span>- {formatCurrency(payment.amount)}</span>
                 </div>
               ))}
@@ -457,10 +721,17 @@ function BillDetailView({ bill }: { bill: Bill }) {
           )}
           {bill.paymentsRecorded && bill.paymentsRecorded.length > 0 && (
             <div className="border-t pt-2 space-y-1">
-              <p className="text-xs text-slate-500 font-semibold">Record Payment:</p>
+              <p className="text-xs text-slate-500 font-semibold">
+                Record Payment:
+              </p>
               {bill.paymentsRecorded.map((payment, index) => (
-                <div key={index} className="flex justify-between text-sm text-purple-600">
-                  <span>Payment {payment.paymentNumber || payment.paymentId}</span>
+                <div
+                  key={index}
+                  className="flex justify-between text-sm text-purple-600"
+                >
+                  <span>
+                    Payment {payment.paymentNumber || payment.paymentId}
+                  </span>
                   <span>- {formatCurrency(payment.amount)}</span>
                 </div>
               ))}
@@ -481,7 +752,10 @@ function BillDetailView({ bill }: { bill: Bill }) {
             </TabsList>
             <TabsContent value="journal">
               <p className="text-xs text-slate-500 mb-2">
-                Amount is displayed in your base currency <Badge variant="outline" className="text-xs">INR</Badge>
+                Amount is displayed in your base currency{" "}
+                <Badge variant="outline" className="text-xs">
+                  INR
+                </Badge>
               </p>
               <h4 className="font-semibold mb-2">Bill</h4>
               <Table>
@@ -496,8 +770,12 @@ function BillDetailView({ bill }: { bill: Bill }) {
                   {bill.journalEntries.map((entry, index) => (
                     <TableRow key={index}>
                       <TableCell>{entry.account}</TableCell>
-                      <TableCell className="text-right">{entry.debit.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">{entry.credit.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">
+                        {entry.debit.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {entry.credit.toFixed(2)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -522,7 +800,7 @@ function BillDetailPanel({
   onClone,
   onCreateVendorCredits,
   onViewJournal,
-  onExpectedPaymentDate
+  onExpectedPaymentDate,
 }: {
   bill: Bill;
   branding?: any;
@@ -540,50 +818,76 @@ function BillDetailPanel({
   const [showPdfView, setShowPdfView] = useState(true);
 
   const handleDownloadPDF = async () => {
-    const element = document.getElementById('bill-pdf-content');
+    const element = document.getElementById("bill-pdf-content");
     if (!element) return;
-    
+
     // Polyfill for oklch which html2canvas doesn't support
     const originalStyle = element.style.cssText;
-    
+
     // Explicitly set background color to avoid transparent issues
-    element.style.backgroundColor = '#ffffff';
-    element.style.color = '#0f172a';
-    element.style.width = '800px';
-    element.style.maxWidth = 'none';
-    
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#0f172a";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
+
     try {
       // Find all elements and replace oklch colors with rgb/hex if found
       // This is a common issue with Tailwind 4+ and html2canvas
-      const allElements = element.querySelectorAll('*');
-      const oklchElements: { element: HTMLElement; originalColor: string }[] = [];
-      
+      const allElements = element.querySelectorAll("*");
+      const oklchElements: { element: HTMLElement; originalColor: string }[] =
+        [];
+
       allElements.forEach((el) => {
         const htmlEl = el as HTMLElement;
         const style = window.getComputedStyle(htmlEl);
-        const hasOklch = style.backgroundColor.includes('oklch') || style.color.includes('oklch') || style.borderColor.includes('oklch');
-        
+        const hasOklch =
+          style.backgroundColor.includes("oklch") ||
+          style.color.includes("oklch") ||
+          style.borderColor.includes("oklch");
+
         if (hasOklch) {
-          oklchElements.push({ 
-            element: htmlEl, 
-            originalColor: htmlEl.style.cssText 
+          oklchElements.push({
+            element: htmlEl,
+            originalColor: htmlEl.style.cssText,
           });
-          
+
           // Force fallback colors for common bill elements
-          if (htmlEl.classList.contains('bg-slate-800')) htmlEl.style.setProperty('background-color', '#1e293b', 'important');
-          if (htmlEl.classList.contains('text-slate-900')) htmlEl.style.setProperty('color', '#0f172a', 'important');
-          if (htmlEl.classList.contains('text-slate-600')) htmlEl.style.setProperty('color', '#475569', 'important');
-          if (htmlEl.classList.contains('text-slate-500')) htmlEl.style.setProperty('color', '#64748b', 'important');
-          if (htmlEl.classList.contains('text-slate-400')) htmlEl.style.setProperty('color', '#94a3b8', 'important');
-          
+          if (htmlEl.classList.contains("bg-slate-800"))
+            htmlEl.style.setProperty(
+              "background-color",
+              "#1e293b",
+              "important",
+            );
+          if (htmlEl.classList.contains("text-slate-900"))
+            htmlEl.style.setProperty("color", "#0f172a", "important");
+          if (htmlEl.classList.contains("text-slate-600"))
+            htmlEl.style.setProperty("color", "#475569", "important");
+          if (htmlEl.classList.contains("text-slate-500"))
+            htmlEl.style.setProperty("color", "#64748b", "important");
+          if (htmlEl.classList.contains("text-slate-400"))
+            htmlEl.style.setProperty("color", "#94a3b8", "important");
+
           // Fallback for border-slate-900 and others
-          if (htmlEl.classList.contains('border-slate-900')) htmlEl.style.setProperty('border-color', '#0f172a', 'important');
-          if (htmlEl.classList.contains('border-slate-200')) htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
-          if (htmlEl.classList.contains('border-slate-100')) htmlEl.style.setProperty('border-color', '#f1f5f9', 'important');
-          
+          if (htmlEl.classList.contains("border-slate-900"))
+            htmlEl.style.setProperty("border-color", "#0f172a", "important");
+          if (htmlEl.classList.contains("border-slate-200"))
+            htmlEl.style.setProperty("border-color", "#e2e8f0", "important");
+          if (htmlEl.classList.contains("border-slate-100"))
+            htmlEl.style.setProperty("border-color", "#f1f5f9", "important");
+
           // Ensure backgrounds are solid for capture
-          if (htmlEl.classList.contains('bg-slate-50')) htmlEl.style.setProperty('background-color', '#f8fafc', 'important');
-          if (htmlEl.classList.contains('bg-white')) htmlEl.style.setProperty('background-color', '#ffffff', 'important');
+          if (htmlEl.classList.contains("bg-slate-50"))
+            htmlEl.style.setProperty(
+              "background-color",
+              "#f8fafc",
+              "important",
+            );
+          if (htmlEl.classList.contains("bg-white"))
+            htmlEl.style.setProperty(
+              "background-color",
+              "#ffffff",
+              "important",
+            );
         }
       });
 
@@ -591,35 +895,55 @@ function BillDetailPanel({
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: "#ffffff",
         windowWidth: 800,
         onclone: (clonedDoc: Document) => {
-          const clonedElement = clonedDoc.getElementById('bill-pdf-content');
+          const clonedElement = clonedDoc.getElementById("bill-pdf-content");
           if (clonedElement) {
-            clonedElement.style.width = '800px';
-            clonedElement.style.maxWidth = 'none';
-            clonedElement.style.backgroundColor = '#ffffff';
-            clonedElement.style.color = '#0f172a';
-            
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#0f172a";
+
             // Further ensure no oklch in the clone
-            const clonedAll = clonedElement.querySelectorAll('*');
+            const clonedAll = clonedElement.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
               const computed = window.getComputedStyle(htmlEl);
-              if (computed.backgroundColor.includes('oklch')) htmlEl.style.setProperty('background-color', '#ffffff', 'important');
-              if (computed.color.includes('oklch')) htmlEl.style.setProperty('color', '#0f172a', 'important');
-              if (computed.borderColor.includes('oklch')) htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+              if (computed.backgroundColor.includes("oklch"))
+                htmlEl.style.setProperty(
+                  "background-color",
+                  "#ffffff",
+                  "important",
+                );
+              if (computed.color.includes("oklch"))
+                htmlEl.style.setProperty("color", "#0f172a", "important");
+              if (computed.borderColor.includes("oklch"))
+                htmlEl.style.setProperty(
+                  "border-color",
+                  "#e2e8f0",
+                  "important",
+                );
             });
           }
-        }
+        },
       });
-      
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST",
+      );
       pdf.save(`Bill-${bill.billNumber}.pdf`);
     } finally {
       element.style.cssText = originalStyle;
@@ -627,12 +951,12 @@ function BillDetailPanel({
   };
 
   const handlePrint = () => {
-    const content = document.getElementById('bill-pdf-content')?.innerHTML;
+    const content = document.getElementById("bill-pdf-content")?.innerHTML;
     if (!content) return;
-    
-    const printWindow = window.open('', '_blank');
+
+    const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-    
+
     printWindow.document.write(`
       <html>
         <head>
@@ -673,25 +997,57 @@ function BillDetailPanel({
   return (
     <div className="h-full flex flex-col bg-white border-l border-slate-200 overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
-        <h2 className="text-lg font-semibold text-slate-900" data-testid="text-bill-number">{bill.billNumber}</h2>
+        <h2
+          className="text-lg font-semibold text-slate-900"
+          data-testid="text-bill-number"
+        >
+          {bill.billNumber}
+        </h2>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownloadPDF}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleDownloadPDF}
+          >
             <Download className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handlePrint}
+          >
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowPdfView(!showPdfView)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setShowPdfView(!showPdfView)}
+          >
             <Eye className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} data-testid="button-close-panel">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onClose}
+            data-testid="button-close-panel"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200 overflow-x-auto bg-white">
-        <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={onEdit} data-testid="button-edit-bill">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5"
+          onClick={onEdit}
+          data-testid="button-edit-bill"
+        >
           <Pencil className="h-3.5 w-3.5" />
           Edit
         </Button>
@@ -712,20 +1068,31 @@ function BillDetailPanel({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        {bill.balanceDue > 0 && bill.status !== 'VOID' && (
-          <Button variant="ghost" size="sm" className="h-8 gap-1.5" onClick={onRecordPayment} data-testid="button-record-payment">
+        {bill.balanceDue > 0 && bill.status !== "VOID" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5"
+            onClick={onRecordPayment}
+            data-testid="button-record-payment"
+          >
             <CreditCard className="h-3.5 w-3.5" />
             Record Payment
           </Button>
         )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5" data-testid="button-more-actions">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 gap-1.5"
+              data-testid="button-more-actions"
+            >
               <MoreHorizontal className="h-3.5 w-3.5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            {bill.status !== 'VOID' && (
+            {bill.status !== "VOID" && (
               <DropdownMenuItem onClick={onVoid} className="text-red-600">
                 <Ban className="mr-2 h-4 w-4" />
                 Void
@@ -758,8 +1125,14 @@ function BillDetailPanel({
 
       <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-end">
         <div className="flex items-center gap-2">
-          <Label htmlFor="pdf-view" className="text-sm text-slate-500">Show PDF View</Label>
-          <Switch id="pdf-view" checked={showPdfView} onCheckedChange={setShowPdfView} />
+          <Label htmlFor="pdf-view" className="text-sm text-slate-500">
+            Show PDF View
+          </Label>
+          <Switch
+            id="pdf-view"
+            checked={showPdfView}
+            onCheckedChange={setShowPdfView}
+          />
         </div>
       </div>
 
@@ -772,7 +1145,10 @@ function BillDetailPanel({
       </div>
 
       <div className="border-t border-slate-200 p-3 text-center text-xs text-slate-500">
-        PDF Template: <span className="text-blue-600">{bill.pdfTemplate || 'Standard Template'}</span>
+        PDF Template:{" "}
+        <span className="text-blue-600">
+          {bill.pdfTemplate || "Standard Template"}
+        </span>
         <button className="text-blue-600 ml-2">Change</button>
       </div>
     </div>
@@ -784,7 +1160,7 @@ function RecordPaymentDialog({
   isOpen,
   onClose,
   bill,
-  onPaymentRecorded
+  onPaymentRecorded,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -794,7 +1170,9 @@ function RecordPaymentDialog({
   const { toast } = useToast();
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentMode, setPaymentMode] = useState("Cash");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [paymentDate, setPaymentDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [paymentNumber, setPaymentNumber] = useState("1");
   const [paymentMadeOn, setPaymentMadeOn] = useState("");
   const [paidThrough, setPaidThrough] = useState("Petty Cash");
@@ -806,20 +1184,20 @@ function RecordPaymentDialog({
   useEffect(() => {
     if (isOpen && bill) {
       setPaymentAmount(String(bill.balanceDue || 0));
-      setPaymentDate(new Date().toISOString().split('T')[0]);
+      setPaymentDate(new Date().toISOString().split("T")[0]);
       fetchNextPaymentNumber();
     }
   }, [isOpen, bill]);
 
   const fetchNextPaymentNumber = async () => {
     try {
-      const response = await fetch('/api/payments-made/next-number');
+      const response = await fetch("/api/payments-made/next-number");
       if (response.ok) {
         const data = await response.json();
         setPaymentNumber(data.data?.nextNumber || "1");
       }
     } catch (error) {
-      console.error('Failed to fetch next payment number:', error);
+      console.error("Failed to fetch next payment number:", error);
     }
   };
 
@@ -828,16 +1206,22 @@ function RecordPaymentDialog({
     setPaymentNumber(String(num + 1));
   };
 
-  const handleSave = async (status: 'DRAFT' | 'PAID') => {
+  const handleSave = async (status: "DRAFT" | "PAID") => {
     if (!bill) return;
 
     const amount = parseFloat(paymentAmount);
     if (isNaN(amount) || amount <= 0) {
-      toast({ title: "Please enter a valid payment amount", variant: "destructive" });
+      toast({
+        title: "Please enter a valid payment amount",
+        variant: "destructive",
+      });
       return;
     }
     if (amount > (bill.balanceDue || 0)) {
-      toast({ title: "Payment amount cannot exceed balance due", variant: "destructive" });
+      toast({
+        title: "Payment amount cannot exceed balance due",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -845,8 +1229,8 @@ function RecordPaymentDialog({
     try {
       // Record payment on the bill - this also creates a payment in Payments Made
       const billResponse = await fetch(`/api/bills/${bill.id}/record-payment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount,
           paymentMode,
@@ -857,15 +1241,20 @@ function RecordPaymentDialog({
           reference,
           notes,
           status,
-          sendNotification
-        })
+          sendNotification,
+        }),
       });
 
       if (!billResponse.ok) {
-        throw new Error('Failed to record payment');
+        throw new Error("Failed to record payment");
       }
 
-      toast({ title: status === 'DRAFT' ? "Payment saved as draft" : "Payment recorded successfully" });
+      toast({
+        title:
+          status === "DRAFT"
+            ? "Payment saved as draft"
+            : "Payment recorded successfully",
+      });
       onPaymentRecorded();
       onClose();
       resetForm();
@@ -879,7 +1268,7 @@ function RecordPaymentDialog({
   const resetForm = () => {
     setPaymentAmount("");
     setPaymentMode("Cash");
-    setPaymentDate(new Date().toISOString().split('T')[0]);
+    setPaymentDate(new Date().toISOString().split("T")[0]);
     setPaymentNumber("1");
     setPaymentMadeOn("");
     setPaidThrough("Petty Cash");
@@ -894,7 +1283,10 @@ function RecordPaymentDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold" data-testid="text-payment-title">
+          <DialogTitle
+            className="text-xl font-semibold"
+            data-testid="text-payment-title"
+          >
             Payment for {bill.billNumber}
           </DialogTitle>
         </DialogHeader>
@@ -916,12 +1308,14 @@ function RecordPaymentDialog({
 
           {/* Info Message */}
 
-
           {/* Payment Mode */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Payment Mode</Label>
             <Select value={paymentMode} onValueChange={setPaymentMode}>
-              <SelectTrigger className="max-w-xs" data-testid="select-payment-mode">
+              <SelectTrigger
+                className="max-w-xs"
+                data-testid="select-payment-mode"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -996,10 +1390,16 @@ function RecordPaymentDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Petty Cash">Petty Cash</SelectItem>
-                  <SelectItem value="Undeposited Funds">Undeposited Funds</SelectItem>
+                  <SelectItem value="Undeposited Funds">
+                    Undeposited Funds
+                  </SelectItem>
                   <SelectItem value="Bank Account">Bank Account</SelectItem>
-                  <SelectItem value="Prepaid Expenses">Prepaid Expenses</SelectItem>
-                  <SelectItem value="Accounts Payable">Accounts Payable</SelectItem>
+                  <SelectItem value="Prepaid Expenses">
+                    Prepaid Expenses
+                  </SelectItem>
+                  <SelectItem value="Accounts Payable">
+                    Accounts Payable
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1030,7 +1430,11 @@ function RecordPaymentDialog({
             <div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2" data-testid="button-upload-file">
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    data-testid="button-upload-file"
+                  >
                     <Upload className="h-4 w-4" />
                     Upload File
                     <ChevronDown className="h-4 w-4" />
@@ -1041,7 +1445,9 @@ function RecordPaymentDialog({
                   <DropdownMenuItem>Attach from Cloud</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <p className="text-xs text-slate-500 mt-1">You can upload a maximum of 5 files, 10MB each</p>
+              <p className="text-xs text-slate-500 mt-1">
+                You can upload a maximum of 5 files, 10MB each
+              </p>
             </div>
           </div>
 
@@ -1050,10 +1456,15 @@ function RecordPaymentDialog({
             <Checkbox
               id="send-notification"
               checked={sendNotification}
-              onCheckedChange={(checked) => setSendNotification(checked === true)}
+              onCheckedChange={(checked) =>
+                setSendNotification(checked === true)
+              }
               data-testid="checkbox-send-notification"
             />
-            <Label htmlFor="send-notification" className="text-sm cursor-pointer">
+            <Label
+              htmlFor="send-notification"
+              className="text-sm cursor-pointer"
+            >
               Send a Payment Made email notification.
             </Label>
           </div>
@@ -1062,14 +1473,14 @@ function RecordPaymentDialog({
           <div className="flex items-center gap-3 pt-4 border-t">
             <Button
               variant="outline"
-              onClick={() => handleSave('DRAFT')}
+              onClick={() => handleSave("DRAFT")}
               disabled={isSubmitting}
               data-testid="button-save-draft"
             >
               Save as Draft
             </Button>
             <Button
-              onClick={() => handleSave('PAID')}
+              onClick={() => handleSave("PAID")}
               disabled={isSubmitting}
               className="bg-blue-600 hover:bg-blue-700"
               data-testid="button-save-paid"
@@ -1101,10 +1512,11 @@ export default function Bills() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [billToDelete, setBillToDelete] = useState<string | null>(null);
   const [selectedBills, setSelectedBills] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<'list' | 'table'>('table');
+  const [viewMode, setViewMode] = useState<"list" | "table">("table");
   const [recordPaymentDialogOpen, setRecordPaymentDialogOpen] = useState(false);
   const [voidDialogOpen, setVoidDialogOpen] = useState(false);
-  const [expectedPaymentDateDialogOpen, setExpectedPaymentDateDialogOpen] = useState(false);
+  const [expectedPaymentDateDialogOpen, setExpectedPaymentDateDialogOpen] =
+    useState(false);
   const [expectedPaymentDate, setExpectedPaymentDate] = useState("");
   const [journalDialogOpen, setJournalDialogOpen] = useState(false);
   const [branding, setBranding] = useState<any>(null);
@@ -1128,13 +1540,13 @@ export default function Bills() {
 
   const fetchBills = async () => {
     try {
-      const response = await fetch('/api/bills');
+      const response = await fetch("/api/bills");
       if (response.ok) {
         const data = await response.json();
         setBills(data.data || []);
       }
     } catch (error) {
-      console.error('Failed to fetch bills:', error);
+      console.error("Failed to fetch bills:", error);
     } finally {
       setLoading(false);
     }
@@ -1148,7 +1560,7 @@ export default function Bills() {
         setSelectedBill(data.data);
       }
     } catch (error) {
-      console.error('Failed to fetch bill detail:', error);
+      console.error("Failed to fetch bill detail:", error);
     }
   };
 
@@ -1174,7 +1586,9 @@ export default function Bills() {
   const confirmDelete = async () => {
     if (!billToDelete) return;
     try {
-      const response = await fetch(`/api/bills/${billToDelete}`, { method: 'DELETE' });
+      const response = await fetch(`/api/bills/${billToDelete}`, {
+        method: "DELETE",
+      });
       if (response.ok) {
         toast({ title: "Bill deleted successfully" });
         fetchBills();
@@ -1194,9 +1608,9 @@ export default function Bills() {
     if (!selectedBill) return;
     try {
       const response = await fetch(`/api/bills/${selectedBill.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'PAID' })
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "PAID" }),
       });
       if (response.ok) {
         toast({ title: "Bill marked as paid" });
@@ -1228,9 +1642,9 @@ export default function Bills() {
     if (!selectedBill) return;
     try {
       const response = await fetch(`/api/bills/${selectedBill.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'VOID' })
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "VOID" }),
       });
       if (response.ok) {
         toast({ title: "Bill has been voided" });
@@ -1252,7 +1666,9 @@ export default function Bills() {
 
   const handleCreateVendorCredits = () => {
     if (selectedBill) {
-      setLocation(`/vendor-credits/new?billId=${selectedBill.id}&vendorId=${selectedBill.vendorId}`);
+      setLocation(
+        `/vendor-credits/new?billId=${selectedBill.id}&vendorId=${selectedBill.vendorId}`,
+      );
     }
   };
 
@@ -1271,9 +1687,9 @@ export default function Bills() {
     if (!selectedBill) return;
     try {
       const response = await fetch(`/api/bills/${selectedBill.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...selectedBill, expectedPaymentDate })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...selectedBill, expectedPaymentDate }),
       });
       if (response.ok) {
         toast({ title: "Expected payment date updated" });
@@ -1281,7 +1697,10 @@ export default function Bills() {
         fetchBillDetail(selectedBill.id);
       }
     } catch (error) {
-      toast({ title: "Failed to update expected payment date", variant: "destructive" });
+      toast({
+        title: "Failed to update expected payment date",
+        variant: "destructive",
+      });
     } finally {
       setExpectedPaymentDateDialogOpen(false);
     }
@@ -1290,34 +1709,68 @@ export default function Bills() {
   const toggleSelectBill = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedBills.includes(id)) {
-      setSelectedBills(selectedBills.filter(i => i !== id));
+      setSelectedBills(selectedBills.filter((i) => i !== id));
     } else {
       setSelectedBills([...selectedBills, id]);
     }
   };
 
-  const filteredBills = bills.filter(bill =>
-    bill.billNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bill.vendorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    bill.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBills = bills.filter(
+    (bill) =>
+      bill.billNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bill.vendorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bill.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const paginationResult = usePagination<Bill>(filteredBills, 10);
-  const { currentPage, totalPages, totalItems, itemsPerPage, goToPage } = paginationResult;
+  const { currentPage, totalPages, totalItems, itemsPerPage, goToPage } =
+    paginationResult;
   const paginatedItems: Bill[] = paginationResult.paginatedItems;
 
   const getStatusBadge = (status: string) => {
     switch (status?.toUpperCase()) {
-      case 'PAID':
-        return <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">PAID</Badge>;
-      case 'OPEN':
-        return <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">OPEN</Badge>;
-      case 'OVERDUE':
-        return <Badge variant="outline" className="text-red-600 border-red-200 bg-red-50">OVERDUE</Badge>;
-      case 'PARTIALLY_PAID':
-        return <Badge variant="outline" className="text-amber-600 border-amber-200 bg-amber-50">PARTIALLY PAID</Badge>;
-      case 'VOID':
-        return <Badge variant="outline" className="text-slate-600 border-slate-200">VOID</Badge>;
+      case "PAID":
+        return (
+          <Badge
+            variant="outline"
+            className="text-green-600 border-green-200 bg-green-50"
+          >
+            PAID
+          </Badge>
+        );
+      case "OPEN":
+        return (
+          <Badge
+            variant="outline"
+            className="text-blue-600 border-blue-200 bg-blue-50"
+          >
+            OPEN
+          </Badge>
+        );
+      case "OVERDUE":
+        return (
+          <Badge
+            variant="outline"
+            className="text-red-600 border-red-200 bg-red-50"
+          >
+            OVERDUE
+          </Badge>
+        );
+      case "PARTIALLY_PAID":
+        return (
+          <Badge
+            variant="outline"
+            className="text-amber-600 border-amber-200 bg-amber-50"
+          >
+            PARTIALLY PAID
+          </Badge>
+        );
+      case "VOID":
+        return (
+          <Badge variant="outline" className="text-slate-600 border-slate-200">
+            VOID
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -1325,7 +1778,9 @@ export default function Bills() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedBill ? 'flex-1 min-w-[400px]' : 'flex-1'}`}>
+      <div
+        className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedBill ? "flex-1 min-w-[400px]" : "flex-1"}`}
+      >
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-semibold text-slate-900">All Bills</h1>
@@ -1337,8 +1792,8 @@ export default function Bills() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className={`h-9 w-9 ${viewMode === 'list' ? 'bg-slate-100' : ''}`}
-                  onClick={() => setViewMode('list')}
+                  className={`h-9 w-9 ${viewMode === "list" ? "bg-slate-100" : ""}`}
+                  onClick={() => setViewMode("list")}
                   data-testid="button-list-view"
                 >
                   <List className="h-4 w-4" />
@@ -1346,8 +1801,8 @@ export default function Bills() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className={`h-9 w-9 ${viewMode === 'table' ? 'bg-slate-100' : ''}`}
-                  onClick={() => setViewMode('table')}
+                  className={`h-9 w-9 ${viewMode === "table" ? "bg-slate-100" : ""}`}
+                  onClick={() => setViewMode("table")}
                   data-testid="button-table-view"
                 >
                   <Grid3X3 className="h-4 w-4" />
@@ -1363,7 +1818,12 @@ export default function Bills() {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9"
+                  data-testid="button-more-options"
+                >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -1399,7 +1859,9 @@ export default function Bills() {
 
         <div className="flex-1 overflow-auto">
           {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading bills...</div>
+            <div className="p-8 text-center text-slate-500">
+              Loading bills...
+            </div>
           ) : filteredBills.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
@@ -1407,10 +1869,16 @@ export default function Bills() {
               </div>
               <h3 className="text-lg font-semibold mb-2">No bills found</h3>
               <p className="text-slate-500 mb-4">
-                {searchTerm ? 'Try adjusting your search criteria' : 'Create your first bill to get started'}
+                {searchTerm
+                  ? "Try adjusting your search criteria"
+                  : "Create your first bill to get started"}
               </p>
               {!searchTerm && (
-                <Button onClick={() => setLocation("/bills/new")} className="gap-2" data-testid="button-create-first-bill">
+                <Button
+                  onClick={() => setLocation("/bills/new")}
+                  className="gap-2"
+                  data-testid="button-create-first-bill"
+                >
                   <Plus className="h-4 w-4" /> Create New Bill
                 </Button>
               )}
@@ -1428,7 +1896,9 @@ export default function Bills() {
                   <TableHead className="text-xs">STATUS</TableHead>
                   <TableHead className="text-xs">DUE DATE</TableHead>
                   <TableHead className="text-xs text-right">AMOUNT</TableHead>
-                  <TableHead className="text-xs text-right">BALANCE DUE</TableHead>
+                  <TableHead className="text-xs text-right">
+                    BALANCE DUE
+                  </TableHead>
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -1437,7 +1907,7 @@ export default function Bills() {
                   <TableRow
                     key={bill.id}
                     onClick={() => handleBillClick(bill)}
-                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? 'bg-blue-50' : ''}`}
+                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
                     data-testid={`row-bill-${bill.id}`}
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -1446,26 +1916,52 @@ export default function Bills() {
                         onClick={(e) => toggleSelectBill(bill.id, e)}
                       />
                     </TableCell>
-                    <TableCell className="text-sm">{formatDate(bill.billDate)}</TableCell>
-                    <TableCell className="text-sm text-blue-600 font-medium">{bill.billNumber}</TableCell>
-                    <TableCell className="text-sm">{bill.orderNumber || '-'}</TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(bill.billDate)}
+                    </TableCell>
+                    <TableCell className="text-sm text-blue-600 font-medium">
+                      {bill.billNumber}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {bill.orderNumber || "-"}
+                    </TableCell>
                     <TableCell className="text-sm">{bill.vendorName}</TableCell>
                     <TableCell>{getStatusBadge(bill.status)}</TableCell>
-                    <TableCell className="text-sm">{formatDate(bill.dueDate)}</TableCell>
-                    <TableCell className="text-sm text-right font-medium">{formatCurrency(bill.total)}</TableCell>
-                    <TableCell className="text-sm text-right">{formatCurrency(bill.balanceDue)}</TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(bill.dueDate)}
+                    </TableCell>
+                    <TableCell className="text-sm text-right font-medium">
+                      {formatCurrency(bill.total)}
+                    </TableCell>
+                    <TableCell className="text-sm text-right">
+                      {formatCurrency(bill.balanceDue)}
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <DropdownMenuTrigger
+                          asChild
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setLocation(`/bills/${bill.id}/edit`)}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              setLocation(`/bills/${bill.id}/edit`)
+                            }
+                          >
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(bill.id)}>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleDelete(bill.id)}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1487,7 +1983,9 @@ export default function Bills() {
                   <TableHead className="text-xs">STATUS</TableHead>
                   <TableHead className="text-xs">DUE DATE</TableHead>
                   <TableHead className="text-xs text-right">AMOUNT</TableHead>
-                  <TableHead className="text-xs text-right">BALANCE DUE</TableHead>
+                  <TableHead className="text-xs text-right">
+                    BALANCE DUE
+                  </TableHead>
                   <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -1496,7 +1994,7 @@ export default function Bills() {
                   <TableRow
                     key={bill.id}
                     onClick={() => handleBillClick(bill)}
-                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? 'bg-blue-50' : ''}`}
+                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
                     data-testid={`row-bill-${bill.id}`}
                   >
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -1505,29 +2003,56 @@ export default function Bills() {
                         onClick={(e) => toggleSelectBill(bill.id, e)}
                       />
                     </TableCell>
-                    <TableCell className="text-sm">{formatDate(bill.billDate)}</TableCell>
-                    <TableCell className="text-sm text-blue-600 font-medium">{bill.billNumber}</TableCell>
-                    <TableCell className="text-sm">{bill.orderNumber || '-'}</TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(bill.billDate)}
+                    </TableCell>
+                    <TableCell className="text-sm text-blue-600 font-medium">
+                      {bill.billNumber}
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {bill.orderNumber || "-"}
+                    </TableCell>
                     <TableCell className="text-sm">{bill.vendorName}</TableCell>
                     <TableCell>{getStatusBadge(bill.status)}</TableCell>
-                    <TableCell className="text-sm">{formatDate(bill.dueDate)}</TableCell>
-                    <TableCell className="text-sm text-right">{formatCurrency(bill.total)}</TableCell>
-                    <TableCell className="text-sm text-right">{formatCurrency(bill.balanceDue)}</TableCell>
+                    <TableCell className="text-sm">
+                      {formatDate(bill.dueDate)}
+                    </TableCell>
+                    <TableCell className="text-sm text-right">
+                      {formatCurrency(bill.total)}
+                    </TableCell>
+                    <TableCell className="text-sm text-right">
+                      {formatCurrency(bill.balanceDue)}
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <DropdownMenuTrigger
+                          asChild
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setLocation(`/bills/${bill.id}/edit`); }}>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLocation(`/bills/${bill.id}/edit`);
+                            }}
+                          >
                             <Pencil className="mr-2 h-4 w-4" /> Edit
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-red-600"
-                            onClick={(e) => { e.stopPropagation(); handleDelete(bill.id); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(bill.id);
+                            }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
                           </DropdownMenuItem>
@@ -1584,12 +2109,16 @@ export default function Bills() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Bill</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this bill? This action cannot be undone.
+              Are you sure you want to delete this bill? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1602,12 +2131,16 @@ export default function Bills() {
           <AlertDialogHeader>
             <AlertDialogTitle>Void Bill</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to void this bill? This will cancel the bill and it cannot be used for any transactions.
+              Are you sure you want to void this bill? This will cancel the bill
+              and it cannot be used for any transactions.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmVoid} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction
+              onClick={confirmVoid}
+              className="bg-red-600 hover:bg-red-700"
+            >
               Void Bill
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1615,7 +2148,10 @@ export default function Bills() {
       </AlertDialog>
 
       {/* Expected Payment Date Dialog */}
-      <Dialog open={expectedPaymentDateDialogOpen} onOpenChange={setExpectedPaymentDateDialogOpen}>
+      <Dialog
+        open={expectedPaymentDateDialogOpen}
+        onOpenChange={setExpectedPaymentDateDialogOpen}
+      >
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Expected Payment Date</DialogTitle>
@@ -1631,10 +2167,16 @@ export default function Bills() {
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setExpectedPaymentDateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setExpectedPaymentDateDialogOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={confirmExpectedPaymentDate} className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                onClick={confirmExpectedPaymentDate}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
                 Save
               </Button>
             </div>
@@ -1650,46 +2192,67 @@ export default function Bills() {
           </DialogHeader>
           <div className="pt-4">
             <p className="text-xs text-slate-500 mb-2">
-              Amount is displayed in your base currency <Badge variant="outline" className="text-xs">INR</Badge>
+              Amount is displayed in your base currency{" "}
+              <Badge variant="outline" className="text-xs">
+                INR
+              </Badge>
             </p>
             {selectedBill && (
               <>
-                <h4 className="font-semibold mb-2">Bill - {selectedBill.billNumber}</h4>
+                <h4 className="font-semibold mb-2">
+                  Bill - {selectedBill.billNumber}
+                </h4>
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead className="text-xs">ACCOUNT</TableHead>
-                      <TableHead className="text-xs text-right">DEBIT</TableHead>
-                      <TableHead className="text-xs text-right">CREDIT</TableHead>
+                      <TableHead className="text-xs text-right">
+                        DEBIT
+                      </TableHead>
+                      <TableHead className="text-xs text-right">
+                        CREDIT
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {selectedBill.journalEntries && selectedBill.journalEntries.length > 0 ? (
+                    {selectedBill.journalEntries &&
+                    selectedBill.journalEntries.length > 0 ? (
                       selectedBill.journalEntries.map((entry, index) => (
                         <TableRow key={index}>
                           <TableCell>{entry.account}</TableCell>
-                          <TableCell className="text-right">{entry.debit.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">{entry.credit.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">
+                            {entry.debit.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {entry.credit.toFixed(2)}
+                          </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <>
                         <TableRow>
                           <TableCell>Purchases</TableCell>
-                          <TableCell className="text-right">{selectedBill.subTotal.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">
+                            {selectedBill.subTotal.toFixed(2)}
+                          </TableCell>
                           <TableCell className="text-right">0.00</TableCell>
                         </TableRow>
-                        {selectedBill.taxAmount && selectedBill.taxAmount > 0 && (
-                          <TableRow>
-                            <TableCell>Input Tax Credits (IGST)</TableCell>
-                            <TableCell className="text-right">{selectedBill.taxAmount.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">0.00</TableCell>
-                          </TableRow>
-                        )}
+                        {selectedBill.taxAmount &&
+                          selectedBill.taxAmount > 0 && (
+                            <TableRow>
+                              <TableCell>Input Tax Credits (IGST)</TableCell>
+                              <TableCell className="text-right">
+                                {selectedBill.taxAmount.toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-right">0.00</TableCell>
+                            </TableRow>
+                          )}
                         <TableRow>
                           <TableCell>Accounts Payable</TableCell>
                           <TableCell className="text-right">0.00</TableCell>
-                          <TableCell className="text-right">{selectedBill.total.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">
+                            {selectedBill.total.toFixed(2)}
+                          </TableCell>
                         </TableRow>
                       </>
                     )}
@@ -1698,7 +2261,10 @@ export default function Bills() {
               </>
             )}
             <div className="flex justify-end mt-4">
-              <Button variant="outline" onClick={() => setJournalDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setJournalDialogOpen(false)}
+              >
                 Close
               </Button>
             </div>
