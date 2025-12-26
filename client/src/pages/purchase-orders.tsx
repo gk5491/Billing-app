@@ -107,29 +107,29 @@ function formatDate(dateString: string): string {
 
 function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: PurchaseOrder; branding?: any }) {
   return (
-    <div className="bg-white border border-slate-200 shadow-sm w-full">
+    <div className="bg-white border border-slate-200 shadow-sm w-full pdf-container">
       <div className="flex w-full">
-        <div className="w-2 bg-blue-600 shrink-0"></div>
+        <div className="w-2 bg-[#2563eb] shrink-0"></div>
         <div className="flex-1 p-4 min-w-0">
           <div className="flex justify-between items-start mb-6">
             <div>
               {branding?.logo?.url ? (
                 <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-2" data-testid="img-po-logo" />
               ) : (
-                <div className="h-10 w-10 bg-blue-600 rounded flex items-center justify-center mb-2">
+                <div className="h-10 w-10 bg-[#2563eb] rounded flex items-center justify-center mb-2">
                   <span className="text-white font-bold text-lg">S</span>
                 </div>
               )}
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-bold text-blue-600 mb-2">Purchase Order</h2>
-              <p className="text-blue-600 font-medium"># {purchaseOrder.purchaseOrderNumber}</p>
+              <h2 className="text-2xl font-bold text-[#2563eb] mb-2">Purchase Order</h2>
+              <p className="text-[#2563eb] font-medium"># {purchaseOrder.purchaseOrderNumber}</p>
             </div>
           </div>
 
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-slate-500 mb-2">Vendor Address</h4>
-            <p className="font-semibold text-blue-600">{purchaseOrder.vendorName}</p>
+            <p className="font-semibold text-[#2563eb]">{purchaseOrder.vendorName}</p>
             {purchaseOrder.vendorAddress && (
               <div className="text-sm text-slate-600">
                 {purchaseOrder.vendorAddress.street1 && <p>{purchaseOrder.vendorAddress.street1}</p>}
@@ -149,7 +149,7 @@ function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: Purc
 
           <table className="w-full mb-6">
             <thead>
-              <tr className="bg-blue-600 text-white">
+              <tr className="bg-[#2563eb] text-white">
                 <th className="px-3 py-2 text-left text-sm font-medium">#</th>
                 <th className="px-3 py-2 text-left text-sm font-medium">Item & Description</th>
                 <th className="px-3 py-2 text-center text-sm font-medium">Qty</th>
@@ -214,15 +214,15 @@ function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: Purc
                 <p className="text-sm">Authorized Signature</p>
               </div>
             ) : (
-              <>
-                <div className="w-32 h-32 border-2 border-blue-600 rounded-full flex items-center justify-center mx-auto">
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 border-2 border-[#2563eb] rounded-full flex items-center justify-center">
                   <div className="text-center">
-                    <p className="text-xs text-blue-600 font-medium">COMPANY</p>
-                    <p className="text-[8px] text-slate-500">PVT. LTD.</p>
+                    <p className="text-[10px] text-[#2563eb] font-bold">COMPANY</p>
+                    <p className="text-[6px] text-slate-500">PVT. LTD.</p>
                   </div>
                 </div>
-                <p className="text-center text-sm mt-2">Authorized Signature</p>
-              </>
+                <p className="text-center text-xs mt-2">Authorized Signature</p>
+              </div>
             )}
           </div>
         </div>
@@ -264,11 +264,27 @@ function PurchaseOrderDetailPanel({
   const handleDownloadPDF = async () => {
     if (!pdfRef.current) return;
     try {
-      const canvas = await html2canvas(pdfRef.current, {
+      // Create a clone for PDF generation to avoid "oklch" issues
+      const element = pdfRef.current;
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        onclone: (clonedDoc) => {
+          // Replace all oklch colors with standard ones in the clone
+          const elements = clonedDoc.getElementsByTagName('*');
+          for (let i = 0; i < elements.length; i++) {
+            const el = elements[i] as HTMLElement;
+            if (el.style) {
+              // Simple cleanup for common tailwind oklch usage
+              const computedStyle = window.getComputedStyle(el);
+              if (computedStyle.color.includes('oklch')) el.style.color = '#000000';
+              if (computedStyle.backgroundColor.includes('oklch')) el.style.backgroundColor = 'transparent';
+              if (computedStyle.borderColor.includes('oklch')) el.style.borderColor = '#e2e8f0';
+            }
+          }
+        }
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
@@ -295,23 +311,60 @@ function PurchaseOrderDetailPanel({
         <html>
           <head>
             <title>Print Purchase Order - ${purchaseOrder.purchaseOrderNumber}</title>
-            <script src="https://cdn.tailwindcss.com"></script>
             <style>
               @media print {
-                body { padding: 0; margin: 0; }
+                body { padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
                 .no-print { display: none; }
               }
-              body { font-family: sans-serif; }
+              body { font-family: sans-serif; padding: 40px; }
+              .flex { display: flex; }
+              .flex-col { flex-direction: column; }
+              .justify-between { justify-content: space-between; }
+              .items-start { align-items: flex-start; }
+              .items-center { align-items: center; }
+              .w-full { width: 100%; }
+              .w-2 { width: 8px; }
+              .bg-blue-600 { background-color: #2563eb !important; }
+              .text-blue-600 { color: #2563eb !important; }
+              .text-white { color: #ffffff !important; }
+              .text-right { text-align: right; }
+              .text-center { text-align: center; }
+              .font-bold { font-weight: bold; }
+              .font-semibold { font-weight: 600; }
+              .font-medium { font-weight: 500; }
+              .mb-2 { margin-bottom: 8px; }
+              .mb-4 { margin-bottom: 16px; }
+              .mb-6 { margin-bottom: 24px; }
+              .mt-2 { margin-top: 8px; }
+              .mt-8 { margin-top: 32px; }
+              .p-4 { padding: 16px; }
+              .px-3 { padding-left: 12px; padding-right: 12px; }
+              .py-2 { padding-top: 8px; padding-bottom: 8px; }
+              .py-3 { padding-top: 12px; padding-bottom: 12px; }
+              .text-sm { font-size: 14px; }
+              .text-xs { font-size: 12px; }
+              .text-2xl { font-size: 24px; }
+              .border { border: 1px solid #e2e8f0; }
+              .border-b { border-bottom: 1px solid #e2e8f0; }
+              .border-t { border-top: 1px solid #e2e8f0; }
+              .rounded { border-radius: 4px; }
+              .rounded-full { border-radius: 9999px; }
+              table { width: 100%; border-collapse: collapse; }
+              th { text-align: left; }
+              .space-y-1 > * + * { margin-top: 4px; }
+              .space-y-2 > * + * { margin-top: 8px; }
+              .gap-2 { gap: 8px; }
+              .shrink-0 { flex-shrink: 0; }
             </style>
           </head>
           <body>
-            <div class="p-8">
-              ${printContent}
-            </div>
+            ${printContent}
             <script>
               window.onload = () => {
-                window.print();
-                window.close();
+                setTimeout(() => {
+                  window.print();
+                  window.close();
+                }, 500);
               };
             </script>
           </body>
