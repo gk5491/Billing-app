@@ -360,8 +360,15 @@ export default function PaymentsMade() {
           caret-color: transparent !important;
           accent-color: transparent !important;
         }
+        /* Fix for light lines and colors in PDF */
+        .border-slate-50 { border-color: #f1f5f9 !important; border-bottom-width: 1px !important; }
+        .border-slate-100 { border-color: #f1f5f9 !important; border-bottom-width: 1px !important; }
+        .text-slate-400 { color: #94a3b8 !important; }
+        .text-slate-500 { color: #64748b !important; }
+        .bg-slate-50 { background-color: #f8fafc !important; }
+        
         /* Hide badge for PDF generation */
-        .pdf-hide-badge {
+        .paid-badge-overlay {
           display: none !important;
         }
       `;
@@ -771,14 +778,14 @@ export default function PaymentsMade() {
                   <h4 className="text-xs font-bold mb-4 text-slate-800 dark:text-slate-200">Payment for</h4>
                   <table className="w-full text-[10px]">
                     <thead>
-                      <tr className="bg-slate-50 dark:bg-slate-800/50">
-                        <th className="px-3 py-2 text-left font-semibold text-slate-500">Bill Number</th>
-                        <th className="px-3 py-2 text-left font-semibold text-slate-500">Bill Date</th>
-                        <th className="px-3 py-2 text-right font-semibold text-slate-500">Bill Amount</th>
-                        <th className="px-3 py-2 text-right font-semibold text-slate-500">Payment Amount</th>
+                      <tr className="bg-slate-100 dark:bg-slate-800/50">
+                        <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Number</th>
+                        <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Date</th>
+                        <th className="px-3 py-2 text-right font-bold text-slate-700">Bill Amount</th>
+                        <th className="px-3 py-2 text-right font-bold text-slate-700">Payment Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-200">
                       {getBillPaymentsArray(selectedPayment).map((bp, index) => (
                         <tr key={index}>
                           <td className="px-3 py-2 text-blue-600 font-medium">{bp.billNumber}</td>
