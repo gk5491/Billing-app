@@ -1,5 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   Plus, Search, ChevronDown, MoreHorizontal, Pencil, Trash2,
   X, Mail, FileText, Printer, ArrowRight, Filter, Download,
@@ -257,6 +259,67 @@ function PurchaseOrderDetailPanel({
   branding?: any;
 }) {
   const [showPdfView, setShowPdfView] = useState(true);
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = async () => {
+    if (!pdfRef.current) return;
+    try {
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${purchaseOrder.purchaseOrderNumber}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+  const handlePrint = () => {
+    if (!pdfRef.current) return;
+    const printContent = pdfRef.current.innerHTML;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Purchase Order - ${purchaseOrder.purchaseOrderNumber}</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+              @media print {
+                body { padding: 0; margin: 0; }
+                .no-print { display: none; }
+              }
+              body { font-family: sans-serif; }
+            </style>
+          </head>
+          <body>
+            <div class="p-8">
+              ${printContent}
+            </div>
+            <script>
+              window.onload = () => {
+                window.print();
+                window.close();
+              };
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
 
   function getActionsForStatus(status: string): ActionItem[] {
     const actions: ActionItem[] = [];
@@ -315,13 +378,13 @@ function PurchaseOrderDetailPanel({
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900" data-testid="text-po-number">{purchaseOrder.purchaseOrderNumber}</h2>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownloadPDF}>
             <Download className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint}>
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowPdfView(!showPdfView)}>
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} data-testid="button-close-panel">
@@ -348,10 +411,10 @@ function PurchaseOrderDetailPanel({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadPDF}>
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" /> Print
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -423,69 +486,71 @@ function PurchaseOrderDetailPanel({
       </div>
 
       <div className="flex-1 overflow-auto p-2">
-        {showPdfView ? (
-          <div className="w-full">
-            <PurchaseOrderPDFView purchaseOrder={purchaseOrder} branding={branding} />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-slate-500">Vendor</span>
-                <p className="font-medium text-blue-600">{purchaseOrder.vendorName}</p>
-              </div>
-              <div>
-                <span className="text-slate-500">Date</span>
-                <p className="font-medium">{formatDate(purchaseOrder.date)}</p>
-              </div>
-              <div>
-                <span className="text-slate-500">Delivery Date</span>
-                <p className="font-medium">{formatDate(purchaseOrder.deliveryDate || '')}</p>
-              </div>
-              <div>
-                <span className="text-slate-500">Status</span>
-                <Badge variant="outline" className="text-green-600 border-green-200">
-                  {purchaseOrder.status}
-                </Badge>
-              </div>
+        <div ref={pdfRef} className="w-full">
+          {showPdfView ? (
+            <div className="w-full">
+              <PurchaseOrderPDFView purchaseOrder={purchaseOrder} branding={branding} />
             </div>
+          ) : (
+            <div className="space-y-6 p-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-slate-500">Vendor</span>
+                  <p className="font-medium text-blue-600">{purchaseOrder.vendorName}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Date</span>
+                  <p className="font-medium">{formatDate(purchaseOrder.date)}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Delivery Date</span>
+                  <p className="font-medium">{formatDate(purchaseOrder.deliveryDate || '')}</p>
+                </div>
+                <div>
+                  <span className="text-slate-500">Status</span>
+                  <Badge variant="outline" className="text-green-600 border-green-200">
+                    {purchaseOrder.status}
+                  </Badge>
+                </div>
+              </div>
 
-            <div>
-              <h4 className="font-semibold mb-2">Items</h4>
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-2 py-1 text-left">Item</th>
-                    <th className="px-2 py-1 text-center">Qty</th>
-                    <th className="px-2 py-1 text-right">Rate</th>
-                    <th className="px-2 py-1 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {purchaseOrder.items.map((item) => (
-                    <tr key={item.id} className="border-b">
-                      <td className="px-2 py-2">{item.itemName}</td>
-                      <td className="px-2 py-2 text-center">{item.quantity}</td>
-                      <td className="px-2 py-2 text-right">{formatCurrency(item.rate)}</td>
-                      <td className="px-2 py-2 text-right">{formatCurrency(item.amount)}</td>
+              <div>
+                <h4 className="font-semibold mb-2">Items</h4>
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="px-2 py-1 text-left">Item</th>
+                      <th className="px-2 py-1 text-center">Qty</th>
+                      <th className="px-2 py-1 text-right">Rate</th>
+                      <th className="px-2 py-1 text-right">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {purchaseOrder.items.map((item) => (
+                      <tr key={item.id} className="border-b">
+                        <td className="px-2 py-2">{item.itemName}</td>
+                        <td className="px-2 py-2 text-center">{item.quantity}</td>
+                        <td className="px-2 py-2 text-right">{formatCurrency(item.rate)}</td>
+                        <td className="px-2 py-2 text-right">{formatCurrency(item.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            <div className="text-right space-y-1">
-              <div className="flex justify-end gap-4 text-sm">
-                <span className="text-slate-500">Sub Total:</span>
-                <span className="w-28">{formatCurrency(purchaseOrder.subTotal)}</span>
-              </div>
-              <div className="flex justify-end gap-4 text-sm font-semibold">
-                <span>Total:</span>
-                <span className="w-28">{formatCurrency(purchaseOrder.total)}</span>
+              <div className="text-right space-y-1">
+                <div className="flex justify-end gap-4 text-sm">
+                  <span className="text-slate-500">Sub Total:</span>
+                  <span className="w-28">{formatCurrency(purchaseOrder.subTotal)}</span>
+                </div>
+                <div className="flex justify-end gap-4 text-sm font-semibold">
+                  <span>Total:</span>
+                  <span className="w-28">{formatCurrency(purchaseOrder.total)}</span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="border-t border-slate-200 p-3 text-center text-xs text-slate-500">
