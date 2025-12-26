@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import {
   Plus, Search, ChevronDown, MoreHorizontal, Pencil, Trash2,
   X, Mail, FileText, Printer, Filter, Download,
@@ -553,7 +555,7 @@ function BillDetailPanel({
         logging: false,
         backgroundColor: '#ffffff',
         windowWidth: 800,
-        onclone: (clonedDoc) => {
+        onclone: (clonedDoc: Document) => {
           const clonedElement = clonedDoc.getElementById('bill-pdf-content');
           if (clonedElement) {
             clonedElement.style.width = '800px';
