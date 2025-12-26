@@ -905,23 +905,30 @@ function BillDetailPanel({
             clonedElement.style.backgroundColor = "#ffffff";
             clonedElement.style.color = "#0f172a";
 
-            // Further ensure no oklch in the clone
-            const clonedAll = clonedElement.querySelectorAll("*");
-            clonedAll.forEach((el) => {
-              const htmlEl = el as HTMLElement;
-              const computed = window.getComputedStyle(htmlEl);
-              if (computed.backgroundColor.includes("oklch"))
-                htmlEl.style.setProperty(
-                  "background-color",
-                  "#ffffff",
-                  "important",
-                );
-              if (computed.color.includes("oklch"))
-                htmlEl.style.setProperty("color", "#0f172a", "important");
-              if (computed.borderColor.includes("oklch"))
-                htmlEl.style.setProperty(
-                  "border-color",
-                  "#e2e8f0",
+      // Further ensure no oklch in the clone
+      const clonedAll = clonedElement.querySelectorAll("*");
+      clonedAll.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const computed = window.getComputedStyle(htmlEl);
+        if (computed.backgroundColor.includes("oklch"))
+          htmlEl.style.setProperty(
+            "background-color",
+            "#ffffff",
+            "important",
+          );
+        if (computed.color.includes("oklch"))
+          htmlEl.style.setProperty("color", "#0f172a", "important");
+        if (computed.borderColor.includes("oklch"))
+          htmlEl.style.setProperty(
+            "border-color",
+            "#e2e8f0",
+            "important",
+          );
+        // Add more common oklch variables used in TW4
+        htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+        htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+      });
+
                   "important",
                 );
             });
