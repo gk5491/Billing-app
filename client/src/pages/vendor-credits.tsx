@@ -500,15 +500,26 @@ export default function VendorCredits() {
       tempDiv.style.left = '-9999px';
       tempDiv.style.width = '210mm';
       tempDiv.style.padding = '0';
+      tempDiv.style.background = '#ffffff';
+      tempDiv.style.color = '#000000';
       tempDiv.appendChild(element);
       document.body.appendChild(tempDiv);
 
+      // Remove all class and style attributes that might contain unsupported colors
+      const allElements = tempDiv.querySelectorAll('*');
+      allElements.forEach((el: Element) => {
+        el.removeAttribute('style');
+        el.removeAttribute('class');
+      });
+
       // Capture the content
-      const canvas = await html2canvas(element, {
+      const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
+        imageTimeout: 0,
       });
 
       // Clean up temp element
@@ -570,15 +581,26 @@ export default function VendorCredits() {
       tempDiv.style.left = '-9999px';
       tempDiv.style.width = '210mm';
       tempDiv.style.padding = '0';
+      tempDiv.style.background = '#ffffff';
+      tempDiv.style.color = '#000000';
       tempDiv.appendChild(element);
       document.body.appendChild(tempDiv);
 
+      // Remove all class and style attributes that might contain unsupported colors
+      const allElements = tempDiv.querySelectorAll('*');
+      allElements.forEach((el: Element) => {
+        el.removeAttribute('style');
+        el.removeAttribute('class');
+      });
+
       // Capture the content
-      const canvas = await html2canvas(element, {
+      const canvas = await html2canvas(tempDiv, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
+        imageTimeout: 0,
       });
 
       // Clean up temp element

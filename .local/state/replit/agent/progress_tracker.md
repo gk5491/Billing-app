@@ -125,3 +125,4 @@
 [x] 125. Fixed html2canvas "oklch" color error by adding polyfill/fallback and explicit background styles (Dec 26, 2025)
 [x] 126. Restored PDF color consistency by removing broad transparent overrides and ensuring explicit color branding (Dec 26, 2025)
 [x] 127. Implemented PDF Download and Print functionality for Vendor Credits with full styling support (Dec 26, 2025)
+[x] 128. Fixed oklab color parsing error in PDF download/print by removing class and style attributes (Dec 26, 2025)
