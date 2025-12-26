@@ -359,13 +359,24 @@ export default function PaymentsMade() {
           outline-color: transparent !important;
           caret-color: transparent !important;
           accent-color: transparent !important;
+          
+          /* Force standard RGB colors for PDF consistency */
+          color-scheme: light !important;
         }
         /* Fix for light lines and colors in PDF */
         .border-slate-50 { border-color: #f1f5f9 !important; border-bottom-width: 1px !important; }
         .border-slate-100 { border-color: #f1f5f9 !important; border-bottom-width: 1px !important; }
+        .border-slate-200 { border-color: #e2e8f0 !important; border-bottom-width: 1px !important; }
         .text-slate-400 { color: #94a3b8 !important; }
         .text-slate-500 { color: #64748b !important; }
+        .text-slate-600 { color: #475569 !important; }
+        .text-slate-700 { color: #334155 !important; }
         .bg-slate-50 { background-color: #f8fafc !important; }
+        .bg-slate-100 { background-color: #f1f5f9 !important; }
+        
+        /* Force background visibility */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
         
         /* Hide badge for PDF generation */
         .paid-badge-overlay {
@@ -791,7 +802,7 @@ export default function PaymentsMade() {
                           <td className="px-3 py-2 text-blue-600 font-medium">{bp.billNumber}</td>
                           <td className="px-3 py-2 text-slate-600">{formatDate(bp.billDate)}</td>
                           <td className="px-3 py-2 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
-                          <td className="px-3 py-2 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount)}</td>
+                          <td className="px-3 py-2 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount || 0)}</td>
                         </tr>
                       ))}
                     </tbody>
