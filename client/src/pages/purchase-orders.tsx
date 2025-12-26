@@ -107,121 +107,121 @@ function formatDate(dateString: string): string {
 
 function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: PurchaseOrder; branding?: any }) {
   return (
-    <div className="bg-white border border-slate-200 shadow-sm w-full pdf-container">
-      <div className="flex w-full">
-        <div className="w-2 bg-[#2563eb] shrink-0"></div>
-        <div className="flex-1 p-4 min-w-0">
-          <div className="flex justify-between items-start mb-6">
+    <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', width: '100%', fontFamily: 'sans-serif' }} className="pdf-container">
+      <div style={{ display: 'flex', width: '100%' }}>
+        <div style={{ width: '8px', backgroundColor: '#2563eb', flexShrink: 0 }}></div>
+        <div style={{ flex: 1, padding: '16px', minWidth: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
             <div>
               {branding?.logo?.url ? (
-                <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-2" data-testid="img-po-logo" />
+                <img src={branding.logo.url} alt="Company Logo" style={{ height: '48px', width: 'auto', marginBottom: '8px', maxWidth: '200px', objectFit: 'contain' }} data-testid="img-po-logo" />
               ) : (
-                <div className="h-10 w-10 bg-[#2563eb] rounded flex items-center justify-center mb-2">
-                  <span className="text-white font-bold text-lg">S</span>
+                <div style={{ height: '40px', width: '40px', backgroundColor: '#2563eb', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                  <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>S</span>
                 </div>
               )}
             </div>
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-[#2563eb] mb-2">Purchase Order</h2>
-              <p className="text-[#2563eb] font-medium"># {purchaseOrder.purchaseOrderNumber}</p>
+            <div style={{ textAlign: 'right' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px', marginTop: 0 }}>Purchase Order</h2>
+              <p style={{ color: '#2563eb', fontWeight: '500', margin: 0 }}># {purchaseOrder.purchaseOrderNumber}</p>
             </div>
           </div>
 
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-slate-500 mb-2">Vendor Address</h4>
-            <p className="font-semibold text-[#2563eb]">{purchaseOrder.vendorName}</p>
+          <div style={{ marginBottom: '24px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#64748b', marginBottom: '8px', marginTop: 0 }}>Vendor Address</h4>
+            <p style={{ fontWeight: '600', color: '#2563eb', margin: 0 }}>{purchaseOrder.vendorName}</p>
             {purchaseOrder.vendorAddress && (
-              <div className="text-sm text-slate-600">
-                {purchaseOrder.vendorAddress.street1 && <p>{purchaseOrder.vendorAddress.street1}</p>}
+              <div style={{ fontSize: '14px', color: '#475569' }}>
+                {purchaseOrder.vendorAddress.street1 && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.street1}</p>}
                 {purchaseOrder.vendorAddress.city && (
-                  <p>{purchaseOrder.vendorAddress.city}, {purchaseOrder.vendorAddress.state}</p>
+                  <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.city}, {purchaseOrder.vendorAddress.state}</p>
                 )}
-                {purchaseOrder.vendorAddress.pinCode && <p>{purchaseOrder.vendorAddress.pinCode}</p>}
-                {purchaseOrder.vendorAddress.countryRegion && <p>{purchaseOrder.vendorAddress.countryRegion}</p>}
-                {purchaseOrder.vendorAddress.gstin && <p>GSTIN: {purchaseOrder.vendorAddress.gstin}</p>}
+                {purchaseOrder.vendorAddress.pinCode && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.pinCode}</p>}
+                {purchaseOrder.vendorAddress.countryRegion && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.countryRegion}</p>}
+                {purchaseOrder.vendorAddress.gstin && <p style={{ margin: '2px 0' }}>GSTIN: {purchaseOrder.vendorAddress.gstin}</p>}
               </div>
             )}
           </div>
 
-          <div className="text-right mb-4">
-            <p className="text-sm"><span className="text-slate-500">Date:</span> {formatDate(purchaseOrder.date)}</p>
+          <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', margin: 0 }}><span style={{ color: '#64748b' }}>Date:</span> {formatDate(purchaseOrder.date)}</p>
           </div>
 
-          <table className="w-full mb-6">
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px' }}>
             <thead>
-              <tr className="bg-[#2563eb] text-white">
-                <th className="px-3 py-2 text-left text-sm font-medium">#</th>
-                <th className="px-3 py-2 text-left text-sm font-medium">Item & Description</th>
-                <th className="px-3 py-2 text-center text-sm font-medium">Qty</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Rate</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Amount</th>
+              <tr style={{ backgroundColor: '#2563eb' }}>
+                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '14px', fontWeight: '500', color: 'white' }}>#</th>
+                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '14px', fontWeight: '500', color: 'white' }}>Item & Description</th>
+                <th style={{ padding: '8px 12px', textAlign: 'center', fontSize: '14px', fontWeight: '500', color: 'white' }}>Qty</th>
+                <th style={{ padding: '8px 12px', textAlign: 'right', fontSize: '14px', fontWeight: '500', color: 'white' }}>Rate</th>
+                <th style={{ padding: '8px 12px', textAlign: 'right', fontSize: '14px', fontWeight: '500', color: 'white' }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {purchaseOrder.items.map((item, index) => (
-                <tr key={item.id} className="border-b border-slate-100">
-                  <td className="px-3 py-3 text-sm">{index + 1}</td>
-                  <td className="px-3 py-3">
-                    <p className="font-medium text-sm">{item.itemName}</p>
-                    {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
+                <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '12px', fontSize: '14px' }}>{index + 1}</td>
+                  <td style={{ padding: '12px' }}>
+                    <p style={{ fontWeight: '500', fontSize: '14px', margin: 0 }}>{item.itemName}</p>
+                    {item.description && <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>{item.description}</p>}
                   </td>
-                  <td className="px-3 py-3 text-center text-sm">{item.quantity.toLocaleString('en-IN')}</td>
-                  <td className="px-3 py-3 text-right text-sm">{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-3 py-3 text-right text-sm font-medium">{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '14px' }}>{item.quantity.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '14px' }}>{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '14px', fontWeight: '500' }}>{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          <div className="flex justify-end mb-6">
-            <div className="w-64 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Sub Total</span>
-                <span>{purchaseOrder.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+            <div style={{ width: '256px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
+                <span style={{ color: '#64748b' }}>Sub Total</span>
+                <span style={{ textAlign: 'right' }}>{purchaseOrder.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
               {purchaseOrder.taxAmount && purchaseOrder.taxAmount > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">IGST (18%)</span>
-                  <span>{purchaseOrder.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
+                  <span style={{ color: '#64748b' }}>IGST (18%)</span>
+                  <span style={{ textAlign: 'right' }}>{purchaseOrder.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </div>
               )}
-              <div className="flex justify-between font-semibold border-t pt-2">
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
                 <span>Total</span>
-                <span>{formatCurrency(purchaseOrder.total)}</span>
+                <span style={{ textAlign: 'right' }}>{formatCurrency(purchaseOrder.total)}</span>
               </div>
             </div>
           </div>
 
           {purchaseOrder.termsAndConditions && (
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold mb-2">Terms & Conditions</h4>
-              <div className="text-xs text-slate-600 space-y-1">
+            <div style={{ marginBottom: '24px' }}>
+              <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', marginTop: 0 }}>Terms & Conditions</h4>
+              <div style={{ fontSize: '12px', color: '#475569' }}>
                 {purchaseOrder.termsAndConditions.split('\n').map((line, i) => (
-                  <p key={i}>{line}</p>
+                  <p key={i} style={{ margin: '2px 0' }}>{line}</p>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="mt-8">
+          <div style={{ marginTop: '32px' }}>
             {branding?.signature?.url ? (
-              <div className="flex flex-col items-center gap-2">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                 <img
                   src={branding.signature.url}
                   alt="Authorized Signature"
                   style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
                 />
-                <p className="text-sm">Authorized Signature</p>
+                <p style={{ fontSize: '14px', margin: 0 }}>Authorized Signature</p>
               </div>
             ) : (
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 border-2 border-[#2563eb] rounded-full flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-[10px] text-[#2563eb] font-bold">COMPANY</p>
-                    <p className="text-[6px] text-slate-500">PVT. LTD.</p>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: '96px', height: '96px', border: '2px solid #2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: '10px', color: '#2563eb', fontWeight: 'bold', margin: 0 }}>COMPANY</p>
+                    <p style={{ fontSize: '6px', color: '#64748b', margin: 0 }}>PVT. LTD.</p>
                   </div>
                 </div>
-                <p className="text-center text-xs mt-2">Authorized Signature</p>
+                <p style={{ textAlign: 'center', fontSize: '12px', marginTop: '8px', margin: 0 }}>Authorized Signature</p>
               </div>
             )}
           </div>
@@ -264,45 +264,12 @@ function PurchaseOrderDetailPanel({
   const handleDownloadPDF = async () => {
     if (!pdfRef.current) return;
     try {
-      // Create a clone for PDF generation to avoid "oklch" issues
       const element = pdfRef.current;
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
-        onclone: (clonedDoc) => {
-          // Replace all oklch/color-function colors with standard ones in the clone
-          const elements = clonedDoc.getElementsByTagName('*');
-          for (let i = 0; i < elements.length; i++) {
-            const el = elements[i] as HTMLElement;
-            
-            // Critical fix: Override styles directly on the element instead of checking computed style
-            // which can be slow and unreliable in the clone
-            if (el.classList.contains('bg-[#2563eb]')) {
-              el.style.setProperty('background-color', '#2563eb', 'important');
-            }
-            if (el.classList.contains('text-[#2563eb]')) {
-              el.style.setProperty('color', '#2563eb', 'important');
-            }
-            if (el.classList.contains('border-[#2563eb]')) {
-              el.style.setProperty('border-color', '#2563eb', 'important');
-            }
-
-            // Cleanup any remaining oklch variables from tailwind
-            if (el.style) {
-              const styleProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'stopColor', 'fill', 'stroke'];
-              styleProps.forEach(prop => {
-                const value = (el.style as any)[prop];
-                if (value && (value.includes('oklch') || value.includes('var('))) {
-                  if (prop === 'color') el.style.setProperty('color', '#000000', 'important');
-                  else if (prop === 'backgroundColor' && !el.classList.contains('bg-[#2563eb]')) el.style.setProperty('background-color', 'transparent', 'important');
-                  else if (prop === 'borderColor') el.style.setProperty('border-color', '#e2e8f0', 'important');
-                }
-              });
-            }
-          }
-        }
+        backgroundColor: '#ffffff'
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
