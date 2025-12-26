@@ -266,13 +266,21 @@ function PurchaseOrderDetailPanel({
 
   const handleDownloadPDF = async () => {
     if (!pdfRef.current) return;
+    const toastId = toast({ title: "Generating PDF...", description: "Please wait while we prepare your document." });
     try {
       const element = pdfRef.current;
       
       // Temporary style adjustments for PDF generation
       const originalStyle = element.getAttribute('style') || '';
-      element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important;');
+      element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important; background-color: white !important;');
       
+      // Ensure the element is visible during capture
+      const isHidden = !showPdfView;
+      if (isHidden) setShowPdfView(true);
+      
+      // Wait for state update and rendering
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -283,6 +291,7 @@ function PurchaseOrderDetailPanel({
       
       // Restore original style
       element.setAttribute('style', originalStyle);
+      if (isHidden) setShowPdfView(false);
       
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
@@ -295,8 +304,10 @@ function PurchaseOrderDetailPanel({
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${purchaseOrder.purchaseOrderNumber}.pdf`);
+      toast({ title: "Success", description: "PDF downloaded successfully" });
     } catch (error) {
       console.error('Error generating PDF:', error);
+      toast({ title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
     }
   };
 
