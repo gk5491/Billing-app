@@ -106,126 +106,131 @@ function formatDate(dateString: string): string {
 }
 
 function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: PurchaseOrder; branding?: any }) {
+  const redThemeColor = '#b91c1c'; // Red-700
+  const blueThemeColor = '#1d4ed8'; // Blue-700
+  
   return (
-    <div style={{ backgroundColor: 'white', border: '1px solid #e2e8f0', width: '100%', fontFamily: 'sans-serif' }} className="pdf-container">
-      <div style={{ display: 'flex', width: '100%' }}>
-        <div style={{ width: '8px', backgroundColor: '#2563eb', flexShrink: 0 }}></div>
-        <div style={{ flex: 1, padding: '16px', minWidth: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
-            <div>
-              {branding?.logo?.url ? (
-                <img src={branding.logo.url} alt="Company Logo" style={{ height: '48px', width: 'auto', marginBottom: '8px', maxWidth: '200px', objectFit: 'contain' }} data-testid="img-po-logo" />
-              ) : (
-                <div style={{ height: '40px', width: '40px', backgroundColor: '#2563eb', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-                  <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>S</span>
-                </div>
-              )}
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px', marginTop: 0 }}>Purchase Order</h2>
-              <p style={{ color: '#2563eb', fontWeight: '500', margin: 0 }}># {purchaseOrder.purchaseOrderNumber}</p>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: '24px' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#64748b', marginBottom: '8px', marginTop: 0 }}>Vendor Address</h4>
-            <p style={{ fontWeight: '600', color: '#2563eb', margin: 0 }}>{purchaseOrder.vendorName}</p>
-            {purchaseOrder.vendorAddress && (
-              <div style={{ fontSize: '14px', color: '#475569' }}>
-                {purchaseOrder.vendorAddress.street1 && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.street1}</p>}
-                {purchaseOrder.vendorAddress.city && (
-                  <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.city}, {purchaseOrder.vendorAddress.state}</p>
-                )}
-                {purchaseOrder.vendorAddress.pinCode && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.pinCode}</p>}
-                {purchaseOrder.vendorAddress.countryRegion && <p style={{ margin: '2px 0' }}>{purchaseOrder.vendorAddress.countryRegion}</p>}
-                {purchaseOrder.vendorAddress.gstin && <p style={{ margin: '2px 0' }}>GSTIN: {purchaseOrder.vendorAddress.gstin}</p>}
-              </div>
-            )}
-          </div>
-
-          <div style={{ textAlign: 'right', marginBottom: '16px' }}>
-            <p style={{ fontSize: '14px', margin: 0 }}><span style={{ color: '#64748b' }}>Date:</span> {formatDate(purchaseOrder.date)}</p>
-          </div>
-
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#2563eb' }}>
-                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '14px', fontWeight: '500', color: 'white' }}>#</th>
-                <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: '14px', fontWeight: '500', color: 'white' }}>Item & Description</th>
-                <th style={{ padding: '8px 12px', textAlign: 'center', fontSize: '14px', fontWeight: '500', color: 'white' }}>Qty</th>
-                <th style={{ padding: '8px 12px', textAlign: 'right', fontSize: '14px', fontWeight: '500', color: 'white' }}>Rate</th>
-                <th style={{ padding: '8px 12px', textAlign: 'right', fontSize: '14px', fontWeight: '500', color: 'white' }}>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {purchaseOrder.items.map((item, index) => (
-                <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '12px', fontSize: '14px' }}>{index + 1}</td>
-                  <td style={{ padding: '12px' }}>
-                    <p style={{ fontWeight: '500', fontSize: '14px', margin: 0 }}>{item.itemName}</p>
-                    {item.description && <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>{item.description}</p>}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '14px' }}>{item.quantity.toLocaleString('en-IN')}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '14px' }}>{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '14px', fontWeight: '500' }}>{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
-            <div style={{ width: '256px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
-                <span style={{ color: '#64748b' }}>Sub Total</span>
-                <span style={{ textAlign: 'right' }}>{purchaseOrder.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              </div>
-              {purchaseOrder.taxAmount && purchaseOrder.taxAmount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '8px' }}>
-                  <span style={{ color: '#64748b' }}>IGST (18%)</span>
-                  <span style={{ textAlign: 'right' }}>{purchaseOrder.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '14px', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
-                <span>Total</span>
-                <span style={{ textAlign: 'right' }}>{formatCurrency(purchaseOrder.total)}</span>
-              </div>
-            </div>
-          </div>
-
-          {purchaseOrder.termsAndConditions && (
-            <div style={{ marginBottom: '24px' }}>
-              <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', marginTop: 0 }}>Terms & Conditions</h4>
-              <div style={{ fontSize: '12px', color: '#475569' }}>
-                {purchaseOrder.termsAndConditions.split('\n').map((line, i) => (
-                  <p key={i} style={{ margin: '2px 0' }}>{line}</p>
-                ))}
-              </div>
-            </div>
+    <div style={{ backgroundColor: 'white', padding: '40px', width: '100%', fontFamily: 'serif', color: '#1e293b' }} className="pdf-container">
+      {/* Header Section */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div style={{ flex: 1 }}>
+          {branding?.logo?.url ? (
+            <img src={branding.logo.url} alt="Company Logo" style={{ height: '40px', width: 'auto', marginBottom: '10px', objectFit: 'contain' }} />
+          ) : (
+            <h1 style={{ color: redThemeColor, fontSize: '24px', margin: 0, fontWeight: 'bold' }}>SKILLTON<span style={{ fontStyle: 'italic', color: '#334155' }}>IT</span></h1>
           )}
-
-          <div style={{ marginTop: '32px' }}>
-            {branding?.signature?.url ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <img
-                  src={branding.signature.url}
-                  alt="Authorized Signature"
-                  style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-                />
-                <p style={{ fontSize: '14px', margin: 0 }}>Authorized Signature</p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '96px', height: '96px', border: '2px solid #2563eb', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <p style={{ fontSize: '10px', color: '#2563eb', fontWeight: 'bold', margin: 0 }}>COMPANY</p>
-                    <p style={{ fontSize: '6px', color: '#64748b', margin: 0 }}>PVT. LTD.</p>
-                  </div>
-                </div>
-                <p style={{ textAlign: 'center', fontSize: '12px', marginTop: '8px', margin: 0 }}>Authorized Signature</p>
-              </div>
-            )}
+          <div style={{ fontSize: '11px', color: '#475569', lineHeight: '1.4' }}>
+            <p style={{ margin: 0 }}>Hinjewadi - Wakad road</p>
+            <p style={{ margin: 0 }}>Hinjewadi</p>
+            <p style={{ margin: 0 }}>Pune Maharashtra 411057</p>
+            <p style={{ margin: 0 }}>India</p>
+            <p style={{ margin: 0 }}>GSTIN 27AZEPA5145K1ZH</p>
+            <p style={{ margin: 0 }}>www.skilltonit.com</p>
           </div>
         </div>
+        <div style={{ textAlign: 'right' }}>
+          <h2 style={{ fontSize: '28px', color: redThemeColor, margin: '0 0 5px 0', fontWeight: 'normal' }}>Purchase Order</h2>
+          <p style={{ fontSize: '12px', margin: 0, fontWeight: 'bold' }}># {purchaseOrder.purchaseOrderNumber || 'PO-00005'}</p>
+        </div>
+      </div>
+
+      {/* Vendor Section */}
+      <div style={{ marginBottom: '30px' }}>
+        <h4 style={{ fontSize: '12px', color: '#64748b', marginBottom: '5px', fontWeight: 'normal' }}>Vendor Address</h4>
+        <p style={{ fontSize: '12px', color: blueThemeColor, fontWeight: 'bold', margin: '0 0 2px 0', textTransform: 'uppercase' }}>{purchaseOrder.vendorName}</p>
+        <div style={{ fontSize: '11px', color: '#475569', lineHeight: '1.4' }}>
+          {purchaseOrder.vendorAddress?.street1 && <p style={{ margin: 0 }}>{purchaseOrder.vendorAddress.street1}</p>}
+          {purchaseOrder.vendorAddress?.city && <p style={{ margin: 0 }}>{purchaseOrder.vendorAddress.city}</p>}
+          <p style={{ margin: 0 }}>{purchaseOrder.vendorAddress?.pinCode || '411057'}, {purchaseOrder.vendorAddress?.state || 'Maharashtra'}</p>
+          <p style={{ margin: 0 }}>{purchaseOrder.vendorAddress?.countryRegion || 'India'}</p>
+          <p style={{ margin: 0 }}>GSTIN {purchaseOrder.vendorAddress?.gstin || '27AAMCC3732G1ZN'}</p>
+        </div>
+      </div>
+
+      {/* Date/Ref Section */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginBottom: '20px', fontSize: '11px' }}>
+        <div style={{ display: 'flex', width: '150px', justifyContent: 'space-between', marginBottom: '5px' }}>
+          <span style={{ color: '#64748b' }}>Date :</span>
+          <span>{formatDate(purchaseOrder.date)}</span>
+        </div>
+        <div style={{ display: 'flex', width: '150px', justifyContent: 'space-between' }}>
+          <span style={{ color: '#64748b' }}>Ref# :</span>
+          <span>{purchaseOrder.referenceNumber || 'SO-00001'}</span>
+        </div>
+      </div>
+
+      {/* Table Section */}
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+        <thead>
+          <tr style={{ backgroundColor: redThemeColor, color: 'white' }}>
+            <th style={{ padding: '8px', textAlign: 'center', fontSize: '11px', width: '30px', fontWeight: 'bold' }}>#</th>
+            <th style={{ padding: '8px', textAlign: 'left', fontSize: '11px', fontWeight: 'bold' }}>Item & Description</th>
+            <th style={{ padding: '8px', textAlign: 'center', fontSize: '11px', width: '80px', fontWeight: 'bold' }}>HSN/SAC</th>
+            <th style={{ padding: '8px', textAlign: 'center', fontSize: '11px', width: '60px', fontWeight: 'bold' }}>Qty</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontSize: '11px', width: '100px', fontWeight: 'bold' }}>Rate</th>
+            <th style={{ padding: '8px', textAlign: 'right', fontSize: '11px', width: '100px', fontWeight: 'bold' }}>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {purchaseOrder.items.map((item, index) => (
+            <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+              <td style={{ padding: '15px 8px', textAlign: 'center', fontSize: '11px', verticalAlign: 'top' }}>{index + 1}</td>
+              <td style={{ padding: '15px 8px', verticalAlign: 'top' }}>
+                <p style={{ fontSize: '11px', fontWeight: 'bold', margin: '0 0 5px 0' }}>{item.itemName}</p>
+                <p style={{ fontSize: '9px', color: '#64748b', margin: 0, textTransform: 'uppercase' }}>{item.description}</p>
+              </td>
+              <td style={{ padding: '15px 8px', textAlign: 'center', fontSize: '11px', verticalAlign: 'top', color: '#64748b' }}>{(item as any).hsnSac || '998315'}</td>
+              <td style={{ padding: '15px 8px', textAlign: 'center', fontSize: '11px', verticalAlign: 'top' }}>{item.quantity.toFixed(2)}</td>
+              <td style={{ padding: '15px 8px', textAlign: 'right', fontSize: '11px', verticalAlign: 'top' }}>{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              <td style={{ padding: '15px 8px', textAlign: 'right', fontSize: '11px', verticalAlign: 'top' }}>{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Totals Section */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginBottom: '40px' }}>
+        <div style={{ width: '250px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '10px' }}>
+            <span style={{ color: '#64748b' }}>Sub Total</span>
+            <span style={{ fontWeight: 'bold' }}>{purchaseOrder.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '10px' }}>
+            <span style={{ color: '#64748b' }}>CGST9 (9%)</span>
+            <span style={{ fontWeight: 'bold' }}>{(purchaseOrder.taxAmount ? purchaseOrder.taxAmount / 2 : 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '10px' }}>
+            <span style={{ color: '#64748b' }}>SGST9 (9%)</span>
+            <span style={{ fontWeight: 'bold' }}>{(purchaseOrder.taxAmount ? purchaseOrder.taxAmount / 2 : 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: redThemeColor, marginBottom: '15px' }}>
+            <div style={{ textAlign: 'right', flex: 1, marginRight: '20px' }}>
+              <p style={{ margin: 0 }}>Amount Withheld</p>
+              <p style={{ margin: 0 }}>(Section 194 J)</p>
+            </div>
+            <span style={{ fontWeight: 'bold' }}>(-){(0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '10px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Total</span>
+            <span style={{ fontSize: '14px', fontWeight: 'bold' }}>₹{purchaseOrder.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Signature Section */}
+      <div style={{ marginTop: '50px', textAlign: 'center' }}>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <div style={{ width: '120px', height: '120px', border: '2px solid #1e293b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.8 }}>
+            <div style={{ textAlign: 'center', color: '#1e293b', transform: 'rotate(-15deg)' }}>
+              <p style={{ fontSize: '14px', fontWeight: 'bold', margin: 0, borderBottom: '1px solid #1e293b', paddingBottom: '2px' }}>SKILLTONIT</p>
+              <p style={{ fontSize: '12px', fontWeight: 'bold', margin: 0 }}>* SKILLTONIT *</p>
+            </div>
+          </div>
+          {branding?.signature?.url && (
+            <img src={branding.signature.url} alt="Signature" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '100px', maxHeight: '60px' }} />
+          )}
+        </div>
+        <p style={{ fontSize: '12px', marginTop: '10px', color: '#64748b' }}>Authorized Signature</p>
       </div>
     </div>
   );
@@ -265,12 +270,22 @@ function PurchaseOrderDetailPanel({
     if (!pdfRef.current) return;
     try {
       const element = pdfRef.current;
+      
+      // Temporary style adjustments for PDF generation
+      const originalStyle = element.getAttribute('style') || '';
+      element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important;');
+      
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: 800
       });
+      
+      // Restore original style
+      element.setAttribute('style', originalStyle);
+      
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -300,46 +315,12 @@ function PurchaseOrderDetailPanel({
               @media print {
                 body { padding: 0; margin: 0; -webkit-print-color-adjust: exact; }
                 .no-print { display: none; }
+                @page { margin: 10mm; }
               }
-              body { font-family: sans-serif; padding: 40px; }
-              .flex { display: flex; }
-              .flex-col { flex-direction: column; }
-              .justify-between { justify-content: space-between; }
-              .items-start { align-items: flex-start; }
-              .items-center { align-items: center; }
-              .w-full { width: 100%; }
-              .w-2 { width: 8px; }
-              .bg-blue-600 { background-color: #2563eb !important; }
-              .text-blue-600 { color: #2563eb !important; }
-              .text-white { color: #ffffff !important; }
-              .text-right { text-align: right; }
-              .text-center { text-align: center; }
-              .font-bold { font-weight: bold; }
-              .font-semibold { font-weight: 600; }
-              .font-medium { font-weight: 500; }
-              .mb-2 { margin-bottom: 8px; }
-              .mb-4 { margin-bottom: 16px; }
-              .mb-6 { margin-bottom: 24px; }
-              .mt-2 { margin-top: 8px; }
-              .mt-8 { margin-top: 32px; }
-              .p-4 { padding: 16px; }
-              .px-3 { padding-left: 12px; padding-right: 12px; }
-              .py-2 { padding-top: 8px; padding-bottom: 8px; }
-              .py-3 { padding-top: 12px; padding-bottom: 12px; }
-              .text-sm { font-size: 14px; }
-              .text-xs { font-size: 12px; }
-              .text-2xl { font-size: 24px; }
-              .border { border: 1px solid #e2e8f0; }
-              .border-b { border-bottom: 1px solid #e2e8f0; }
-              .border-t { border-top: 1px solid #e2e8f0; }
-              .rounded { border-radius: 4px; }
-              .rounded-full { border-radius: 9999px; }
+              body { font-family: serif; padding: 20px; color: #1e293b; }
+              p { margin: 0; }
               table { width: 100%; border-collapse: collapse; }
-              th { text-align: left; }
-              .space-y-1 > * + * { margin-top: 4px; }
-              .space-y-2 > * + * { margin-top: 8px; }
-              .gap-2 { gap: 8px; }
-              .shrink-0 { flex-shrink: 0; }
+              .pdf-container { width: 100%; }
             </style>
           </head>
           <body>
