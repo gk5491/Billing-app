@@ -219,15 +219,13 @@ function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: Purc
 
       {/* Signature Section */}
       <div style={{ marginTop: '50px', textAlign: 'center' }}>
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-          <div style={{ width: '120px', height: '120px', border: '2px solid #1e293b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.8 }}>
-            <div style={{ textAlign: 'center', color: '#1e293b', transform: 'rotate(-15deg)' }}>
-              <p style={{ fontSize: '14px', fontWeight: 'bold', margin: 0, borderBottom: '1px solid #1e293b', paddingBottom: '2px' }}>SKILLTONIT</p>
-              <p style={{ fontSize: '12px', fontWeight: 'bold', margin: 0 }}>* SKILLTONIT *</p>
+        <div style={{ position: 'relative', display: 'inline-block', minHeight: '80px', minWidth: '200px' }}>
+          {branding?.signature?.url ? (
+            <img src={branding.signature.url} alt="Signature" style={{ maxWidth: '150px', maxHeight: '80px', objectFit: 'contain' }} />
+          ) : (
+            <div style={{ textAlign: 'center', color: '#1e293b', paddingTop: '20px' }}>
+              <p style={{ fontSize: '14px', fontWeight: 'bold', margin: 0, borderBottom: '1px solid #1e293b', paddingBottom: '2px', display: 'inline-block' }}>SKILLTONIT</p>
             </div>
-          </div>
-          {branding?.signature?.url && (
-            <img src={branding.signature.url} alt="Signature" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', maxWidth: '100px', maxHeight: '60px' }} />
           )}
         </div>
         <p style={{ fontSize: '12px', marginTop: '10px', color: '#64748b' }}>Authorized Signature</p>
