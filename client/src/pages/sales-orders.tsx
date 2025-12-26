@@ -189,118 +189,127 @@ interface SalesOrderDetailPanelProps {
 
 function SalesOrderPdfPreview({ order, branding }: { order: SalesOrderDetail; branding?: any }) {
   return (
-    <div id="sales-order-pdf-preview" className="bg-white p-8 text-black min-h-full" style={{ fontFamily: 'Arial, sans-serif' }}>
-      <div className="flex justify-between items-start mb-8">
+    <div id="sales-order-pdf-preview" style={{ 
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#ffffff',
+      color: '#000000',
+      padding: '32px',
+      margin: '0',
+      minHeight: '100%',
+      width: '794px',
+      boxSizing: 'border-box'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
         <div>
           {branding?.logo?.url ? (
-            <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-3" />
+            <img src={branding.logo.url} alt="Company Logo" style={{ height: '48px', width: 'auto', marginBottom: '12px' }} />
           ) : (
-            <div className="text-xl font-bold text-slate-900">Company Logo</div>
+            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>Company Logo</div>
           )}
         </div>
-        <div className="text-right">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">SALES ORDER</h1>
-          <p className="text-sm text-slate-600">{order.salesOrderNumber}</p>
-          <div className="mt-4 bg-blue-50 px-4 py-3 rounded">
-            <p className="text-xs text-slate-600">Total</p>
-            <p className="text-xl font-bold text-slate-900">{formatCurrency(order.total)}</p>
+        <div style={{ textAlign: 'right' }}>
+          <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px', margin: '0 0 8px 0' }}>SALES ORDER</h1>
+          <p style={{ fontSize: '14px', color: '#475569', margin: '0 0 12px 0' }}>{order.salesOrderNumber}</p>
+          <div style={{ marginTop: '16px', backgroundColor: '#eff6ff', padding: '12px 16px', borderRadius: '4px' }}>
+            <p style={{ fontSize: '12px', color: '#475569', margin: '0' }}>Total</p>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0' }}>{formatCurrency(order.total)}</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-8 mb-8 text-sm">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px', fontSize: '14px' }}>
         <div>
-          <h3 className="font-semibold text-slate-900 mb-2">BILL TO</h3>
-          <p className="font-medium text-slate-900">{order.customerName}</p>
+          <h3 style={{ fontWeight: '600', color: '#1e293b', marginBottom: '8px', margin: '0 0 8px 0' }}>BILL TO</h3>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0 0 4px 0' }}>{order.customerName}</p>
           {formatAddress(order.billingAddress).map((line, i) => (
-            <p key={i} className="text-slate-600">{line}</p>
+            <p key={i} style={{ color: '#475569', margin: '0 0 2px 0' }}>{line}</p>
           ))}
         </div>
         <div>
-          <h3 className="font-semibold text-slate-900 mb-2">SHIP TO</h3>
-          <p className="font-medium text-slate-900">{order.customerName}</p>
+          <h3 style={{ fontWeight: '600', color: '#1e293b', marginBottom: '8px', margin: '0 0 8px 0' }}>SHIP TO</h3>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0 0 4px 0' }}>{order.customerName}</p>
           {formatAddress(order.shippingAddress).map((line, i) => (
-            <p key={i} className="text-slate-600">{line}</p>
+            <p key={i} style={{ color: '#475569', margin: '0 0 2px 0' }}>{line}</p>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8 text-sm">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px', fontSize: '14px' }}>
         <div>
-          <p className="text-xs text-slate-600 font-medium">ORDER DATE</p>
-          <p className="font-medium text-slate-900">{formatDate(order.date)}</p>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', margin: '0 0 4px 0' }}>ORDER DATE</p>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0' }}>{formatDate(order.date)}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-600 font-medium">EXPECTED SHIPMENT</p>
-          <p className="font-medium text-slate-900">{formatDate(order.expectedShipmentDate)}</p>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', margin: '0 0 4px 0' }}>EXPECTED SHIPMENT</p>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0' }}>{formatDate(order.expectedShipmentDate)}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-600 font-medium">PAYMENT TERMS</p>
-          <p className="font-medium text-slate-900">{order.paymentTerms}</p>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', margin: '0 0 4px 0' }}>PAYMENT TERMS</p>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0' }}>{order.paymentTerms}</p>
         </div>
         <div>
-          <p className="text-xs text-slate-600 font-medium">PLACE OF SUPPLY</p>
-          <p className="font-medium text-slate-900">{order.placeOfSupply || '-'}</p>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', margin: '0 0 4px 0' }}>PLACE OF SUPPLY</p>
+          <p style={{ fontWeight: '500', color: '#1e293b', margin: '0' }}>{order.placeOfSupply || '-'}</p>
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-hidden mb-6">
-        <table className="w-full">
-          <thead className="bg-slate-900 text-white">
+      <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '24px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead style={{ backgroundColor: '#1e293b', color: '#ffffff' }}>
             <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium">#</th>
-              <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
-              <th className="px-4 py-2 text-left text-xs font-medium">HSN/SAC</th>
-              <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
-              <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
-              <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
+              <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500' }}>#</th>
+              <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500' }}>Item & Description</th>
+              <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500' }}>HSN/SAC</th>
+              <th style={{ padding: '8px 16px', textAlign: 'center', fontSize: '12px', fontWeight: '500' }}>Qty</th>
+              <th style={{ padding: '8px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '500' }}>Rate</th>
+              <th style={{ padding: '8px 16px', textAlign: 'right', fontSize: '12px', fontWeight: '500' }}>Amount</th>
             </tr>
           </thead>
           <tbody>
             {order.items.map((item, index) => (
-              <tr key={item.id} className="border-b">
-                <td className="px-4 py-3 text-sm">{index + 1}</td>
-                <td className="px-4 py-3 text-sm">
-                  <div><p className="font-medium text-slate-900">{item.name}</p>{item.description && <p className="text-xs text-slate-600">{item.description}</p>}</div>
+              <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#1e293b' }}>{index + 1}</td>
+                <td style={{ padding: '12px 16px', fontSize: '14px' }}>
+                  <div><p style={{ fontWeight: '500', color: '#1e293b', margin: '0 0 4px 0' }}>{item.name}</p>{item.description && <p style={{ fontSize: '12px', color: '#475569', margin: '0' }}>{item.description}</p>}</div>
                 </td>
-                <td className="px-4 py-3 text-sm text-slate-600">{item.hsnSac || '-'}</td>
-                <td className="px-4 py-3 text-sm text-center">{item.ordered}{item.unit}</td>
-                <td className="px-4 py-3 text-sm text-right text-slate-900">{formatCurrency(item.rate)}</td>
-                <td className="px-4 py-3 text-sm text-right font-medium text-slate-900">{formatCurrency(item.amount)}</td>
+                <td style={{ padding: '12px 16px', fontSize: '14px', color: '#475569' }}>{item.hsnSac || '-'}</td>
+                <td style={{ padding: '12px 16px', fontSize: '14px', textAlign: 'center', color: '#1e293b' }}>{item.ordered}{item.unit}</td>
+                <td style={{ padding: '12px 16px', fontSize: '14px', textAlign: 'right', color: '#1e293b' }}>{formatCurrency(item.rate)}</td>
+                <td style={{ padding: '12px 16px', fontSize: '14px', textAlign: 'right', fontWeight: '500', color: '#1e293b' }}>{formatCurrency(item.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex justify-end mb-6">
-        <div className="w-64 space-y-2 text-sm">
-          <div className="flex justify-between"><span className="text-slate-600">Sub Total</span><span className="font-medium text-slate-900">{formatCurrency(order.subTotal)}</span></div>
-          {order.shippingCharges > 0 && <div className="flex justify-between"><span className="text-slate-600">Shipping Charges</span><span className="font-medium text-slate-900">{formatCurrency(order.shippingCharges)}</span></div>}
-          {order.cgst > 0 && <div className="flex justify-between"><span className="text-slate-600">CGST</span><span className="font-medium text-slate-900">{formatCurrency(order.cgst)}</span></div>}
-          {order.sgst > 0 && <div className="flex justify-between"><span className="text-slate-600">SGST</span><span className="font-medium text-slate-900">{formatCurrency(order.sgst)}</span></div>}
-          {order.igst > 0 && <div className="flex justify-between"><span className="text-slate-600">IGST</span><span className="font-medium text-slate-900">{formatCurrency(order.igst)}</span></div>}
-          <div className="flex justify-between border-t pt-2 font-semibold"><span className="text-slate-900">Total</span><span className="text-slate-900">{formatCurrency(order.total)}</span></div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
+        <div style={{ width: '256px', fontSize: '14px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}><span style={{ color: '#475569' }}>Sub Total</span><span style={{ fontWeight: '500', color: '#1e293b' }}>{formatCurrency(order.subTotal)}</span></div>
+          {order.shippingCharges > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}><span style={{ color: '#475569' }}>Shipping Charges</span><span style={{ fontWeight: '500', color: '#1e293b' }}>{formatCurrency(order.shippingCharges)}</span></div>}
+          {order.cgst > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}><span style={{ color: '#475569' }}>CGST</span><span style={{ fontWeight: '500', color: '#1e293b' }}>{formatCurrency(order.cgst)}</span></div>}
+          {order.sgst > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}><span style={{ color: '#475569' }}>SGST</span><span style={{ fontWeight: '500', color: '#1e293b' }}>{formatCurrency(order.sgst)}</span></div>}
+          {order.igst > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}><span style={{ color: '#475569' }}>IGST</span><span style={{ fontWeight: '500', color: '#1e293b' }}>{formatCurrency(order.igst)}</span></div>}
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e2e8f0', paddingTop: '8px', fontWeight: '600' }}><span style={{ color: '#1e293b' }}>Total</span><span style={{ color: '#1e293b' }}>{formatCurrency(order.total)}</span></div>
         </div>
       </div>
 
       {order.customerNotes && (
-        <div className="border-t pt-4 mt-8 mb-6">
-          <p className="text-xs text-slate-600 font-medium uppercase mb-2">Customer Notes</p>
-          <p className="text-sm text-slate-600">{order.customerNotes}</p>
+        <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: '32px', marginBottom: '24px' }}>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', textTransform: 'uppercase', marginBottom: '8px', margin: '0 0 8px 0' }}>Customer Notes</p>
+          <p style={{ fontSize: '14px', color: '#475569', margin: '0' }}>{order.customerNotes}</p>
         </div>
       )}
 
       {order.termsAndConditions && (
-        <div className="border-t pt-4 mb-6">
-          <p className="text-xs text-slate-600 font-medium uppercase mb-2">Terms & Conditions</p>
-          <p className="text-sm text-slate-600">{order.termsAndConditions}</p>
+        <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginBottom: '24px' }}>
+          <p style={{ fontSize: '12px', color: '#475569', fontWeight: '500', textTransform: 'uppercase', marginBottom: '8px', margin: '0 0 8px 0' }}>Terms & Conditions</p>
+          <p style={{ fontSize: '14px', color: '#475569', margin: '0' }}>{order.termsAndConditions}</p>
         </div>
       )}
 
-      <div className="border-t pt-4 mt-8">
-        <p className="text-xs text-slate-600">Authorized Signature</p>
-        {branding?.signature?.url && <img src={branding.signature.url} alt="Signature" className="h-12 mt-2" />}
+      <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: '32px' }}>
+        <p style={{ fontSize: '12px', color: '#475569', margin: '0 0 8px 0' }}>Authorized Signature</p>
+        {branding?.signature?.url && <img src={branding.signature.url} alt="Signature" style={{ height: '48px', marginTop: '8px' }} />}
       </div>
     </div>
   );
