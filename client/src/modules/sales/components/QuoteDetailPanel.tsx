@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
+import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import { X, Edit, MoreHorizontal, ChevronDown, Send, Share2, FileText, RefreshCw, ExternalLink, Printer, Copy, Trash2 } from "lucide-react";
+import { X, Edit, MoreHorizontal, ChevronDown, Send, Share2, FileText, RefreshCw, ExternalLink, Printer, Copy, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -275,120 +276,133 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
   };
 
   const handleDownloadPDF = async () => {
-    const doc = new jsPDF();
+    const element = document.getElementById("quote-pdf-content");
+    if (!element) return;
 
-    // Add logo if available
-    if (branding?.logo?.url) {
-      try {
-        const img = new Image();
-        img.onload = () => {
-          doc.addImage(img, 'PNG', 20, 15, 30, 30);
-          completePDF();
-        };
-        img.src = branding.logo.url;
-        return;
-      } catch (error) {
-        console.error("Failed to add logo:", error);
-      }
-    }
+    const originalStyle = element.style.cssText;
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#0f172a";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
 
-    completePDF();
+    try {
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
+        }
+      `;
+      document.head.appendChild(polyfillStyles);
 
-    function completePDF() {
-      doc.setFontSize(24);
-      doc.setFont("helvetica", "bold");
-      doc.text("QUOTE", 190, 30, { align: "right" });
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 800,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById("quote-pdf-content");
+          if (clonedElement) {
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#0f172a";
 
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "normal");
-      doc.text(`# ${quote.quoteNumber}`, 190, 38, { align: "right" });
-      doc.text(`Total`, 190, 48, { align: "right" });
-      doc.setFont("helvetica", "bold");
-      doc.text(formatCurrency(quote.total), 190, 56, { align: "right" });
+            const clonedAll = clonedDoc.querySelectorAll("*");
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
+              }
 
-      // Start content lower if logo is present
-      const startY = branding?.logo?.url ? 65 : 30;
-
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text("QUOTE TO", 20, startY + 40);
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.text(quote.customerName, 20, startY + 48);
-      const billAddress = formatAddress(quote.billingAddress);
-      billAddress.forEach((line, i) => {
-        doc.text(line, 20, startY + 54 + (i * 5));
+              const computed = window.getComputedStyle(htmlEl);
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && (value.includes('oklch') || value.includes('oklab'))) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#0f172a', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#e2e8f0', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+            });
+          }
+        },
       });
 
-      doc.text(`Quote Date: ${formatDate(quote.date)}`, 120, startY + 48);
-      doc.text(`Expiry Date: ${formatDate(quote.expiryDate)}`, 120, startY + 54);
+      document.head.removeChild(polyfillStyles);
 
-      doc.setDrawColor(200);
-      doc.setLineWidth(0.5);
-      doc.line(20, startY + 70, 190, startY + 70);
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      doc.setFont("helvetica", "bold");
-      doc.text("#", 20, startY + 78);
-      doc.text("Item", 30, startY + 78);
-      doc.text("Qty", 100, startY + 78);
-      doc.text("Rate", 130, startY + 78);
-      doc.text("Amount", 190, startY + 78, { align: "right" });
-
-      doc.line(20, startY + 82, 190, startY + 82);
-
-      let yPos = startY + 90;
-      doc.setFont("helvetica", "normal");
-      quote.items.forEach((item, index) => {
-        doc.text(String(index + 1), 20, yPos);
-        doc.text(item.name || 'Item', 30, yPos);
-        doc.text(String(item.quantity || 1), 100, yPos);
-        doc.text(formatCurrency(item.rate || 0), 130, yPos);
-        doc.text(formatCurrency(item.amount || 0), 190, yPos, { align: "right" });
-        yPos += 8;
-      });
-
-      yPos += 10;
-      doc.line(120, yPos, 190, yPos);
-      yPos += 8;
-
-      doc.text("Sub Total", 120, yPos);
-      doc.text(formatCurrency(quote.subTotal), 190, yPos, { align: "right" });
-      yPos += 8;
-
-      if (quote.cgst > 0) {
-        doc.text("CGST", 120, yPos);
-        doc.text(formatCurrency(quote.cgst), 190, yPos, { align: "right" });
-        yPos += 8;
-      }
-      if (quote.sgst > 0) {
-        doc.text("SGST", 120, yPos);
-        doc.text(formatCurrency(quote.sgst), 190, yPos, { align: "right" });
-        yPos += 8;
-      }
-
-      doc.setFont("helvetica", "bold");
-      doc.text("Total", 120, yPos);
-      doc.text(formatCurrency(quote.total), 190, yPos, { align: "right" });
-
-      doc.setFontSize(8);
-      doc.setFont("helvetica", "normal");
-      doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 280, { align: "center" });
-
-      doc.save(`${quote.quoteNumber}.pdf`);
-
-      toast({
-        title: "PDF Downloaded",
-        description: `${quote.quoteNumber}.pdf has been downloaded successfully.`,
-      });
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight, undefined, "FAST");
+      pdf.save(`Quote-${quote.quoteNumber}.pdf`);
+      toast({ title: "PDF Downloaded", description: `Quote-${quote.quoteNumber}.pdf downloaded successfully` });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({ title: "Failed to download PDF", variant: "destructive" });
+    } finally {
+      element.style.cssText = originalStyle;
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-    toast({
-      title: "Print Dialog",
-      description: "Print dialog opened",
-    });
+  const handlePrintPDF = () => {
+    const content = document.getElementById("quote-pdf-content")?.innerHTML;
+    if (!content) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Quote ${quote.quoteNumber}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            @media print {
+              body { margin: 0; padding: 0; }
+              #quote-pdf-content { border: none !important; box-shadow: none !important; width: 100% !important; }
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="quote-pdf-content" class="w-full">
+            ${content}
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleShare = () => {
@@ -469,8 +483,14 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={handleDownloadPDF}>Download PDF</DropdownMenuItem>
-            <DropdownMenuItem onClick={handlePrint}>Print</DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadPDF} data-testid="menu-download-pdf">
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrintPDF} data-testid="menu-print-pdf">
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <DropdownMenu>
@@ -567,13 +587,107 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
               Activity Logs
             </TabsTrigger>
           </TabsList>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-slate-500 dark:text-slate-400">Show PDF View</span>
-            <Switch checked={showPdfView} onCheckedChange={setShowPdfView} />
+          <div className="flex items-center gap-4 text-sm">
+            {!showPdfView && (
+              <div className="flex items-center gap-2">
+                <Button size="sm" variant="ghost" className="h-7 gap-1" onClick={handleDownloadPDF} data-testid="button-download-pdf">
+                  <Download className="h-3.5 w-3.5" />
+                  Download
+                </Button>
+                <Button size="sm" variant="ghost" className="h-7 gap-1" onClick={handlePrintPDF} data-testid="button-print-pdf">
+                  <Printer className="h-3.5 w-3.5" />
+                  Print
+                </Button>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 dark:text-slate-400">Show PDF View</span>
+              <Switch checked={showPdfView} onCheckedChange={setShowPdfView} />
+            </div>
           </div>
         </div>
 
-        <TabsContent value="details" className="flex-1 overflow-auto p-6 mt-0">
+        {showPdfView ? (
+          <TabsContent value="details" className="flex-1 overflow-auto p-6 mt-0 bg-slate-100 dark:bg-slate-800">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-lg shadow-sm" id="quote-pdf-content">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  {branding?.logo?.url ? (
+                    <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-3" />
+                  ) : (
+                    <div className="text-xl font-bold text-slate-900 dark:text-white">Company Logo</div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Quote</h1>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{quote.quoteNumber}</p>
+                  <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 px-4 py-3 rounded">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">Total</p>
+                    <p className="text-xl font-bold text-slate-900 dark:text-white">{formatCurrency(quote.total)}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-8 mb-8 text-sm">
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-2">BILL TO</h3>
+                  <p className="font-medium text-slate-900 dark:text-white">{quote.customerName}</p>
+                  {formatAddress(quote.billingAddress).map((line, i) => (
+                    <p key={i} className="text-slate-600 dark:text-slate-400">{line}</p>
+                  ))}
+                </div>
+                <div className="text-right">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between"><span className="text-slate-600">Quote Date:</span><span>{formatDate(quote.date)}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-600">Expiry Date:</span><span>{formatDate(quote.expiryDate)}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border rounded-lg overflow-hidden mb-6">
+                <table className="w-full">
+                  <thead className="bg-slate-900 text-white">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium">#</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
+                      <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quote.items.map((item, index) => (
+                      <tr key={item.id} className="border-b">
+                        <td className="px-4 py-3 text-sm">{index + 1}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <div><p className="font-medium">{item.name}</p>{item.description && <p className="text-xs text-slate-600">{item.description}</p>}</div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-center">{item.quantity}{item.unit}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.rate)}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.amount)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex justify-end mb-6">
+                <div className="w-64 space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-600">Sub Total</span><span className="font-medium">{formatCurrency(quote.subTotal)}</span></div>
+                  {quote.cgst > 0 && <div className="flex justify-between"><span className="text-slate-600">CGST (9%)</span><span className="font-medium">{formatCurrency(quote.cgst)}</span></div>}
+                  {quote.sgst > 0 && <div className="flex justify-between"><span className="text-slate-600">SGST (9%)</span><span className="font-medium">{formatCurrency(quote.sgst)}</span></div>}
+                  <div className="flex justify-between border-t pt-2 font-semibold"><span>Total</span><span className="text-slate-900 dark:text-white">{formatCurrency(quote.total)}</span></div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4 mt-8">
+                <p className="text-xs text-slate-600 dark:text-slate-400">Authorized Signature</p>
+                {branding?.signature?.url && <img src={branding.signature.url} alt="Signature" className="h-12 mt-2" />}
+              </div>
+            </div>
+          </TabsContent>
+        ) : (
+          <TabsContent value="details" className="flex-1 overflow-auto p-6 mt-0">
           <div className="space-y-6">
             <div className="flex items-start justify-between">
               <div>
@@ -746,6 +860,7 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
             </div>
           </div>
         </TabsContent>
+        )}
 
         <TabsContent value="activity" className="flex-1 overflow-auto mt-0">
           <div className="p-6 space-y-4">
