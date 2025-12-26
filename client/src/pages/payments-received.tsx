@@ -185,9 +185,9 @@ function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; b
             <p className="font-semibold text-slate-900">{payment.amountInWords || 'N/A'}</p>
           </div>
           <div className="flex justify-end items-start">
-            <div className="bg-green-500 text-white px-8 py-3 rounded text-center">
-              <div className="text-xs font-medium text-white">Amount Received</div>
-              <div className="text-2xl font-bold text-white">{formatCurrency(payment.amount)}</div>
+            <div className="bg-green-600 text-white px-8 py-3 rounded text-center" style={{ backgroundColor: '#16a34a !important', color: 'white !important' }}>
+              <div className="text-xs font-medium text-white" style={{ color: 'white !important' }}>Amount Received</div>
+              <div className="text-2xl font-bold text-white" style={{ color: 'white !important' }}>{formatCurrency(payment.amount)}</div>
             </div>
           </div>
         </div>
