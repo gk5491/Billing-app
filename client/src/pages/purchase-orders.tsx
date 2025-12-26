@@ -276,15 +276,28 @@ function PurchaseOrderDetailPanel({
           const elements = clonedDoc.getElementsByTagName('*');
           for (let i = 0; i < elements.length; i++) {
             const el = elements[i] as HTMLElement;
+            
+            // Critical fix: Override styles directly on the element instead of checking computed style
+            // which can be slow and unreliable in the clone
+            if (el.classList.contains('bg-[#2563eb]')) {
+              el.style.setProperty('background-color', '#2563eb', 'important');
+            }
+            if (el.classList.contains('text-[#2563eb]')) {
+              el.style.setProperty('color', '#2563eb', 'important');
+            }
+            if (el.classList.contains('border-[#2563eb]')) {
+              el.style.setProperty('border-color', '#2563eb', 'important');
+            }
+
+            // Cleanup any remaining oklch variables from tailwind
             if (el.style) {
-              const styles = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'stopColor', 'fill', 'stroke'];
-              styles.forEach(prop => {
+              const styleProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'stopColor', 'fill', 'stroke'];
+              styleProps.forEach(prop => {
                 const value = (el.style as any)[prop];
                 if (value && (value.includes('oklch') || value.includes('var('))) {
-                  // Fallback to computed hex/rgb if possible, or theme defaults
-                  if (prop === 'color') el.style.color = '#000000';
-                  else if (prop === 'backgroundColor' && !el.classList.contains('bg-[#2563eb]')) el.style.backgroundColor = 'transparent';
-                  else if (prop === 'borderColor') el.style.borderColor = '#e2e8f0';
+                  if (prop === 'color') el.style.setProperty('color', '#000000', 'important');
+                  else if (prop === 'backgroundColor' && !el.classList.contains('bg-[#2563eb]')) el.style.setProperty('background-color', 'transparent', 'important');
+                  else if (prop === 'borderColor') el.style.setProperty('border-color', '#e2e8f0', 'important');
                 }
               });
             }
