@@ -682,23 +682,23 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh }: 
                 <table className="w-full">
                   <thead className="bg-slate-900 text-white">
                     <tr>
-                      <th className="px-4 py-2 text-center text-xs font-medium">#</th>
-                      <th className="px-4 py-2 text-center text-xs font-medium">Item & Description</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium">#</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
                       <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
-                      <th className="px-4 py-2 text-center text-xs font-medium">Rate</th>
-                      <th className="px-4 py-2 text-center text-xs font-medium">Amount</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     {quote.items.map((item, index) => (
                       <tr key={item.id} className="border-b">
-                        <td className="px-4 py-3 text-sm text-center">{index + 1}</td>
-                        <td className="px-4 py-3 text-sm text-center">
+                        <td className="px-4 py-3 text-sm">{index + 1}</td>
+                        <td className="px-4 py-3 text-sm">
                           <div><p className="font-medium">{item.name}</p>{item.description && <p className="text-xs text-slate-600">{item.description}</p>}</div>
                         </td>
                         <td className="px-4 py-3 text-sm text-center">{item.quantity}{item.unit}</td>
-                        <td className="px-4 py-3 text-sm text-center">{formatCurrency(item.rate)}</td>
-                        <td className="px-4 py-3 text-sm text-center">{formatCurrency(item.amount)}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.rate)}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.amount)}</td>
                       </tr>
                     ))}
                   </tbody>
