@@ -971,34 +971,35 @@ export default function Invoices() {
                     </div>
 
                     {showPdfPreview ? (
-                        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-4 md:p-8 flex items-start justify-center">
-                            <div id="invoice-pdf-content" className="bg-white shadow-2xl" style={{ width: '210mm', minHeight: '297mm', border: '1px solid #cbd5e1' }}>
-                                <div className="p-12 text-black">
-                                    {/* Header Section */}
-                                    <div className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200">
-                                        <div className="flex-1">
-                                            {branding?.logo?.url ? (
-                                                <img src={branding.logo.url} alt="Company Logo" className="h-16 w-auto mb-2" />
-                                            ) : (
-                                                <div className="text-xl font-bold text-blue-600 mb-2">Your Company Name</div>
-                                            )}
-                                            <div className="text-xs text-slate-600 mt-2">
-                                                <p>Your Company Address</p>
-                                                <p>City, State - PIN Code</p>
+                        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-8">
+                            <div className="max-w-4xl mx-auto shadow-lg bg-white dark:bg-white">
+                                <div id="invoice-pdf-content" className="bg-white" style={{ width: '210mm', minHeight: '297mm', border: '1px solid #cbd5e1' }}>
+                                    <div className="p-12 text-black">
+                                        {/* Header Section */}
+                                        <div className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200">
+                                            <div className="flex-1">
+                                                {branding?.logo?.url ? (
+                                                    <img src={branding.logo.url} alt="Company Logo" className="h-16 w-auto mb-2" />
+                                                ) : (
+                                                    <div className="text-xl font-bold text-blue-600 mb-2">Your Company Name</div>
+                                                )}
+                                                <div className="text-xs text-slate-600 mt-2">
+                                                    <p>Your Company Address</p>
+                                                    <p>City, State - PIN Code</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <Badge className={`${getStatusColor(selectedInvoice.status)} mb-3 px-3 py-1`}>
+                                                    {selectedInvoice.status}
+                                                </Badge>
+                                                <h1 className="text-4xl font-bold text-slate-900 mb-2">INVOICE</h1>
+                                                <p className="text-sm text-slate-600"># {selectedInvoice.invoiceNumber}</p>
+                                                <div className="mt-4 bg-slate-50 border border-slate-200 p-3 rounded">
+                                                    <p className="text-xs text-slate-500 mb-1">Balance Due</p>
+                                                    <p className="text-2xl font-bold text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <Badge className={`${getStatusColor(selectedInvoice.status)} mb-3 px-3 py-1`}>
-                                                {selectedInvoice.status}
-                                            </Badge>
-                                            <h1 className="text-4xl font-bold text-slate-900 mb-2">INVOICE</h1>
-                                            <p className="text-sm text-slate-600"># {selectedInvoice.invoiceNumber}</p>
-                                            <div className="mt-4 bg-slate-50 border border-slate-200 p-3 rounded">
-                                                <p className="text-xs text-slate-500 mb-1">Balance Due</p>
-                                                <p className="text-2xl font-bold text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</p>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     {/* Bill To and Invoice Details */}
                                     <div className="grid grid-cols-2 gap-12 mb-8">

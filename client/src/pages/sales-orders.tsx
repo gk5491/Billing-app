@@ -449,8 +449,10 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
       </div>
 
       {showPdfPreview ? (
-        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800">
-          <SalesOrderPdfPreview order={order} branding={branding} />
+        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-8">
+          <div className="max-w-4xl mx-auto shadow-lg bg-white dark:bg-white">
+            <SalesOrderPdfPreview order={order} branding={branding} />
+          </div>
         </div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
