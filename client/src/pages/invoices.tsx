@@ -776,7 +776,7 @@ export default function Invoices() {
 
     return (
         <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-            <div className={`flex-1 flex flex-col overflow-hidden ${selectedInvoice ? 'max-w-md' : ''}`}>
+            <div className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedInvoice ? 'w-[380px] border-r border-slate-200 bg-slate-50' : 'flex-1'}`}>
                 <div className="flex items-center justify-between p-4">
                     <div className="flex items-center gap-2">
                         <h1 className="text-xl font-semibold text-slate-900">All Invoices</h1>
@@ -956,18 +956,21 @@ export default function Invoices() {
 
             {selectedInvoice && (
                 <div className="flex-1 flex flex-col bg-white border-l border-slate-200 overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-                        <h2 className="text-xl font-semibold text-slate-900" data-testid="text-invoice-number">
-                            {selectedInvoice.invoiceNumber}
-                        </h2>
+                    <div className="flex items-center justify-between p-3 border-b border-slate-200 sticky top-0 bg-white z-10">
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-slate-500 dark:text-slate-400">Show PDF View</span>
-                                <Switch checked={showPdfPreview} onCheckedChange={setShowPdfPreview} />
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleClosePanel} data-testid="button-close-panel">
+                            <Button variant="ghost" size="icon" onClick={handleClosePanel} className="h-8 w-8">
                                 <X className="h-4 w-4" />
                             </Button>
+                            <div className="flex flex-col">
+                                <h2 className="text-sm font-semibold text-slate-900">{selectedInvoice.invoiceNumber}</h2>
+                                <span className="text-xs text-slate-500">{selectedInvoice.customerName}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-slate-500">Show PDF View</span>
+                                <Switch checked={showPdfPreview} onCheckedChange={setShowPdfPreview} />
+                            </div>
                         </div>
                     </div>
 

@@ -127,8 +127,8 @@ function formatDate(dateString: string): string {
 }
 
 function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; branding?: any }) {
-  const receiptContent = (
-    <div className="bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
+  return (
+    <div className="bg-white" style={{ width: '210mm', minHeight: '297mm', color: 'black' }}>
       <div className="p-12 text-black text-sm">
         {/* Header with Logo and Company Details */}
         <div className="mb-6 pb-4 border-b border-gray-300">
@@ -182,12 +182,12 @@ function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; b
         <div className="mb-8 grid grid-cols-2 gap-8">
           <div>
             <p className="text-gray-600 text-xs font-semibold mb-2">Amount Received In Words</p>
-            <p className="font-semibold text-slate-900">{payment.amountInWords}</p>
+            <p className="font-semibold text-slate-900">{payment.amountInWords || 'N/A'}</p>
           </div>
           <div className="flex justify-end items-start">
             <div className="bg-green-500 text-white px-8 py-3 rounded text-center">
-              <div className="text-xs font-medium">Amount Received</div>
-              <div className="text-2xl font-bold">{formatCurrency(payment.amount)}</div>
+              <div className="text-xs font-medium text-white">Amount Received</div>
+              <div className="text-2xl font-bold text-white">{formatCurrency(payment.amount)}</div>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; b
             <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Payment For</h4>
             <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="border-b-2 border-gray-300">
+                <tr className="border-b-2 border-gray-300 bg-slate-100">
                   <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Number</th>
                   <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Date</th>
                   <th className="text-right py-2 px-2 font-semibold text-gray-700">Invoice Amount</th>
@@ -248,24 +248,6 @@ function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; b
         )}
       </div>
     </div>
-  );
-
-  return (
-    <>
-      {/* Hidden element for PDF generation */}
-      <div id="payment-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
-        {receiptContent}
-      </div>
-
-      {/* Visible preview */}
-      <div className="w-full bg-slate-100 p-2 overflow-auto">
-        <div className="w-full flex justify-center">
-          <div className="shadow-lg max-w-full overflow-hidden" style={{ transform: 'scale(0.6)', transformOrigin: 'top center' }}>
-            {receiptContent}
-          </div>
-        </div>
-      </div>
-    </>
   );
 }
 
@@ -323,6 +305,10 @@ function PaymentDetailPanel({
 
   return (
     <div className="h-full flex flex-col bg-white border-l border-slate-200 overflow-hidden">
+      <div id="payment-pdf-content" className="bg-white" style={{ position: 'fixed', left: '-9999px', top: 0, width: '210mm', height: '297mm', overflow: 'hidden', zIndex: -1 }}>
+        <PaymentReceiptView payment={payment} branding={branding} />
+      </div>
+
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900" data-testid="text-payment-number">{payment.paymentNumber}</h2>
         <div className="flex items-center gap-1">
