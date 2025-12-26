@@ -293,9 +293,9 @@ function PurchaseOrderDetailPanel({
         break;
 
       case 'CLOSED':
-
-      case 'CANCELLED':
         actions.push(
+          { icon: Eye, label: "View", onClick: () => { } },
+          { icon: FileText, label: "PDF/Print", onClick: () => { } },
           { icon: Copy, label: "Clone", onClick: onClone },
           { icon: Trash2, label: "Delete", onClick: onDelete, className: "text-red-600" }
         );
