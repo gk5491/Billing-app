@@ -273,7 +273,40 @@ function PurchaseOrderDetailPanel({
       
       // Temporary style adjustments for PDF generation
       const originalStyle = element.getAttribute('style') || '';
-      element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important; background-color: white !important;');
+      // Explicitly set non-OKLCH colors and hide problematic elements
+      element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important; background-color: white !important; color: black !important;');
+      
+      // Inject CSS to override OKLCH colors during capture
+      const styleTag = document.createElement('style');
+      styleTag.id = 'pdf-capture-overrides';
+      styleTag.innerHTML = `
+        * { 
+          color-scheme: light !important;
+        }
+        .pdf-container, .pdf-container * {
+          border-color: #e2e8f0 !important;
+          outline-color: #e2e8f0 !important;
+          color: #000000 !important;
+          background-color: transparent !important;
+        }
+        .bg-slate-50 { background-color: #f8fafc !important; }
+        .text-slate-900 { color: #0f172a !important; }
+        .text-slate-600 { color: #475569 !important; }
+        .text-slate-500 { color: #64748b !important; }
+        .text-blue-600 { color: #2563eb !important; }
+        .text-green-600 { color: #16a34a !important; }
+        .text-amber-600 { color: #d97706 !important; }
+        .text-red-600 { color: #dc2626 !important; }
+        .border-slate-200 { border-color: #e2e8f0 !important; }
+        /* Reset any OKLCH variables commonly used in shadcn/tailwind */
+        :root {
+          --background: 0 0% 100%;
+          --foreground: 222.2 84% 4.9%;
+          --primary: 221.2 83.2% 53.3%;
+          --primary-foreground: 210 40% 98%;
+        }
+      `;
+      document.head.appendChild(styleTag);
       
       // Ensure the element is visible during capture
       const isHidden = !showPdfView;
@@ -287,10 +320,22 @@ function PurchaseOrderDetailPanel({
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: 800
+        windowWidth: 800,
+        onclone: (clonedDoc) => {
+          // Remove elements with OKLCH colors if still problematic
+          const items = clonedDoc.querySelectorAll('*');
+          items.forEach(el => {
+            const style = window.getComputedStyle(el);
+            if (style.backgroundColor.includes('oklch') || style.color.includes('oklch')) {
+              (el as HTMLElement).style.setProperty('background-color', '#ffffff', 'important');
+              (el as HTMLElement).style.setProperty('color', '#000000', 'important');
+            }
+          });
+        }
       });
       
-      // Restore original style
+      // Cleanup
+      document.getElementById('pdf-capture-overrides')?.remove();
       element.setAttribute('style', originalStyle);
       if (isHidden) setShowPdfView(false);
       
@@ -308,6 +353,7 @@ function PurchaseOrderDetailPanel({
       toastResult.update({ id: toastResult.id, title: "Success", description: "PDF downloaded successfully" });
     } catch (error) {
       console.error('Error generating PDF:', error);
+      document.getElementById('pdf-capture-overrides')?.remove();
       toastResult.update({ id: toastResult.id, title: "Error", description: "Failed to generate PDF. Please try again.", variant: "destructive" });
     }
   };

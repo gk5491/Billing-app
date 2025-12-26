@@ -24,7 +24,7 @@
 [x] 24. Session restart - reinstalled cross-env and verified application running (Dec 12, 2025 - afternoon session)
 [x] 25. Created e-Way Bills API routes in server/routes.ts with full CRUD operations (Dec 12, 2025)
 [x] 26. Updated e-way-bills.tsx with proper list view matching reference image (filters, table columns: Date, Transaction#, Customer Name, Customer GSTIN, Expiry Date, Total)
-[x] 27. Updated e-way-bills.tsx form with proper fields matching reference image (Document Type, Transaction Sub Type, Customer, Credit Note#, Address Details, Transportation Details, Part B)
+[x_ 27. Updated e-way-bills.tsx form with proper fields matching reference image (Document Type, Transaction Sub Type, Customer, Credit Note#, Address Details, Transportation Details, Part B)
 [x] 28. Connected e-Way Bills to related sections (customers, credit notes, invoices, delivery challans)
 [x] 29. Added e-Way Bills route to App.tsx router
 [x] 30. Session restart - reinstalled cross-env and verified application running (Dec 15, 2025)
@@ -118,4 +118,5 @@
 [x] 118. Session restart - reinstalled cross-env and verified application running (Dec 25, 2025 - current session)
 [x] 119. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025)
 [x] 120. Fixed PDF download in Purchase Orders section (Dec 26, 2025)
-[x] 121. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - latest session)
+[x] 121. Fixed html2canvas "oklch" color error by adding polyfill/fallback and explicit background styles (Dec 26, 2025)
+[x] 122. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - latest session)
