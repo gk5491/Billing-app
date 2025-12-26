@@ -283,14 +283,16 @@ function PurchaseOrderDetailPanel({
         break;
 
       case 'RECEIVED':
-      case 'CLOSED':
         actions.push(
+          { icon: ArrowRight, label: "Convert to Bill", onClick: onConvertToBill },
           { icon: Eye, label: "View", onClick: () => { } },
           { icon: FileText, label: "PDF/Print", onClick: () => { } },
           { icon: Copy, label: "Clone", onClick: onClone },
           { icon: Trash2, label: "Delete", onClick: onDelete, className: "text-red-600" }
         );
         break;
+
+      case 'CLOSED':
 
       case 'CANCELLED':
         actions.push(
