@@ -167,166 +167,168 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
   const paymentStatus = getPaymentStatus(bill);
 
   return (
-    <div className="bg-white border border-slate-200 shadow-sm max-w-3xl mx-auto">
-      <div className="relative">
-        <div className="absolute top-4 left-4">
-          <Badge className={`border-0 px-3 py-1 text-xs font-semibold rotate-[-5deg] ${paymentStatus === 'PAID' ? 'bg-green-500 text-white' :
-            paymentStatus === 'PARTIALLY PAID' ? 'bg-amber-500 text-white' :
-              paymentStatus === 'VOID' ? 'bg-slate-500 text-white' :
-                paymentStatus === 'OVERDUE' ? 'bg-red-500 text-white' :
-                  'bg-blue-500 text-white'
-            }`}>
-            {paymentStatus}
-          </Badge>
+    <div className="bg-white max-w-4xl mx-auto" id="bill-pdf-content">
+      <div className="p-8 pt-12">
+        {/* Header Section */}
+        <div className="flex justify-between items-start mb-12">
+          <div className="flex flex-col gap-1">
+            {branding?.logo?.url ? (
+              <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-2 object-contain self-start" data-testid="img-bill-logo" />
+            ) : (
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-slate-800 rounded flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">S</span>
+                </div>
+                <span className="text-xl font-bold text-slate-900 tracking-tight">SKILLTON IT</span>
+              </div>
+            )}
+            <div className="text-[13px] text-slate-600 leading-relaxed">
+              <p className="font-semibold text-slate-900 text-sm">SkilltonIT</p>
+              <p>Hinjewadi - Wakad road</p>
+              <p>Hinjewadi</p>
+              <p>Pune Maharashtra 411057</p>
+              <p>India</p>
+              <p>GSTIN 27AZCPA5145K1ZH</p>
+              <p>Sales.SkilltonIT@skilltonit.com</p>
+              <p>www.skilltonit.com</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <h1 className="text-4xl font-light text-slate-900 mb-1 tracking-tight">BILL</h1>
+            <p className="text-slate-600 font-medium mb-4">Bill# {bill.billNumber}</p>
+            <div className="mt-4">
+              <p className="text-[13px] text-slate-500 font-medium uppercase tracking-wider mb-1">Balance Due</p>
+              <p className="text-2xl font-bold text-slate-900">{formatCurrency(bill.balanceDue)}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              {branding?.logo?.url ? (
-                <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-3" data-testid="img-bill-logo" />
-              ) : (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">S</span>
-                  </div>
-                  <span className="text-lg font-bold text-green-600">Company Name</span>
-                </div>
+        {/* Bill From & Details Section */}
+        <div className="grid grid-cols-2 gap-12 mb-10">
+          <div>
+            <h4 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Bill From</h4>
+            <div className="text-[14px] text-slate-700 leading-relaxed">
+              <p className="font-bold text-slate-900 mb-1 uppercase">{bill.vendorName}</p>
+              {bill.vendorAddress && (
+                <>
+                  {bill.vendorAddress.street1 && <p>{bill.vendorAddress.street1}</p>}
+                  {bill.vendorAddress.street2 && <p>{bill.vendorAddress.street2}</p>}
+                  <p>
+                    {bill.vendorAddress.city && `${bill.vendorAddress.city}${bill.vendorAddress.state ? ', ' : ''}`}
+                    {bill.vendorAddress.state}
+                  </p>
+                  {bill.vendorAddress.pinCode && <p>{bill.vendorAddress.pinCode}</p>}
+                  {bill.vendorAddress.country && <p>{bill.vendorAddress.country}</p>}
+                  {bill.vendorAddress.gstin && <p className="mt-1 font-medium">GSTIN {bill.vendorAddress.gstin}</p>}
+                </>
               )}
             </div>
-            <div className="text-right">
-              <h2 className="text-3xl font-bold text-slate-800 mb-1">BILL</h2>
-              <p className="text-slate-600">Bill# <span className="font-medium">{bill.billNumber}</span></p>
-              <div className="mt-2 text-sm">
-                <p className="text-slate-500">Balance Due</p>
-                <p className="text-xl font-bold">{formatCurrency(bill.balanceDue)}</p>
-              </div>
+          </div>
+          <div className="flex justify-end">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-[14px]">
+              <div className="text-slate-500 font-medium">Bill Date :</div>
+              <div className="text-slate-900 font-medium text-right">{formatDate(bill.billDate)}</div>
+              
+              <div className="text-slate-500 font-medium">Due Date :</div>
+              <div className="text-slate-900 font-medium text-right">{formatDate(bill.dueDate)}</div>
+              
+              <div className="text-slate-500 font-medium">Terms :</div>
+              <div className="text-slate-900 font-medium text-right">{bill.paymentTerms || 'Due on Receipt'}</div>
             </div>
           </div>
+        </div>
 
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-slate-500 mb-2">Bill From</h4>
-            <p className="font-semibold text-blue-600">{bill.vendorName}</p>
-            {bill.vendorAddress && (
-              <div className="text-sm text-slate-600">
-                {bill.vendorAddress.street1 && <p>{bill.vendorAddress.street1}</p>}
-                {bill.vendorAddress.city && (
-                  <p>{bill.vendorAddress.city}, {bill.vendorAddress.state}</p>
-                )}
-                {bill.vendorAddress.pinCode && <p>{bill.vendorAddress.pinCode}</p>}
-                {bill.vendorAddress.country && <p>{bill.vendorAddress.country}</p>}
-                {bill.vendorAddress.gstin && <p>GSTIN {bill.vendorAddress.gstin}</p>}
-              </div>
-            )}
-          </div>
-
-          <div className="flex justify-end mb-4 text-sm">
-            <div className="space-y-1 text-right">
-              <p><span className="text-slate-500">Bill Date :</span> {formatDate(bill.billDate)}</p>
-              <p><span className="text-slate-500">Due Date :</span> {formatDate(bill.dueDate)}</p>
-              <p><span className="text-slate-500">Terms :</span> {bill.paymentTerms}</p>
-            </div>
-          </div>
-
-          <table className="w-full mb-6">
-            <thead>
-              <tr className="bg-blue-600 text-white">
-                <th className="px-3 py-2 text-left text-sm font-medium">#</th>
-                <th className="px-3 py-2 text-left text-sm font-medium">Item & Description</th>
-                <th className="px-3 py-2 text-center text-sm font-medium">Qty</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Rate</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Amount</th>
+        {/* Items Table */}
+        <table className="w-full mb-8 border-collapse">
+          <thead>
+            <tr className="bg-slate-800 text-white border-b-2 border-slate-900">
+              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider w-12">#</th>
+              <th className="px-4 py-3 text-left text-[12px] font-semibold uppercase tracking-wider">Item & Description</th>
+              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider">HSN/SAC</th>
+              <th className="px-4 py-3 text-center text-[12px] font-semibold uppercase tracking-wider">Qty</th>
+              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider">Rate</th>
+              <th className="px-4 py-3 text-right text-[12px] font-semibold uppercase tracking-wider">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bill.items.map((item, index) => (
+              <tr key={item.id} className="border-b border-slate-200">
+                <td className="px-4 py-4 text-[14px] text-slate-700 align-top">{index + 1}</td>
+                <td className="px-4 py-4 align-top">
+                  <p className="font-semibold text-slate-900 text-[14px]">{item.itemName}</p>
+                  {item.description && <p className="text-[13px] text-slate-500 mt-1 leading-relaxed">{item.description}</p>}
+                </td>
+                <td className="px-4 py-4 text-center text-[14px] text-slate-700 align-top">998315</td>
+                <td className="px-4 py-4 text-center text-[14px] text-slate-700 align-top">{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 text-right text-[14px] text-slate-700 align-top">{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                <td className="px-4 py-4 text-right text-[14px] text-slate-900 font-semibold align-top">{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               </tr>
-            </thead>
-            <tbody>
-              {bill.items.map((item, index) => (
-                <tr key={item.id} className="border-b border-slate-100">
-                  <td className="px-3 py-3 text-sm">{index + 1}</td>
-                  <td className="px-3 py-3">
-                    <p className="font-medium text-sm">{item.itemName}</p>
-                    {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
-                  </td>
-                  <td className="px-3 py-3 text-center text-sm">{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-3 py-3 text-right text-sm">{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-3 py-3 text-right text-sm font-medium">{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
 
-          <div className="flex justify-end mb-6">
-            <div className="w-64 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Sub Total</span>
-                <span>{bill.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              </div>
-              {bill.taxAmount && bill.taxAmount > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-500">IGST18 (18%)</span>
-                  <span>{bill.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-              )}
-              <div className="flex justify-between font-semibold border-t pt-2">
-                <span>Total</span>
-                <span>{formatCurrency(bill.total)}</span>
-              </div>
-              {bill.creditsApplied && bill.creditsApplied.length > 0 && (
-                <div className="border-t pt-2 space-y-1">
-                  <p className="text-xs text-slate-500 font-semibold">Credits Applied:</p>
-                  {bill.creditsApplied.map((credit, index) => (
-                    <div key={index} className="flex justify-between text-sm text-green-600">
-                      <span>Credit {credit.creditNumber}</span>
-                      <span>- {formatCurrency(credit.amount)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {bill.paymentsMadeApplied && bill.paymentsMadeApplied.length > 0 && (
-                <div className="border-t pt-2 space-y-1">
-                  <p className="text-xs text-slate-500 font-semibold">Payment Made:</p>
-                  {bill.paymentsMadeApplied.map((payment, index) => (
-                    <div key={index} className="flex justify-between text-sm text-blue-600">
-                      <span>Payment {payment.paymentNumber || payment.paymentId}</span>
-                      <span>- {formatCurrency(payment.amount)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {bill.paymentsRecorded && bill.paymentsRecorded.length > 0 && (
-                <div className="border-t pt-2 space-y-1">
-                  <p className="text-xs text-slate-500 font-semibold">Record Payment:</p>
-                  {bill.paymentsRecorded.map((payment, index) => (
-                    <div key={index} className="flex justify-between text-sm text-purple-600">
-                      <span>Payment {payment.paymentNumber || payment.paymentId}</span>
-                      <span>- {formatCurrency(payment.amount)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex justify-between bg-blue-50 p-2 rounded font-semibold">
-                <span>Balance Due</span>
-                <span>{formatCurrency(bill.balanceDue)}</span>
-              </div>
+        {/* Totals Section */}
+        <div className="flex justify-end mb-12">
+          <div className="w-72 space-y-4">
+            <div className="flex justify-between text-[14px] text-slate-600 font-medium pr-2">
+              <span>Sub Total</span>
+              <span className="text-slate-900">{bill.subTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
             </div>
-          </div>
-
-          <div className="mt-12 border-t pt-4">
-            {branding?.signature?.url ? (
-              <div className="flex flex-col gap-2">
-                <img
-                  src={branding.signature.url}
-                  alt="Authorized Signature"
-                  style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-                />
-                <p className="text-xs text-slate-500">Authorized Signature</p>
+            
+            {bill.taxAmount && bill.taxAmount > 0 && (
+              <div className="flex justify-between text-[14px] text-slate-600 font-medium pr-2">
+                <span>IGST18 (18%)</span>
+                <span className="text-slate-900">{bill.taxAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
-            ) : (
-              <p className="text-sm text-slate-600">Authorized Signature ____________________</p>
             )}
+            
+            <div className="flex justify-between text-[16px] font-bold text-slate-900 pr-2 pt-2 border-t border-slate-100">
+              <span>Total</span>
+              <span>{formatCurrency(bill.total)}</span>
+            </div>
+
+            {bill.paymentsMadeApplied && bill.paymentsMadeApplied.length > 0 && (
+              <div className="flex justify-between text-[14px] text-red-600 font-semibold pr-2">
+                <span>Payments Made</span>
+                <span>(-) {bill.paymentsMadeApplied.reduce((sum, p) => sum + p.amount, 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-sm text-[16px] font-bold text-slate-900 border-l-4 border-slate-800">
+          <span>Balance Due</span>
+          <span>{formatCurrency(bill.balanceDue)}</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Footer Section */}
+    <div className="mt-20 px-8">
+      <div className="w-1/2">
+        <div className="relative">
+          {branding?.signature?.url ? (
+            <div className="mb-2">
+              <img
+                src={branding.signature.url}
+                alt="Authorized Signature"
+                className="max-h-16 w-auto object-contain mix-blend-multiply"
+              />
+            </div>
+          ) : (
+            <div className="h-16 mb-2"></div>
+          )}
+          <div className="border-t-2 border-slate-900 w-full pt-2">
+            <p className="text-[13px] font-bold text-slate-900">Authorized Signature</p>
           </div>
         </div>
       </div>
     </div>
+
+    {/* Page Number (Visual only for PDF match) */}
+    <div className="mt-16 text-right border-t border-slate-100 pt-4 px-8 pb-8">
+      <span className="text-[12px] text-slate-400">1</span>
+    </div>
+  </div>
+</div>
   );
 }
 
@@ -535,18 +537,99 @@ function BillDetailPanel({
 }) {
   const [showPdfView, setShowPdfView] = useState(true);
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('bill-pdf-content');
+    if (!element) return;
+    
+    // Temporarily apply print styles for high-quality capture
+    const originalStyle = element.style.cssText;
+    element.style.width = '800px';
+    element.style.maxWidth = 'none';
+    
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 800,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById('bill-pdf-content');
+          if (clonedElement) {
+            clonedElement.style.width = '800px';
+            clonedElement.style.maxWidth = 'none';
+          }
+        }
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      pdf.save(`Bill-${bill.billNumber}.pdf`);
+    } finally {
+      element.style.cssText = originalStyle;
+    }
+  };
+
+  const handlePrint = () => {
+    const content = document.getElementById('bill-pdf-content')?.innerHTML;
+    if (!content) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Bill ${bill.billNumber}</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            @media print {
+              body { margin: 0; padding: 0; }
+              #bill-pdf-content { border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; }
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="bill-pdf-content" class="w-full">
+            ${content}
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   return (
     <div className="h-full flex flex-col bg-white border-l border-slate-200 overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900" data-testid="text-bill-number">{bill.billNumber}</h2>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownloadPDF}>
             <Download className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint}>
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowPdfView(!showPdfView)}>
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} data-testid="button-close-panel">
@@ -569,10 +652,10 @@ function BillDetailPanel({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadPDF}>
               <Download className="mr-2 h-4 w-4" /> Download PDF
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" /> Print
             </DropdownMenuItem>
           </DropdownMenuContent>
