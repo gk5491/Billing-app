@@ -272,16 +272,21 @@ function PurchaseOrderDetailPanel({
         logging: false,
         backgroundColor: '#ffffff',
         onclone: (clonedDoc) => {
-          // Replace all oklch colors with standard ones in the clone
+          // Replace all oklch/color-function colors with standard ones in the clone
           const elements = clonedDoc.getElementsByTagName('*');
           for (let i = 0; i < elements.length; i++) {
             const el = elements[i] as HTMLElement;
             if (el.style) {
-              // Simple cleanup for common tailwind oklch usage
-              const computedStyle = window.getComputedStyle(el);
-              if (computedStyle.color.includes('oklch')) el.style.color = '#000000';
-              if (computedStyle.backgroundColor.includes('oklch')) el.style.backgroundColor = 'transparent';
-              if (computedStyle.borderColor.includes('oklch')) el.style.borderColor = '#e2e8f0';
+              const styles = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'stopColor', 'fill', 'stroke'];
+              styles.forEach(prop => {
+                const value = (el.style as any)[prop];
+                if (value && (value.includes('oklch') || value.includes('var('))) {
+                  // Fallback to computed hex/rgb if possible, or theme defaults
+                  if (prop === 'color') el.style.color = '#000000';
+                  else if (prop === 'backgroundColor' && !el.classList.contains('bg-[#2563eb]')) el.style.backgroundColor = 'transparent';
+                  else if (prop === 'borderColor') el.style.borderColor = '#e2e8f0';
+                }
+              });
             }
           }
         }
