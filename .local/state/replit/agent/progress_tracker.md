@@ -124,3 +124,4 @@
 [x] 124. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
 [x] 125. Fixed html2canvas "oklch" color error by adding polyfill/fallback and explicit background styles (Dec 26, 2025)
 [x] 126. Restored PDF color consistency by removing broad transparent overrides and ensuring explicit color branding (Dec 26, 2025)
+[x] 127. Implemented PDF Download and Print functionality for Vendor Credits with full styling support (Dec 26, 2025)

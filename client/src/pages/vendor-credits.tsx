@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Search, MoreHorizontal, Trash2, Edit, FileText, ChevronDown, X, Printer, Receipt, Copy, Ban, BookOpen, RotateCcw, CheckCircle2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Trash2, Edit, FileText, ChevronDown, X, Printer, Receipt, Copy, Ban, BookOpen, RotateCcw, CheckCircle2, Download } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -157,6 +159,7 @@ export default function VendorCredits() {
   const [setAppliedOnDate, setSetAppliedOnDate] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const journalTabRef = useRef<HTMLButtonElement>(null);
+  const pdfContentRef = useRef<HTMLDivElement>(null);
 
   const { data: vendorCreditsData, isLoading, refetch } = useQuery<{ success: boolean; data: VendorCredit[] }>({
     queryKey: ['/api/vendor-credits'],
@@ -484,6 +487,135 @@ export default function VendorCredits() {
     return { entries, totalDebit, totalCredit };
   };
 
+  const handlePrintPDF = async () => {
+    if (!pdfContentRef.current || !selectedCredit) return;
+
+    try {
+      // Create a clone of the PDF content
+      const element = pdfContentRef.current.cloneNode(true) as HTMLElement;
+      
+      // Create a temporary container
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.padding = '0';
+      tempDiv.appendChild(element);
+      document.body.appendChild(tempDiv);
+
+      // Capture the content
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+
+      // Clean up temp element
+      document.body.removeChild(tempDiv);
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add pages to PDF
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= 297; // A4 height in mm
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= 297;
+      }
+
+      // Open print dialog
+      const pdfBlob = pdf.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.contentWindow?.print();
+      
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+        URL.revokeObjectURL(url);
+      }, 250);
+    } catch (error) {
+      console.error('Print error:', error);
+      toast({ title: "Failed to print PDF", variant: "destructive" });
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!pdfContentRef.current || !selectedCredit) return;
+
+    try {
+      // Create a clone of the PDF content
+      const element = pdfContentRef.current.cloneNode(true) as HTMLElement;
+      
+      // Create a temporary container
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.padding = '0';
+      tempDiv.appendChild(element);
+      document.body.appendChild(tempDiv);
+
+      // Capture the content
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+
+      // Clean up temp element
+      document.body.removeChild(tempDiv);
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      // Add pages to PDF
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= 297; // A4 height in mm
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= 297;
+      }
+
+      // Download PDF
+      pdf.save(`${selectedCredit.creditNumber}.pdf`);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({ title: "Failed to download PDF", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="h-full flex animate-in fade-in duration-500">
       <div className={`${selectedCredit ? 'w-80' : 'w-full'} flex flex-col border-r bg-background transition-all duration-300`}>
@@ -719,8 +851,14 @@ export default function VendorCredits() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>Print</DropdownMenuItem>
-                  <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handlePrintPDF} data-testid="menu-print-pdf">
+                    <Printer className="h-4 w-4 mr-2" />
+                    Print
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadPDF} data-testid="menu-download-pdf">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download PDF
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="outline" size="sm" data-testid="button-apply-to-bills" onClick={handleApplyToBills} disabled={!selectedCredit || selectedCredit.balance <= 0}>
@@ -795,7 +933,7 @@ export default function VendorCredits() {
                         </Badge>
                       </div>
 
-                      <div className="p-6 pt-12">
+                      <div className="p-6 pt-12" ref={pdfContentRef}>
                         <div className="flex justify-between items-start mb-8">
                           <div>
                             {branding?.logo?.url ? (
