@@ -127,98 +127,113 @@ function formatDate(dateString: string): string {
 }
 
 function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; branding?: any }) {
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'PAID':
-        return 'bg-green-500 text-white';
-      case 'REFUNDED':
-        return 'bg-red-500 text-white';
-      case 'DRAFT':
-        return 'bg-slate-500 text-white';
-      default:
-        return 'bg-blue-500 text-white';
-    }
-  };
-
-  return (
-    <div id="payment-pdf-content" className="bg-white border border-slate-200 shadow-sm max-w-3xl mx-auto">
-      <div className="relative">
-        <div className="absolute top-4 left-4">
-          <Badge className={`${getStatusColor(payment.status)} border-0 px-3 py-1 text-xs font-semibold rotate-[-5deg]`}>
-            {payment.status?.toUpperCase() || 'PAID'}
-          </Badge>
+  const receiptContent = (
+    <div className="bg-white" style={{ width: '210mm', marginRight: '-210px', minHeight: '297mm' }}>
+      <div className="p-12 text-black">
+        {/* Header with Logo */}
+        <div className="mb-8">
+          <div>
+            {branding?.logo?.url ? (
+              <img
+                src={branding.logo.url}
+                alt="Company Logo"
+                className="h-12 w-auto mb-2"
+                data-testid="img-payment-logo"
+              />
+            ) : (
+              <div className="mb-4">
+                <span className="text-xl font-bold text-blue-600">Cybaem</span>
+                <br />
+                <span className="text-xl font-bold text-blue-600">tech</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              {branding?.logo?.url ? (
-                <img
-                  src={branding.logo.url}
-                  alt="Company Logo"
-                  className="h-12 w-auto mb-3"
-                  data-testid="img-payment-logo"
-                />
-              ) : (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">C</span>
-                  </div>
-                  <span className="text-lg font-bold text-green-600">Company Name</span>
-                </div>
-              )}
-            </div>
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-center mb-8 text-black">PAYMENT RECEIPT</h2>
+
+        {/* Payment Details */}
+        <div className="space-y-4 mb-8">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Payment Date</span>
+            <span className="font-semibold text-blue-600">{formatDate(payment.date)}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Reference Number</span>
+            <span className="font-semibold text-black">{payment.referenceNumber || '-'}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Payment Mode</span>
+            <span className="font-semibold text-blue-600">{payment.mode}</span>
+          </div>
+        </div>
+
+        {/* Amount Section */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div>
+            <p className="text-sm text-blue-600 font-semibold mb-2">
+              Amount Received In Words
+            </p>
+            <p className="font-semibold text-black">
+              {payment.amountInWords}
+            </p>
           </div>
 
-          <h2 className="text-2xl font-bold text-center mb-8 text-slate-700">PAYMENT RECEIPT</h2>
-
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between items-center border-b border-slate-100 py-2">
-              <span className="text-slate-500 text-sm">Payment Date</span>
-              <span className="font-medium">{formatDate(payment.date)}</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-100 py-2">
-              <span className="text-slate-500 text-sm">Reference Number</span>
-              <span className="font-medium">{payment.referenceNumber || '-'}</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-100 py-2">
-              <span className="text-slate-500 text-sm">Payment Mode</span>
-              <span className="font-medium">{payment.mode}</span>
+          <div className="flex justify-end items-start">
+            <div className="bg-green-500 text-white px-6 py-4 rounded-lg text-center max-w-[180px]">
+              <div className="text-xs font-medium mb-1">Amount Received</div>
+              <div className="text-xl font-bold">
+                {formatCurrency(payment.amount)}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <span className="text-sm text-slate-500">Amount Received In Words</span>
-              <p className="font-medium text-slate-800">{payment.amountInWords}</p>
-            </div>
-            <div className="bg-green-600 text-white px-6 py-4 text-center rounded">
-              <div className="text-sm">Amount Received</div>
-              <div className="text-2xl font-bold">{formatCurrency(payment.amount)}</div>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-8 mb-6">
-            <div>
-              <h4 className="text-sm font-semibold text-slate-500 mb-2">Received From</h4>
-              <p className="font-semibold text-blue-600">{payment.customerName}</p>
-              <p className="text-sm text-slate-600">{payment.placeOfSupply}</p>
-              <p className="text-sm text-slate-600">India</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-slate-500">Authorised Signatory</p>
-            </div>
+        {/* Received From Section */}
+        <div className="grid grid-cols-2 gap-8 mb-16">
+          <div>
+            <h4 className="text-sm font-semibold text-blue-600 mb-3">RECEIVED FROM</h4>
+            <p className="font-bold text-blue-600 text-lg mb-1">{payment.customerName}</p>
+            <p className="text-sm text-gray-600">{payment.placeOfSupply || '(MH) - Maharashtra'}</p>
+            <p className="text-sm text-gray-600">India</p>
           </div>
+          <div className="flex justify-end items-start">
+            <div className="text-3xl font-bold text-green-600">{formatCurrency(payment.amount)}</div>
+          </div>
+        </div>
 
-          <div className="border-t border-slate-200 pt-4 mt-8">
-            <div className="text-center text-sm">
-              <p>Over payment</p>
-              <p className="text-xl font-bold">{formatCurrency(payment.unusedAmount)}</p>
-            </div>
-          </div>
+        {/* Signature Section */}
+        <div className="mb-16">
+          <p className="text-sm text-gray-600">Authorised Signatory</p>
+        </div>
+
+        {/* Over Payment Section */}
+        <div className="border-t border-gray-300 pt-6 text-center">
+          <p className="text-sm text-gray-600 mb-2">Over payment</p>
+          <p className="text-2xl font-bold text-black">{formatCurrency(payment.unusedAmount)}</p>
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* Hidden element for PDF generation */}
+      <div id="payment-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
+        {receiptContent}
+      </div>
+
+      {/* Visible preview */}
+      <div className="w-full bg-slate-100 p-2 overflow-auto">
+        <div className="w-full flex justify-center">
+          <div className="shadow-lg max-w-full overflow-hidden" style={{ transform: 'scale(0.6)', transformOrigin: 'top center' }}>
+            {receiptContent}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -357,10 +372,10 @@ function PaymentDetailPanel({
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4">
-          {showPdfView ? (
-            <PaymentReceiptView payment={payment} branding={branding} />
-          ) : (
+        {showPdfView ? (
+          <PaymentReceiptView payment={payment} branding={branding} />
+        ) : (
+          <div className="p-4">
             <div className="space-y-6">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                 <div>
@@ -454,8 +469,8 @@ function PaymentDetailPanel({
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </ScrollArea>
 
       <div className="border-t border-slate-200 p-3 text-center text-xs text-slate-500">

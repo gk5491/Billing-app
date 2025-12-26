@@ -599,18 +599,105 @@ export default function Invoices() {
                         <head>
                             <title>Invoice - ${selectedInvoice?.invoiceNumber}</title>
                             <style>
-                                body { font-family: sans-serif; padding: 20px; color: black; background-color: white; }
-                                .p-8 { padding: 2rem; }
+                                * { margin: 0; padding: 0; box-sizing: border-box; }
+                                body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+                                    background-color: white; 
+                                    display: flex;
+                                    justify-content: center;
+                                    padding: 20mm;
+                                }
+                                #invoice-pdf-content {
+                                    width: 210mm;
+                                    min-height: 297mm;
+                                    background: white;
+                                    padding: 0;
+                                }
+                                .p-12 { padding: 3rem; }
+                                .mb-8 { margin-bottom: 2rem; }
+                                .mb-6 { margin-bottom: 1.5rem; }
+                                .mb-4 { margin-bottom: 1rem; }
+                                .mb-3 { margin-bottom: 0.75rem; }
+                                .mb-2 { margin-bottom: 0.5rem; }
+                                .mb-1 { margin-bottom: 0.25rem; }
+                                .mt-2 { margin-top: 0.5rem; }
+                                .mt-4 { margin-top: 1rem; }
+                                .pb-4 { padding-bottom: 1rem; }
+                                .pt-6 { padding-top: 1.5rem; }
+                                .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+                                .px-4 { padding-left: 1rem; padding-right: 1rem; }
+                                .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+                                .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+                                .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+                                .p-3 { padding: 0.75rem; }
+                                .p-4 { padding: 1rem; }
                                 .flex { display: flex; }
                                 .justify-between { justify-content: space-between; }
+                                .items-start { align-items: flex-start; }
+                                .grid { display: grid; }
+                                .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                                .gap-12 { gap: 3rem; }
+                                .space-y-0-5 > * + * { margin-top: 0.125rem; }
+                                .space-y-3 > * + * { margin-top: 0.75rem; }
+                                .flex-1 { flex: 1 1 0%; }
                                 .text-right { text-align: right; }
+                                .text-center { text-align: center; }
+                                .text-xs { font-size: 0.75rem; line-height: 1rem; }
+                                .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+                                .text-base { font-size: 1rem; line-height: 1.5rem; }
+                                .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+                                .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+                                .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+                                .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
                                 .font-bold { font-weight: 700; }
-                                .mb-8 { margin-bottom: 2rem; }
-                                table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; }
-                                th { background-color: #f8fafc !important; text-align: left; }
-                                th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+                                .font-semibold { font-weight: 600; }
+                                .font-medium { font-weight: 500; }
+                                .uppercase { text-transform: uppercase; }
+                                .tracking-wide { letter-spacing: 0.025em; }
+                                .text-slate-500 { color: #64748b; }
+                                .text-slate-600 { color: #475569; }
+                                .text-slate-700 { color: #334155; }
+                                .text-slate-900 { color: #0f172a; }
+                                .text-blue-600 { color: #2563eb; }
+                                .text-green-600 { color: #16a34a; }
+                                .bg-slate-50 { background-color: #f8fafc; }
+                                .bg-slate-100 { background-color: #f1f5f9; }
+                                .border { border: 1px solid #e2e8f0; }
+                                .border-b { border-bottom: 1px solid #e2e8f0; }
+                                .border-y-2 { border-top: 2px solid #cbd5e1; border-bottom: 2px solid #cbd5e1; }
+                                .border-t { border-top: 1px solid #e2e8f0; }
+                                .border-t-2 { border-top: 2px solid #cbd5e1; }
+                                .border-slate-100 { border-color: #f1f5f9; }
+                                .border-slate-200 { border-color: #e2e8f0; }
+                                .border-slate-300 { border-color: #cbd5e1; }
+                                .rounded { border-radius: 0.25rem; }
+                                .rounded-lg { border-radius: 0.5rem; }
+                                .w-96 { width: 24rem; }
+                                .leading-relaxed { line-height: 1.625; }
+                                table { width: 100%; border-collapse: collapse; }
+                                th { 
+                                    padding: 0.75rem; 
+                                    text-align: left; 
+                                    font-size: 0.75rem;
+                                    font-weight: 700;
+                                    color: #334155;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.05em;
+                                }
+                                td { 
+                                    padding: 1rem 0.75rem; 
+                                    font-size: 0.875rem;
+                                }
+                                @page {
+                                    size: A4;
+                                    margin: 0;
+                                }
                                 @media print {
-                                    body { padding: 0; }
+                                    body { 
+                                        padding: 0;
+                                        margin: 0;
+                                    }
+                                    .no-print { display: none; }
                                 }
                             </style>
                         </head>
@@ -630,25 +717,35 @@ export default function Invoices() {
 
     const handleDownloadPDFLocal = async () => {
         if (!selectedInvoice) return;
+
+        // Check if PDF preview is already shown
+        const pdfElement = document.getElementById('invoice-pdf-content');
+
+        if (!pdfElement) {
+            // If PDF preview is not shown, show it first and wait
+            setShowPdfPreview(true);
+            setTimeout(handleDownloadPDFLocal, 300);
+            return;
+        }
+
         try {
-            const { jsPDF } = await import("jspdf");
-            const doc = new jsPDF();
-            doc.setFontSize(20);
-            doc.text("INVOICE", 105, 20, { align: "center" });
-            doc.setFontSize(12);
-            doc.text(`Invoice#: ${selectedInvoice.invoiceNumber}`, 20, 40);
-            doc.text(`Date: ${formatDate(selectedInvoice.date)}`, 20, 50);
-            doc.text(`Customer: ${selectedInvoice.customerName}`, 20, 60);
-            let y = 80;
-            selectedInvoice.items?.forEach((item: any, i: number) => {
-                doc.text(`${i + 1}. ${item.name} - ${item.quantity} x ${formatCurrency(item.rate)} = ${formatCurrency(item.amount)}`, 20, y);
-                y += 10;
+            // Import the unified PDF utility
+            const { generatePDFFromElement } = await import("@/lib/pdf-utils");
+
+            // Generate PDF from the existing PDF view
+            await generatePDFFromElement("invoice-pdf-content", `Invoice-${selectedInvoice.invoiceNumber}.pdf`);
+
+            toast({
+                title: "PDF Downloaded",
+                description: `Invoice ${selectedInvoice.invoiceNumber} has been downloaded successfully.`
             });
-            y += 10;
-            doc.text(`Total: ${formatCurrency(selectedInvoice.total)}`, 20, y);
-            doc.save(`Invoice-${selectedInvoice.invoiceNumber}.pdf`);
         } catch (error) {
             console.error("PDF generation error:", error);
+            toast({
+                title: "Failed to download PDF",
+                description: "Please try again.",
+                variant: "destructive"
+            });
         }
     };
 
@@ -879,60 +976,143 @@ export default function Invoices() {
                     </div>
 
                     {showPdfPreview ? (
-                        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-8">
-                            <div id="invoice-pdf-content" className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-                                <div className="p-8 text-black">
-                                    <div className="flex justify-between items-start mb-8">
-                                        <div>
-                                            <h1 className="text-3xl font-bold">INVOICE</h1>
-                                            <p className="text-slate-500 mt-1">{selectedInvoice.invoiceNumber}</p>
-                                        </div>
-                                        <div className="text-right">
+                        <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-4 md:p-8 flex items-start justify-center">
+                            <div id="invoice-pdf-content" className="bg-white shadow-2xl" style={{ width: '210mm', minHeight: '297mm', border: '1px solid #cbd5e1' }}>
+                                <div className="p-12 text-black">
+                                    {/* Header Section */}
+                                    <div className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200">
+                                        <div className="flex-1">
                                             {branding?.logo?.url ? (
-                                                <img src={branding.logo.url} alt="Logo" className="h-12 w-auto ml-auto" />
+                                                <img src={branding.logo.url} alt="Company Logo" className="h-16 w-auto mb-2" />
                                             ) : (
-                                                <h2 className="text-xl font-bold">Company Name</h2>
+                                                <div className="text-xl font-bold text-blue-600 mb-2">Your Company Name</div>
                                             )}
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-8 mb-8">
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-500 uppercase mb-2">Bill To</p>
-                                            <p className="font-semibold">{selectedInvoice.customerName}</p>
+                                            <div className="text-xs text-slate-600 mt-2">
+                                                <p>Your Company Address</p>
+                                                <p>City, State - PIN Code</p>
+                                            </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm"><span className="text-slate-500">Date:</span> {formatDate(selectedInvoice.date)}</p>
-                                            <p className="text-sm"><span className="text-slate-500">Due Date:</span> {formatDate(selectedInvoice.dueDate)}</p>
-                                        </div>
-                                    </div>
-                                    <table className="w-full mb-8 border-collapse">
-                                        <thead>
-                                            <tr className="border-b-2 border-slate-200">
-                                                <th className="py-3 text-left">Item</th>
-                                                <th className="py-3 text-right">Qty</th>
-                                                <th className="py-3 text-right">Rate</th>
-                                                <th className="py-3 text-right">Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {selectedInvoice.items?.map((item: any, i: number) => (
-                                                <tr key={i} className="border-b border-slate-100">
-                                                    <td className="py-3">{item.name}</td>
-                                                    <td className="py-3 text-right">{item.quantity}</td>
-                                                    <td className="py-3 text-right">{formatCurrency(item.rate)}</td>
-                                                    <td className="py-3 text-right">{formatCurrency(item.amount)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    <div className="flex justify-end">
-                                        <div className="w-64">
-                                            <div className="flex justify-between py-2 border-t-2 border-slate-900 font-bold">
-                                                <span>Total</span>
-                                                <span>{formatCurrency(selectedInvoice.total)}</span>
+                                            <Badge className={`${getStatusColor(selectedInvoice.status)} mb-3 px-3 py-1`}>
+                                                {selectedInvoice.status}
+                                            </Badge>
+                                            <h1 className="text-4xl font-bold text-slate-900 mb-2">INVOICE</h1>
+                                            <p className="text-sm text-slate-600"># {selectedInvoice.invoiceNumber}</p>
+                                            <div className="mt-4 bg-slate-50 border border-slate-200 p-3 rounded">
+                                                <p className="text-xs text-slate-500 mb-1">Balance Due</p>
+                                                <p className="text-2xl font-bold text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</p>
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Bill To and Invoice Details */}
+                                    <div className="grid grid-cols-2 gap-12 mb-8">
+                                        <div>
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">BILL TO</p>
+                                            <p className="font-bold text-blue-600 mb-2 text-base">{selectedInvoice.customerName}</p>
+                                            <div className="text-sm text-slate-700 space-y-0.5">
+                                                {formatAddress(selectedInvoice.billingAddress).map((line, i) => (
+                                                    <p key={i}>{line}</p>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="text-sm">
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                    <span className="text-slate-600 font-medium">Invoice Date</span>
+                                                    <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.date)}</span>
+                                                </div>
+                                                <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                    <span className="text-slate-600 font-medium">Terms</span>
+                                                    <span className="font-semibold text-slate-900">{selectedInvoice.paymentTerms || 'Due on Receipt'}</span>
+                                                </div>
+                                                <div className="flex justify-between border-b border-slate-100 pb-2">
+                                                    <span className="text-slate-600 font-medium">Due Date</span>
+                                                    <span className="font-semibold text-slate-900">{formatDate(selectedInvoice.dueDate)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Items Table */}
+                                    <div className="mb-8">
+                                        <table className="w-full">
+                                            <thead>
+                                                <tr className="bg-slate-100 border-y-2 border-slate-300">
+                                                    <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">#</th>
+                                                    <th className="py-3 px-3 text-left text-xs font-bold text-slate-700 uppercase tracking-wide">ITEM & DESCRIPTION</th>
+                                                    <th className="py-3 px-3 text-center text-xs font-bold text-slate-700 uppercase tracking-wide">QTY</th>
+                                                    <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">RATE</th>
+                                                    <th className="py-3 px-3 text-right text-xs font-bold text-slate-700 uppercase tracking-wide">AMOUNT</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {(selectedInvoice.items || []).map((item: any, index: number) => (
+                                                    <tr key={item.id || index} className="border-b border-slate-200">
+                                                        <td className="py-4 px-3 text-sm text-slate-900">{index + 1}</td>
+                                                        <td className="py-4 px-3">
+                                                            <p className="text-sm font-semibold text-slate-900">{item.name}</p>
+                                                            {item.description && (
+                                                                <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>
+                                                            )}
+                                                        </td>
+                                                        <td className="py-4 px-3 text-sm text-center text-slate-900">{item.quantity}</td>
+                                                        <td className="py-4 px-3 text-sm text-right text-slate-900">{formatCurrency(item.rate)}</td>
+                                                        <td className="py-4 px-3 text-sm text-right font-semibold text-slate-900">{formatCurrency(item.amount)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Totals Section */}
+                                    <div className="flex justify-end mb-8">
+                                        <div className="w-96 border border-slate-200 rounded-lg overflow-hidden">
+                                            <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
+                                                <p className="text-xs font-bold text-slate-700 uppercase tracking-wide">Summary</p>
+                                            </div>
+                                            <div className="p-4 space-y-3 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-slate-600">Sub Total</span>
+                                                    <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.subTotal || selectedInvoice.total)}</span>
+                                                </div>
+                                                {selectedInvoice.cgst > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-slate-600">CGST</span>
+                                                        <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.cgst)}</span>
+                                                    </div>
+                                                )}
+                                                {selectedInvoice.sgst > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-slate-600">SGST</span>
+                                                        <span className="font-semibold text-slate-900">{formatCurrency(selectedInvoice.sgst)}</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex justify-between py-3 border-t-2 border-slate-300 text-base font-bold">
+                                                    <span className="text-slate-900">Total</span>
+                                                    <span className="text-slate-900">{formatCurrency(selectedInvoice.total)}</span>
+                                                </div>
+                                                {selectedInvoice.amountPaid > 0 && (
+                                                    <div className="flex justify-between text-green-600">
+                                                        <span className="font-medium">Payment Made</span>
+                                                        <span className="font-semibold">(-) {formatCurrency(selectedInvoice.amountPaid)}</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex justify-between py-3 border-t-2 border-slate-300 text-lg font-bold">
+                                                    <span className="text-slate-900">Balance Due</span>
+                                                    <span className="text-slate-900">{formatCurrency(selectedInvoice.balanceDue)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Notes Section */}
+                                    {selectedInvoice.customerNotes && (
+                                        <div className="mt-8 pt-6 border-t-2 border-slate-200">
+                                            <p className="text-xs text-slate-500 uppercase font-bold mb-3 tracking-wide">NOTES</p>
+                                            <p className="text-sm text-slate-700 leading-relaxed">{selectedInvoice.customerNotes}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1598,10 +1778,10 @@ export default function Invoices() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    
-                    </div>
-                )}
-            </div>
-        );
-    }
-         
+
+                </div>
+            )}
+        </div>
+    );
+}
+

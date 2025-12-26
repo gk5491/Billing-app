@@ -212,7 +212,86 @@
           "user": "Admin User"
         }
       ]
+    },
+    {
+      "id": "1766662273478",
+      "challanNumber": "DC-00003",
+      "referenceNumber": "55623",
+      "date": "2025-12-25",
+      "customerId": "13",
+      "customerName": "Mr. Amit Verma",
+      "challanType": "supply_on_approval",
+      "billingAddress": {
+        "street": "TechNova Towers, Level 12,  Hinjewadi IT Park, Phase 2",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "shippingAddress": {
+        "street": "TechNova Towers, Level 12,  Hinjewadi IT Park, Phase 2",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": "411057"
+      },
+      "placeOfSupply": "",
+      "gstin": "27AABCT6789L1Z2",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "hsnSac": "1006",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 10.799999999999999,
+          "taxName": "GST18",
+          "amount": 70.8
+        },
+        {
+          "id": "0.1516307751032272",
+          "itemId": "0.1516307751032272",
+          "name": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "hsnSac": "847150",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 45000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 8100,
+          "taxName": "GST18",
+          "amount": 53100
+        }
+      ],
+      "subTotal": 45060,
+      "cgst": 4055.4,
+      "sgst": 4055.4,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 53170.8,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "DRAFT",
+      "invoiceStatus": "",
+      "invoiceId": null,
+      "createdAt": "2025-12-25T11:31:13.478Z",
+      "updatedAt": "2025-12-25T11:31:13.478Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-25T11:31:13.478Z",
+          "action": "created",
+          "description": "Delivery challan DC-00003 created",
+          "user": "Admin User"
+        }
+      ]
     }
   ],
-  "nextChallanNumber": 3
+  "nextChallanNumber": 4
 }

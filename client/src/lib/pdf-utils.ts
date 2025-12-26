@@ -92,68 +92,127 @@ export async function generatePDFFromElement(
             throw new Error(`Element with id "${elementId}" not found`);
         }
 
-        // Create a completely new iframe to isolate from all CSS
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
-        iframe.style.top = '0';
-        iframe.style.width = element.scrollWidth + 'px';
-        iframe.style.height = element.scrollHeight + 'px';
-        document.body.appendChild(iframe);
+        // Clone the element to avoid modifying the original
+        const clonedElement = element.cloneNode(true) as HTMLElement;
+        clonedElement.style.position = 'absolute';
+        clonedElement.style.left = '-9999px';
+        clonedElement.style.top = '0';
+        document.body.appendChild(clonedElement);
 
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (!iframeDoc) {
-            throw new Error('Could not access iframe document');
-        }
+        // Convert all oklch/oklab colors and gradients to rgb in the cloned element
+        const allElements = [clonedElement, ...Array.from(clonedElement.querySelectorAll('*'))];
+        allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+                const computed = window.getComputedStyle(el);
 
-        // Create a clean HTML structure with NO external CSS
-        iframeDoc.open();
-        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;"></body></html>');
-        iframeDoc.close();
+                // Check and replace color properties that might have oklch
+                const colorProps = ['color', 'background-color', 'background-image', 'border-color', 'border-top-color',
+                    'border-right-color', 'border-bottom-color', 'border-left-color'];
 
-        // Create styled clone with all inline styles
-        const styledClone = createStyledClone(element);
-        iframeDoc.body.appendChild(styledClone);
+                colorProps.forEach((prop) => {
+                    const value = computed.getPropertyValue(prop);
+                    if (value && hasUnsupportedColorFunction(value)) {
+                        // Set a safe fallback color
+                        if (prop === 'color') {
+                            el.style.setProperty(prop, 'rgb(0, 0, 0)', 'important');
+                        } else if (prop === 'background-image') {
+                            // Remove gradients with unsupported colors
+                            el.style.setProperty(prop, 'none', 'important');
+                            el.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
+                        } else if (prop.includes('background')) {
+                            el.style.setProperty(prop, 'rgb(255, 255, 255)', 'important');
+                        } else if (prop.includes('border')) {
+                            el.style.setProperty(prop, 'rgb(226, 232, 240)', 'important');
+                        }
+                    }
+                });
+            }
+        });
 
-        // Wait for iframe to be ready
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Calculate A4 dimensions in pixels (at 96 DPI: 210mm = 794px, 297mm = 1123px)
+        const a4WidthPx = 794;
+        const a4HeightPx = 1123;
 
-        // Generate canvas from iframe content
-        const canvas = await html2canvas(iframeDoc.body, {
-            scale: 2,
+        // Create a high-quality canvas with proper A4 proportions
+        const scale = 3; // Higher scale for better quality
+        const canvas = await html2canvas(clonedElement, {
+            scale: scale,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight,
+            width: a4WidthPx,
+            height: Math.max(a4HeightPx, clonedElement.scrollHeight),
+            windowWidth: a4WidthPx,
+            windowHeight: Math.max(a4HeightPx, clonedElement.scrollHeight),
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
+            allowTaint: true,
+            foreignObjectRendering: false,
         });
 
-        // Remove the iframe
-        document.body.removeChild(iframe);
+        // Remove the cloned element
+        document.body.removeChild(clonedElement);
 
-        // Calculate PDF dimensions
-        const imgWidth = 210; // A4 width in mm
-        const pageHeight = 297; // A4 height in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        // Calculate PDF dimensions - use A4 standard
+        const pdfWidth = 210; // A4 width in mm
+        const pdfHeight = 297; // A4 height in mm
 
-        // Create PDF
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        let heightLeft = imgHeight;
-        let position = 0;
+        // Calculate the height ratio
+        const imgWidth = pdfWidth;
+        const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-        // Convert canvas to image
-        const imgData = canvas.toDataURL('image/png');
+        // Create PDF with A4 dimensions
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+            compress: true,
+        });
 
-        // Add first page
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        // Convert canvas to high-quality image
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-        // Add additional pages if content is longer than one page
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+        // Check if content fits on one page
+        if (imgHeight <= pdfHeight) {
+            // Single page - center vertically if needed
+            const yOffset = 0; // Start from top
+            pdf.addImage(imgData, 'JPEG', 0, yOffset, imgWidth, imgHeight, '', 'FAST');
+        } else {
+            // Multiple pages needed
+            let heightLeft = imgHeight;
+            let position = 0;
+            let page = 0;
+
+            while (heightLeft > 0) {
+                if (page > 0) {
+                    pdf.addPage();
+                }
+
+                // Calculate the portion of the image to show on this page
+                const sourceY = page * pdfHeight * (canvas.height / imgHeight);
+                const sourceHeight = Math.min(pdfHeight * (canvas.height / imgHeight), canvas.height - sourceY);
+
+                // Create a temporary canvas for this page
+                const pageCanvas = document.createElement('canvas');
+                pageCanvas.width = canvas.width;
+                pageCanvas.height = sourceHeight;
+
+                const ctx = pageCanvas.getContext('2d');
+                if (ctx) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+                    ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, canvas.width, sourceHeight);
+
+                    const pageImgData = pageCanvas.toDataURL('image/jpeg', 1.0);
+                    const pageImgHeight = (sourceHeight * pdfWidth) / canvas.width;
+                    pdf.addImage(pageImgData, 'JPEG', 0, 0, imgWidth, pageImgHeight, '', 'FAST');
+                }
+
+                heightLeft -= pdfHeight;
+                page++;
+            }
         }
 
         // Save the PDF

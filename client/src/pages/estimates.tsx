@@ -113,122 +113,345 @@ const getStatusBadge = (status: string, convertedTo?: string) => {
   return <Badge variant={config.variant}>{config.label}</Badge>;
 };
 
+// Helper function to convert number to words
+function numberToWords(num: number): string {
+  if (num === 0) return "Zero Only";
+
+  const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+    "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+  function convertLessThanOneThousand(n: number): string {
+    let result = "";
+    if (n >= 100) {
+      result += ones[Math.floor(n / 100)] + " Hundred ";
+      n %= 100;
+    }
+    if (n >= 20) {
+      result += tens[Math.floor(n / 10)] + " ";
+      n %= 10;
+    }
+    if (n > 0) {
+      result += ones[n] + " ";
+    }
+    return result.trim();
+  }
+
+  const crore = Math.floor(num / 10000000);
+  num %= 10000000;
+  const lakh = Math.floor(num / 100000);
+  num %= 100000;
+  const thousand = Math.floor(num / 1000);
+  num %= 1000;
+  const remainder = Math.floor(num);
+
+  let result = "Indian Rupee ";
+  if (crore > 0) result += convertLessThanOneThousand(crore) + " Crore ";
+  if (lakh > 0) result += convertLessThanOneThousand(lakh) + " Lakh ";
+  if (thousand > 0) result += convertLessThanOneThousand(thousand) + " Thousand ";
+  if (remainder > 0) result += convertLessThanOneThousand(remainder);
+
+  result += " Only";
+  return result.trim();
+}
+
 function QuotePDFView({ quote, branding }: { quote: Quote; branding?: any }) {
+  // Calculate tax breakdown (assuming items have tax information)
+  const calculateTotals = () => {
+    let subtotal = 0;
+    let cgst = 0;
+    let sgst = 0;
+    let igst = 0;
+
+    if (quote.items && quote.items.length > 0) {
+      quote.items.forEach((item: any) => {
+        subtotal += item.amount || 0;
+        if (item.cgst) cgst += (item.amount * item.cgst) / 100;
+        if (item.sgst) sgst += (item.amount * item.sgst) / 100;
+        if (item.igst) igst += (item.amount * item.igst) / 100;
+      });
+    } else {
+      // If no items with tax info, estimate based on total
+      subtotal = quote.total / 1.18; // Assuming 18% GST
+      cgst = subtotal * 0.09;
+      sgst = subtotal * 0.09;
+    }
+
+    return { subtotal, cgst, sgst, igst, total: quote.total };
+  };
+
+  const totals = calculateTotals();
+  const totals = calculateTotals();
+
   return (
-    <div id="pdf-content" className="bg-white border border-slate-200 shadow-sm max-w-3xl mx-auto">
-      <div className="relative">
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-8">
-            <div>
+    <div id="pdf-content" className="bg-white max-w-4xl mx-auto" style={{ fontFamily: 'Arial, sans-serif' }}>
+      <div className="border-2 border-slate-800">
+        <div className="p-6">
+          {/* Header Section with Company Info and Quote Title */}
+          <div className="flex justify-between items-start mb-6">
+            {/* Left: Company Details */}
+            <div className="flex-1 pr-8">
               {branding?.logo?.url ? (
-                <img src={branding.logo.url} alt="Company Logo" className="h-12 w-auto mb-3" data-testid="img-quote-logo" />
+                <img src={branding.logo.url} alt="Company Logo" className="h-14 w-auto mb-3" data-testid="img-quote-logo" />
               ) : (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">Q</span>
-                  </div>
-                  <span className="text-lg font-bold text-blue-600">Company Name</span>
+                <div className="mb-3">
+                  <div className="text-lg font-bold text-blue-600">Your Company Name</div>
                 </div>
               )}
+              <div className="text-xs leading-relaxed text-slate-700">
+                <p className="font-semibold">Your Company Address</p>
+                <p>City, State - PIN Code</p>
+                <p>India</p>
+                <p className="mt-2"><strong>GSTIN:</strong> Your GSTIN Number</p>
+                <p><strong>Sales:</strong> sales@company.com</p>
+                <p><strong>www.company.com</strong></p>
+              </div>
             </div>
+
+            {/* Right: Quote Title and Number */}
             <div className="text-right">
-              <h2 className="text-3xl font-bold text-slate-800 mb-1">QUOTE</h2>
-              <p className="text-slate-600">Quote# <span className="font-medium">{quote.quoteNumber}</span></p>
-              <div className="mt-2 text-sm">
-                <p className="text-slate-500">Total Amount</p>
-                <p className="text-xl font-bold">{formatCurrency(quote.total)}</p>
+              <h1 className="text-4xl font-bold mb-3" style={{ letterSpacing: '2px' }}>Quote</h1>
+              <div className="text-sm space-y-1">
+                <p><span className="font-semibold"># {quote.quoteNumber}</span></p>
+                <div className="mt-3 p-4 bg-slate-100 border border-slate-300">
+                  <p className="text-xs text-slate-600 mb-1">Total</p>
+                  <p className="text-2xl font-bold">{formatCurrency(quote.total)}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-slate-500 mb-2">BILL TO</h4>
-            <p className="font-semibold text-blue-600">{quote.customerName}</p>
-            {quote.billingAddress && (
-              <div className="text-sm text-slate-600">
-                {quote.billingAddress.street && <p>{quote.billingAddress.street}</p>}
-                {quote.billingAddress.city && (
-                  <p>{quote.billingAddress.city}, {quote.billingAddress.state}</p>
-                )}
-                {quote.billingAddress.pincode && <p>{quote.billingAddress.pincode}</p>}
-                {quote.billingAddress.country && <p>{quote.billingAddress.country}</p>}
-              </div>
-            )}
+          {/* Quote Metadata */}
+          <div className="border-t-2 border-slate-800 pt-4 mb-4">
+            <table className="w-full text-xs">
+              <tbody>
+                <tr>
+                  <td className="py-2 w-1/3">
+                    <span className="font-semibold">Quote Date:</span> {formatDate(quote.date)}
+                  </td>
+                  <td className="py-2 w-1/3">
+                    <span className="font-semibold">Place Of Supply:</span> {quote.billingAddress?.state || 'Maharashtra (27)'}
+                  </td>
+                  <td className="py-2 w-1/3">
+                    <span className="font-semibold">Expiry Date:</span> {quote.expiryDate ? formatDate(quote.expiryDate) : formatDate(new Date(new Date(quote.date).setDate(new Date(quote.date).getDate() + 30)).toISOString())}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div className="flex justify-end mb-4 text-sm">
-            <div className="space-y-1 text-right">
-              <p><span className="text-slate-500">Quote Date :</span> {formatDate(quote.date)}</p>
-              <p><span className="text-slate-500">Expiry Date :</span> {quote.expiryDate ? formatDate(quote.expiryDate) : '-'}</p>
-            </div>
+          {/* Bill To & Ship To Side by Side */}
+          <div className="mb-4">
+            <table className="w-full border-collapse text-xs">
+              <tbody>
+                <tr>
+                  <td className="w-1/2 align-top p-3 border border-slate-400">
+                    <div className="font-bold mb-2">Bill To</div>
+                    <div className="space-y-1">
+                      <p className="font-semibold text-blue-600">{quote.customerName}</p>
+                      {quote.billingAddress && (
+                        <>
+                          {quote.billingAddress.street && <p>{quote.billingAddress.street}</p>}
+                          {(quote.billingAddress.city || quote.billingAddress.state) && (
+                            <p>
+                              {quote.billingAddress.city}
+                              {quote.billingAddress.city && quote.billingAddress.state && ', '}
+                              {quote.billingAddress.state}
+                            </p>
+                          )}
+                          {quote.billingAddress.pincode && <p>{quote.billingAddress.pincode}</p>}
+                          {quote.billingAddress.country && <p>{quote.billingAddress.country}</p>}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td className="w-1/2 align-top p-3 border border-slate-400 border-l-0">
+                    <div className="font-bold mb-2">Ship To</div>
+                    <div className="space-y-1">
+                      {quote.shippingAddress ? (
+                        <>
+                          <p className="font-semibold text-blue-600">{quote.customerName}</p>
+                          {quote.shippingAddress.street && <p>{quote.shippingAddress.street}</p>}
+                          {(quote.shippingAddress.city || quote.shippingAddress.state) && (
+                            <p>
+                              {quote.shippingAddress.city}
+                              {quote.shippingAddress.city && quote.shippingAddress.state && ', '}
+                              {quote.shippingAddress.state}
+                            </p>
+                          )}
+                          {quote.shippingAddress.pincode && <p>{quote.shippingAddress.pincode}</p>}
+                          {quote.shippingAddress.country && <p>{quote.shippingAddress.country}</p>}
+                        </>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-blue-600">{quote.customerName}</p>
+                          {quote.billingAddress && (
+                            <>
+                              {quote.billingAddress.street && <p>{quote.billingAddress.street}</p>}
+                              {(quote.billingAddress.city || quote.billingAddress.state) && (
+                                <p>
+                                  {quote.billingAddress.city}
+                                  {quote.billingAddress.city && quote.billingAddress.state && ', '}
+                                  {quote.billingAddress.state}
+                                </p>
+                              )}
+                              {quote.billingAddress.pincode && <p>{quote.billingAddress.pincode}</p>}
+                              {quote.billingAddress.country && <p>{quote.billingAddress.country}</p>}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <table className="w-full mb-6">
+          {/* Items Table */}
+          <table className="w-full border-collapse mb-4">
             <thead>
-              <tr className="bg-blue-600 text-white">
-                <th className="px-3 py-2 text-left text-sm font-medium">#</th>
-                <th className="px-3 py-2 text-left text-sm font-medium">Item & Description</th>
-                <th className="px-3 py-2 text-center text-sm font-medium">Qty</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Rate</th>
-                <th className="px-3 py-2 text-right text-sm font-medium">Amount</th>
+              <tr className="bg-slate-200">
+                <th className="border border-slate-400 px-2 py-2 text-left text-xs font-semibold">#</th>
+                <th className="border border-slate-400 px-2 py-2 text-left text-xs font-semibold">Item & Description</th>
+                <th className="border border-slate-400 px-2 py-2 text-center text-xs font-semibold">HSN/SAC</th>
+                <th className="border border-slate-400 px-2 py-2 text-center text-xs font-semibold">Qty</th>
+                <th className="border border-slate-400 px-2 py-2 text-right text-xs font-semibold">Rate</th>
+                <th className="border border-slate-400 px-2 py-2 text-right text-xs font-semibold">Amount</th>
               </tr>
             </thead>
             <tbody>
-              {quote.items && quote.items.map((item, index) => (
-                <tr key={item.id || index} className="border-b border-slate-100">
-                  <td className="px-3 py-3 text-sm">{index + 1}</td>
-                  <td className="px-3 py-3">
-                    <p className="font-medium text-sm">{item.name}</p>
-                    {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
-                  </td>
-                  <td className="px-3 py-3 text-center text-sm">{item.quantity.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-3 py-3 text-right text-sm">{item.rate.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                  <td className="px-3 py-3 text-right text-sm font-medium">{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+              {quote.items && quote.items.length > 0 ? (
+                quote.items.map((item: any, index: number) => (
+                  <tr key={item.id || index}>
+                    <td className="border border-slate-400 px-2 py-2 text-xs">{index + 1}</td>
+                    <td className="border border-slate-400 px-2 py-2 text-xs">
+                      <p className="font-semibold">{item.name}</p>
+                      {item.description && <p className="text-slate-600 text-xs mt-0.5">{item.description}</p>}
+                    </td>
+                    <td className="border border-slate-400 px-2 py-2 text-center text-xs">{item.hsn || item.sac || '1000'}</td>
+                    <td className="border border-slate-400 px-2 py-2 text-center text-xs">
+                      {item.quantity} {item.unit || 'kg'}
+                    </td>
+                    <td className="border border-slate-400 px-2 py-2 text-right text-xs">
+                      {item.rate?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="border border-slate-400 px-2 py-2 text-right text-xs font-semibold">
+                      {item.amount?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="border border-slate-400 px-2 py-3 text-center text-xs text-slate-500">No items available</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
 
-          <div className="flex justify-end mb-6">
-            <div className="w-64 space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-slate-500">Sub Total</span>
-                <span>{quote.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              </div>
-              <div className="flex justify-between font-semibold border-t pt-2">
-                <span>Total</span>
-                <span>{formatCurrency(quote.total)}</span>
-              </div>
-            </div>
+          {/* Tax Summary and Total in Words */}
+          <div className="mb-4">
+            <table className="w-full border-collapse text-xs">
+              <tbody>
+                <tr>
+                  <td className="w-1/2 align-top p-3 border border-slate-400">
+                    <div className="font-bold mb-2">Total In Words</div>
+                    <p className="text-xs leading-relaxed">{numberToWords(quote.total)}</p>
+                  </td>
+                  <td className="w-1/2 align-top p-0 border border-slate-400 border-l-0">
+                    <table className="w-full">
+                      <tbody>
+                        <tr>
+                          <td className="px-3 py-2 border-b border-slate-400">Sub Total</td>
+                          <td className="px-3 py-2 text-right border-b border-slate-400">
+                            {totals.subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                        </tr>
+                        {totals.cgst > 0 && (
+                          <tr>
+                            <td className="px-3 py-2 border-b border-slate-400">CGST</td>
+                            <td className="px-3 py-2 text-right border-b border-slate-400">
+                              {totals.cgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        )}
+                        {totals.sgst > 0 && (
+                          <tr>
+                            <td className="px-3 py-2 border-b border-slate-400">SGST</td>
+                            <td className="px-3 py-2 text-right border-b border-slate-400">
+                              {totals.sgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        )}
+                        {totals.igst > 0 && (
+                          <tr>
+                            <td className="px-3 py-2 border-b border-slate-400">IGST</td>
+                            <td className="px-3 py-2 text-right border-b border-slate-400">
+                              {totals.igst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </td>
+                          </tr>
+                        )}
+                        <tr className="font-bold">
+                          <td className="px-3 py-2">Total</td>
+                          <td className="px-3 py-2 text-right">{totals.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
+          {/* Notes Section */}
           {quote.customerNotes && (
-            <div className="mb-4 p-3 bg-slate-50 rounded">
-              <p className="text-xs text-slate-500 font-semibold mb-1">CUSTOMER NOTES</p>
-              <p className="text-sm text-slate-600">{quote.customerNotes}</p>
+            <div className="mb-4 border border-slate-400 p-3">
+              <p className="text-xs font-bold mb-2">NOTES</p>
+              <p className="text-xs leading-relaxed whitespace-pre-wrap">{quote.customerNotes}</p>
             </div>
           )}
 
-          {quote.termsAndConditions && (
-            <div className="mb-4 p-3 bg-slate-50 rounded">
-              <p className="text-xs text-slate-500 font-semibold mb-1">TERMS & CONDITIONS</p>
-              <p className="text-sm text-slate-600">{quote.termsAndConditions}</p>
-            </div>
-          )}
-
-          <div className="mt-12 border-t pt-4">
-            {branding?.signature?.url ? (
-              <div className="flex flex-col gap-2">
-                <img
-                  src={branding.signature.url}
-                  alt="Authorized Signature"
-                  style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-                />
-                <p className="text-xs text-slate-500">Authorized Signature</p>
-              </div>
+          {/* Terms & Conditions */}
+          <div className="mb-4 border border-slate-400 p-3">
+            <p className="text-xs font-bold mb-2">TERMS & CONDITIONS</p>
+            {quote.termsAndConditions ? (
+              <p className="text-xs leading-relaxed whitespace-pre-wrap">{quote.termsAndConditions}</p>
             ) : (
-              <p className="text-sm text-slate-600">Authorized Signature ____________________</p>
+              <div className="text-xs leading-relaxed space-y-1">
+                <p>Looking forward to your business.</p>
+              </div>
             )}
+          </div>
+
+          {/* Signature Section */}
+          <div className="border-t-2 border-slate-800 pt-4">
+            <div className="flex justify-between items-end">
+              <div className="text-xs text-slate-600">
+                <p>Generated on: {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}, {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+              </div>
+              <div className="text-right">
+                {branding?.signature?.url ? (
+                  <div className="flex flex-col items-end">
+                    <img
+                      src={branding.signature.url}
+                      alt="Authorized Signature"
+                      style={{ maxWidth: '120px', maxHeight: '40px', objectFit: 'contain' }}
+                      className="mb-2"
+                    />
+                    <div className="text-xs font-semibold border-t border-slate-400 pt-1" style={{ width: '120px' }}>
+                      Authorized Signature
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <div style={{ width: '120px', height: '40px' }} className="mb-2"></div>
+                    <div className="text-xs font-semibold border-t border-slate-400 pt-1" style={{ width: '120px' }}>
+                      Authorized Signature
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -261,24 +484,88 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
             <head>
               <title>Quote - ${quote.quoteNumber}</title>
               <style>
-                body { font-family: sans-serif; padding: 20px; color: black; background-color: white; }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                  font-family: Arial, sans-serif; 
+                  padding: 20px; 
+                  color: #1e293b; 
+                  background-color: white; 
+                }
                 .bg-white { background-color: white !important; }
-                .p-8 { padding: 2rem; }
+                .border-2 { border: 2px solid #1e293b; }
+                .border { border: 1px solid #94a3b8; }
+                .border-slate-400 { border-color: #94a3b8; }
+                .border-slate-800 { border-color: #1e293b; }
+                .border-t-2 { border-top: 2px solid #1e293b; }
+                .border-t { border-top: 1px solid #94a3b8; }
+                .border-b { border-bottom: 1px solid #94a3b8; }
+                .border-l-0 { border-left: 0; }
+                .p-6 { padding: 1.5rem; }
+                .p-4 { padding: 1rem; }
+                .p-3 { padding: 0.75rem; }
+                .p-0 { padding: 0; }
+                .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+                .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+                .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+                .pt-4 { padding-top: 1rem; }
+                .pt-1 { padding-top: 0.25rem; }
+                .pb-4 { padding-bottom: 1rem; }
+                .pr-8 { padding-right: 2rem; }
+                .mb-6 { margin-bottom: 1.5rem; }
+                .mb-4 { margin-bottom: 1rem; }
+                .mb-3 { margin-bottom: 0.75rem; }
+                .mb-2 { margin-bottom: 0.5rem; }
+                .mb-1 { margin-bottom: 0.25rem; }
+                .mt-2 { margin-top: 0.5rem; }
+                .mt-0-5 { margin-top: 0.125rem; }
                 .flex { display: flex; }
                 .justify-between { justify-content: space-between; }
                 .items-start { align-items: flex-start; }
+                .items-end { align-items: flex-end; }
                 .text-right { text-align: right; }
-                .text-3xl { font-size: 1.875rem; }
+                .text-center { text-align: center; }
+                .text-left { text-align: left; }
+                .text-xs { font-size: 0.75rem; line-height: 1rem; }
+                .text-sm { font-size: 0.875rem; }
+                .text-lg { font-size: 1.125rem; }
+                .text-2xl { font-size: 1.5rem; }
+                .text-4xl { font-size: 2.25rem; }
                 .font-bold { font-weight: 700; }
-                .mb-8 { margin-bottom: 2rem; }
-                .mb-6 { margin-bottom: 1.5rem; }
-                .w-full { width: 100%; }
-                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-                th { background-color: #2563eb !important; color: white !important; text-align: left; }
-                th, td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
-                .text-blue-600 { color: #2563eb !important; }
+                .font-semibold { font-weight: 600; }
+                .text-slate-600 { color: #475569; }
+                .text-slate-700 { color: #334155; }
+                .text-blue-600 { color: #2563eb; }
+                .bg-slate-100 { background-color: #f1f5f9; }
+                .bg-slate-200 { background-color: #e2e8f0; }
+                .leading-relaxed { line-height: 1.625; }
+                .space-y-1 > * + * { margin-top: 0.25rem; }
+                .flex-1 { flex: 1 1 0%; }
+                .w-1-2 { width: 50%; }
+                .w-1-3 { width: 33.333%; }
+                .max-w-4xl { max-width: 56rem; }
+                .mx-auto { margin-left: auto; margin-right: auto; }
+                .align-top { vertical-align: top; }
+                .whitespace-pre-wrap { white-space: pre-wrap; }
+                table { 
+                  width: 100%; 
+                  border-collapse: collapse; 
+                }
+                th { 
+                  background-color: #e2e8f0 !important; 
+                  color: #1e293b !important; 
+                  padding: 0.5rem; 
+                  text-align: left;
+                  font-size: 0.75rem;
+                  font-weight: 600;
+                  border: 1px solid #94a3b8;
+                }
+                td { 
+                  padding: 0.5rem; 
+                  font-size: 0.75rem;
+                  vertical-align: top;
+                }
                 @media print {
-                  body { padding: 0; }
+                  body { padding: 10px; }
                   .no-print { display: none; }
                 }
               </style>
