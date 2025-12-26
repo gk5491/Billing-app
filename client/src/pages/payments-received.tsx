@@ -128,7 +128,7 @@ function formatDate(dateString: string): string {
 
 function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; branding?: any }) {
   return (
-    <div className="bg-white" style={{ width: '210mm', minHeight: '297mm', color: 'black' }}>
+    <div className="bg-white print:m-0" style={{ width: '210mm', minHeight: '297mm', color: 'black' }}>
       <div className="p-12 text-black text-sm">
         {/* Header with Logo and Company Details */}
         <div className="mb-6 pb-4 border-b border-gray-300">
@@ -305,20 +305,28 @@ function PaymentDetailPanel({
 
   return (
     <div className="h-full flex flex-col bg-white border-l border-slate-200 overflow-hidden">
-      <div id="payment-pdf-content" className="bg-white" style={{ position: 'fixed', left: '-9999px', top: 0, width: '210mm', height: '297mm', overflow: 'hidden', zIndex: -1 }}>
-        <PaymentReceiptView payment={payment} branding={branding} />
+      <div className="hidden">
+        <div id="payment-pdf-content" className="bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
+          <PaymentReceiptView payment={payment} branding={branding} />
+        </div>
       </div>
 
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900" data-testid="text-payment-number">{payment.paymentNumber}</h2>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownloadPDF}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleDownloadPDF} title="Download PDF">
             <Download className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint} title="Print Receipt">
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={`h-8 w-8 ${showPdfView ? 'bg-blue-100 text-blue-600' : ''}`} 
+            onClick={() => setShowPdfView(!showPdfView)}
+            title="Toggle PDF View"
+          >
             <Eye className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose} data-testid="button-close-panel">
@@ -391,7 +399,11 @@ function PaymentDetailPanel({
 
       <ScrollArea className="flex-1">
         {showPdfView ? (
-          <PaymentReceiptView payment={payment} branding={branding} />
+          <div className="p-8 bg-slate-100 dark:bg-slate-800 flex justify-center overflow-auto">
+            <div className="shadow-lg bg-white">
+              <PaymentReceiptView payment={payment} branding={branding} />
+            </div>
+          </div>
         ) : (
           <div className="p-4">
             <div className="space-y-6">
@@ -465,25 +477,28 @@ function PaymentDetailPanel({
                         <TableHead className="text-xs text-right">CREDIT</TableHead>
                       </TableRow>
                     </TableHeader>
-                    <TableBody>
-                      {payment.journalEntries.map((entry, index) => (
-                        <TableRow key={index}>
-                          <TableCell className="text-sm">{entry.account}</TableCell>
-                          <TableCell className="text-sm text-right">{entry.debit > 0 ? formatCurrency(entry.debit).replace('₹', '') : '0.00'}</TableCell>
-                          <TableCell className="text-sm text-right">{entry.credit > 0 ? formatCurrency(entry.credit).replace('₹', '') : '0.00'}</TableCell>
+                          <TableHead className="text-xs text-right">CREDIT</TableHead>
                         </TableRow>
-                      ))}
-                      <TableRow className="border-t-2">
-                        <TableCell className="font-semibold">Total</TableCell>
-                        <TableCell className="font-semibold text-right">
-                          {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.debit, 0)).replace('₹', '')}
-                        </TableCell>
-                        <TableCell className="font-semibold text-right">
-                          {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.credit, 0)).replace('₹', '')}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {payment.journalEntries.map((entry, index) => (
+                          <TableRow key={index}>
+                            <TableCell className="text-sm">{entry.account}</TableCell>
+                            <TableCell className="text-sm text-right">{entry.debit > 0 ? formatCurrency(entry.debit).replace('₹', '') : '0.00'}</TableCell>
+                            <TableCell className="text-sm text-right">{entry.credit > 0 ? formatCurrency(entry.credit).replace('₹', '') : '0.00'}</TableCell>
+                          </TableRow>
+                        ))}
+                        <TableRow className="border-t-2">
+                          <TableCell className="font-semibold">Total</TableCell>
+                          <TableCell className="font-semibold text-right">
+                            {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.debit, 0)).replace('₹', '')}
+                          </TableCell>
+                          <TableCell className="font-semibold text-right">
+                            {formatCurrency(payment.journalEntries.reduce((sum, e) => sum + e.credit, 0)).replace('₹', '')}
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
                 </div>
               )}
             </div>
