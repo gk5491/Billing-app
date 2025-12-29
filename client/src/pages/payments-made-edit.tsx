@@ -183,6 +183,9 @@ export default function PaymentsMadeEdit() {
   useEffect(() => {
     if (existingPaymentData?.data) {
       const payment = existingPaymentData.data;
+      const paymentType = payment.paymentType || "bill_payment";
+      
+      // Set form data and activeTab together to ensure bills query triggers
       setFormData({
         vendorId: payment.vendorId || "",
         vendorName: payment.vendorName || "",
@@ -203,6 +206,9 @@ export default function PaymentsMadeEdit() {
         attachments: [],
       });
       
+      // Set active tab first so bills query will be enabled
+      setActiveTab(paymentType);
+      
       if (payment.billPayments) {
         const bills: any = {};
         if (Array.isArray(payment.billPayments)) {
@@ -215,10 +221,6 @@ export default function PaymentsMadeEdit() {
            });
         }
         setSelectedBills(bills);
-      }
-
-      if (payment.paymentType) {
-        setActiveTab(payment.paymentType);
       }
     }
   }, [existingPaymentData]);

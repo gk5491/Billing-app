@@ -70,25 +70,41 @@
       "igst": 0,
       "adjustment": 0,
       "total": 720,
-      "amountPaid": 0,
-      "balanceDue": 720,
+      "amountPaid": 20,
+      "balanceDue": 700,
       "customerNotes": "",
       "termsAndConditions": "",
-      "status": "pending",
+      "status": "PARTIALLY_PAID",
       "sourceType": "sales_order",
       "sourceId": "1766056302179",
       "sourceNumber": null,
       "pdfTemplate": "Standard Template",
       "createdAt": "2025-12-25T04:23:47.252Z",
-      "updatedAt": "2025-12-25T04:23:47.252Z",
+      "updatedAt": "2025-12-29T09:19:26.921Z",
       "createdBy": "Admin User",
-      "payments": [],
+      "payments": [
+        {
+          "id": "1766999966921",
+          "date": "2025-12-29T09:19:00.000Z",
+          "amount": 20,
+          "paymentMode": "cash",
+          "reference": "",
+          "notes": ""
+        }
+      ],
       "activityLogs": [
         {
           "id": "1",
           "timestamp": "2025-12-25T04:23:47.252Z",
           "action": "created",
           "description": "Invoice created for ₹720",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2025-12-29T09:19:26.921Z",
+          "action": "payment_recorded",
+          "description": "Payment of ₹20 recorded",
           "user": "Admin User"
         }
       ]

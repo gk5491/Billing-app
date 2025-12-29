@@ -472,7 +472,43 @@
       "amountInWords": "Indian Rupee Twenty Three Thousand Two Hundred Forty One Only",
       "journalEntries": [],
       "createdAt": "2025-12-23T08:43:01.090Z"
+    },
+    {
+      "id": "pr-1766999966933",
+      "paymentNumber": "56",
+      "date": "2025-12-29",
+      "referenceNumber": "",
+      "customerId": "6",
+      "customerName": "Ganesh kale",
+      "customerEmail": "",
+      "invoices": [
+        {
+          "invoiceId": "1766636627252",
+          "invoiceNumber": "INV-00040",
+          "invoiceDate": "2025-12-25",
+          "invoiceAmount": 720,
+          "amountDue": 700,
+          "paymentAmount": 20
+        }
+      ],
+      "mode": "cash",
+      "depositTo": "Petty Cash",
+      "amount": 20,
+      "unusedAmount": 0,
+      "bankCharges": 0,
+      "tax": "",
+      "taxAmount": 0,
+      "notes": "Payment for INV-00040",
+      "attachments": [],
+      "sendThankYou": false,
+      "status": "PAID",
+      "paymentType": "invoice_payment",
+      "placeOfSupply": "",
+      "descriptionOfSupply": "",
+      "amountInWords": "Indian Rupee Twenty Only",
+      "journalEntries": [],
+      "createdAt": "2025-12-29T09:19:26.921Z"
     }
   ],
-  "nextPaymentNumber": 56
+  "nextPaymentNumber": 57
 }

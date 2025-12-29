@@ -1,6 +1,84 @@
 {
   "creditNotes": [
     {
+      "id": "1766999998247",
+      "creditNoteNumber": "CN-00006",
+      "referenceNumber": "",
+      "date": "2025-12-29",
+      "customerId": "6",
+      "customerName": "Ganesh kale",
+      "invoiceId": "",
+      "invoiceNumber": "",
+      "reason": "sales_return",
+      "salesperson": "",
+      "subject": "Credit Note for Invoice #INV-00040",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "gstin": "",
+      "placeOfSupply": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1765535400204",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "account": "sales",
+          "quantity": 1,
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 0,
+          "taxName": "none",
+          "amount": 60
+        },
+        {
+          "id": "2",
+          "itemId": "1766056260714",
+          "name": "Rice (Copy)",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "account": "sales",
+          "quantity": 11,
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 0,
+          "taxName": "none",
+          "amount": 660
+        }
+      ],
+      "subTotal": 720,
+      "shippingCharges": 0,
+      "tdsType": "TDS",
+      "tdsAmount": 0,
+      "cgst": 0,
+      "sgst": 0,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 720,
+      "creditsRemaining": 720,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "OPEN",
+      "pdfTemplate": "Standard Template",
+      "createdAt": "2025-12-29T09:19:58.246Z",
+      "updatedAt": "2025-12-29T09:19:58.246Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-29T09:19:58.246Z",
+          "action": "created",
+          "description": "Credit Note created for ₹720",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
       "id": "1766634266812",
       "creditNoteNumber": "CN-00005",
       "referenceNumber": "",
@@ -278,5 +356,5 @@
       ]
     }
   ],
-  "nextCreditNoteNumber": 6
+  "nextCreditNoteNumber": 7
 }
