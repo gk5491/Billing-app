@@ -57,6 +57,7 @@ function readOrganizationsData() {
     const defaultOrg = {
       id: "1",
       name: "Default Organization",
+      email: "",
       industry: "Technology",
       location: "India",
       state: "",

@@ -67,6 +67,7 @@ const TIMEZONES = [
 interface FormData {
     id?: string;
     name: string;
+    email?: string;
     industry: string;
     location: string;
     state?: string;
@@ -90,6 +91,7 @@ export default function SettingsOrganizations() {
 
     const initialFormData: FormData = {
         name: "",
+        email: "",
         industry: "",
         location: "India",
         state: "",
@@ -159,6 +161,7 @@ export default function SettingsOrganizations() {
             setFormData({
                 id: org.id,
                 name: org.name,
+                email: org.email || "",
                 industry: org.industry,
                 location: org.location,
                 state: org.state || "",
@@ -228,6 +231,17 @@ export default function SettingsOrganizations() {
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                             placeholder="e.g. My Company"
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={formData.email || ""}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            placeholder="e.g. contact@company.com"
                                         />
                                     </div>
 
@@ -439,6 +453,12 @@ export default function SettingsOrganizations() {
                                     <div className="flex justify-between">
                                         <span>City:</span>
                                         <span className="font-medium text-foreground">{org.city}</span>
+                                    </div>
+                                )}
+                                {org.email && (
+                                    <div className="flex justify-between">
+                                        <span>Email:</span>
+                                        <span className="font-medium text-foreground">{org.email}</span>
                                     </div>
                                 )}
                                 {org.currency && (

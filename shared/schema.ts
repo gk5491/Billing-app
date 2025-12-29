@@ -36,6 +36,7 @@ export type OrganizationBranding = z.infer<typeof organizationBrandingSchema>;
 export const organizationSchema = z.object({
   id: z.string(),
   name: z.string(),
+  email: z.string().optional(),
   industry: z.string(),
   location: z.string(),
   state: z.string().optional(),

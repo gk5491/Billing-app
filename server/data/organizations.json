@@ -1,14 +1,42 @@
 {
-    "organizations": [
-        {
-            "id": "1",
-            "name": "Default Organization",
-            "industry": "Technology",
-            "location": "India",
-            "gstRegistered": false,
-            "gstin": "",
-            "createdAt": "2024-01-01T00:00:00.000Z"
-        }
-    ],
-    "nextOrgId": 2
+  "organizations": [
+    {
+      "id": "1",
+      "name": "Cybaem Tech",
+      "industry": "Technology",
+      "location": "India",
+      "gstRegistered": false,
+      "gstin": "",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "state": "Maharashtra",
+      "street1": "bhumkar chowk, pune",
+      "street2": "",
+      "city": "Pune",
+      "postalCode": "411057",
+      "currency": "INR",
+      "language": "English",
+      "timezone": "IST (Asia/Kolkata)",
+      "note": ""
+    },
+    {
+      "id": "2",
+      "name": "ganesh",
+      "email": "ganesh.kale@cybaemtech.com",
+      "industry": "Agriculture",
+      "location": "India",
+      "state": "Maharashtra",
+      "street1": "bhumkar chowk, pune",
+      "street2": "",
+      "city": "Pune",
+      "postalCode": "411057",
+      "currency": "INR",
+      "language": "English",
+      "timezone": "IST (Asia/Kolkata)",
+      "gstRegistered": false,
+      "gstin": "",
+      "note": "",
+      "createdAt": "2025-12-29T12:13:40.003Z"
+    }
+  ],
+  "nextOrgId": 3
 }
