@@ -16,6 +16,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { PurchasePDFHeader } from "@/components/purchase-pdf-header";
+import { Organization } from "@shared/schema";
+import { useOrganization } from "@/context/OrganizationContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,34 +108,21 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-function PurchaseOrderPDFView({ purchaseOrder, branding }: { purchaseOrder: PurchaseOrder; branding?: any }) {
+function PurchaseOrderPDFView({ purchaseOrder, branding, organization }: { purchaseOrder: PurchaseOrder; branding?: any; organization?: Organization }) {
   const redThemeColor = '#b91c1c'; // Red-700
   const blueThemeColor = '#1d4ed8'; // Blue-700
-  
+
   return (
     <div style={{ backgroundColor: 'white', padding: '40px', width: '100%', fontFamily: 'serif', color: '#1e293b' }} className="pdf-container">
-      {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-          {branding?.logo?.url ? (
-            <img src={branding.logo.url} alt="Company Logo" style={{ height: '40px', width: 'auto', marginBottom: '10px', objectFit: 'contain' }} />
-          ) : (
-            <h1 style={{ color: redThemeColor, fontSize: '24px', margin: 0, fontWeight: 'bold' }}>SKILLTON<span style={{ fontStyle: 'italic', color: '#334155' }}>IT</span></h1>
-          )}
-          <div style={{ fontSize: '11px', color: '#475569', lineHeight: '1.4' }}>
-            <p style={{ margin: 0 }}>Hinjewadi - Wakad road</p>
-            <p style={{ margin: 0 }}>Hinjewadi</p>
-            <p style={{ margin: 0 }}>Pune Maharashtra 411057</p>
-            <p style={{ margin: 0 }}>India</p>
-            <p style={{ margin: 0 }}>GSTIN 27AZEPA5145K1ZH</p>
-            <p style={{ margin: 0 }}>www.skilltonit.com</p>
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <h2 style={{ fontSize: '28px', color: redThemeColor, margin: '0 0 5px 0', fontWeight: 'normal' }}>Purchase Order</h2>
-          <p style={{ fontSize: '12px', margin: 0, fontWeight: 'bold' }}># {purchaseOrder.purchaseOrderNumber || 'PO-00005'}</p>
-        </div>
-      </div>
+      {/* Header Section with Organization Info */}
+      <PurchasePDFHeader
+        logo={branding?.logo}
+        documentTitle="Purchase Order"
+        documentNumber={purchaseOrder.purchaseOrderNumber || 'PO-00001'}
+        date={purchaseOrder.date}
+        referenceNumber={purchaseOrder.referenceNumber}
+        organization={organization}
+      />
 
       {/* Vendor Section */}
       <div style={{ marginBottom: '30px' }}>
@@ -246,7 +236,8 @@ function PurchaseOrderDetailPanel({
   onClone,
   onSetDeliveryDate,
   onCancelItems,
-  branding
+  branding,
+  organization
 }: {
   purchaseOrder: PurchaseOrder;
   onClose: () => void;
@@ -260,6 +251,7 @@ function PurchaseOrderDetailPanel({
   onSetDeliveryDate: () => void;
   onCancelItems: () => void;
   branding?: any;
+  organization?: Organization;
 }) {
   const [showPdfView, setShowPdfView] = useState(true);
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -270,12 +262,12 @@ function PurchaseOrderDetailPanel({
     const toastResult = toast({ title: "Generating PDF...", description: "Please wait while we prepare your document." });
     try {
       const element = pdfRef.current;
-      
+
       // Temporary style adjustments for PDF generation
       const originalStyle = element.getAttribute('style') || '';
       // Explicitly set non-OKLCH colors and hide problematic elements
       element.setAttribute('style', originalStyle + '; width: 800px !important; min-width: 800px !important; background-color: white !important; color: black !important;');
-      
+
       // Inject CSS to override OKLCH colors during capture
       const styleTag = document.createElement('style');
       styleTag.id = 'pdf-capture-overrides';
@@ -308,11 +300,11 @@ function PurchaseOrderDetailPanel({
         }
       `;
       document.head.appendChild(styleTag);
-      
+
       // Ensure the element is visible during capture
       const isHidden = !showPdfView;
       if (isHidden) setShowPdfView(true);
-      
+
       // Wait for state update and rendering
       await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -334,12 +326,12 @@ function PurchaseOrderDetailPanel({
           });
         }
       });
-      
+
       // Cleanup
       document.getElementById('pdf-capture-overrides')?.remove();
       element.setAttribute('style', originalStyle);
       if (isHidden) setShowPdfView(false);
-      
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -648,6 +640,9 @@ export default function PurchaseOrders() {
   const [poToDelete, setPoToDelete] = useState<string | null>(null);
   const [selectedPOs, setSelectedPOs] = useState<string[]>([]);
   const [branding, setBranding] = useState<any>(null);
+
+  // Use organization context instead of local state
+  const { currentOrganization: organization } = useOrganization();
 
   useEffect(() => {
     fetchPurchaseOrders();
@@ -1164,6 +1159,7 @@ export default function PurchaseOrders() {
             onSetDeliveryDate={() => handleSetDeliveryDate(selectedPO.id)}
             onCancelItems={() => handleCancelItems(selectedPO.id)}
             branding={branding}
+            organization={organization || undefined}
           />
         </div>
       )}

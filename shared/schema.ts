@@ -37,6 +37,7 @@ export const organizationSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string().optional(),
+  website: z.string().optional(),
   industry: z.string(),
   location: z.string(),
   state: z.string().optional(),

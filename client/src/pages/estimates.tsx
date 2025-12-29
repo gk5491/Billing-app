@@ -28,6 +28,8 @@ import {
   Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useOrganization } from "@/context/OrganizationContext";
+import { SalesPDFHeader } from "@/components/sales-pdf-header";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -157,7 +159,7 @@ function numberToWords(num: number): string {
   return result.trim();
 }
 
-function QuotePDFView({ quote, branding }: { quote: Quote; branding?: any }) {
+function QuotePDFView({ quote, branding, organization }: { quote: Quote; branding?: any; organization?: any }) {
   // Calculate tax breakdown (assuming items have tax information)
   const calculateTotals = () => {
     let subtotal = 0;
@@ -189,37 +191,21 @@ function QuotePDFView({ quote, branding }: { quote: Quote; branding?: any }) {
     <div id="pdf-content" className="bg-white max-w-4xl mx-auto" style={{ fontFamily: 'Arial, sans-serif' }}>
       <div className="border-2 border-slate-800">
         <div className="p-6">
-          {/* Header Section with Company Info and Quote Title */}
-          <div className="flex justify-between items-start mb-6">
-            {/* Left: Company Details */}
-            <div className="flex-1 pr-8">
-              {branding?.logo?.url ? (
-                <img src={branding.logo.url} alt="Company Logo" className="h-14 w-auto mb-3" data-testid="img-quote-logo" />
-              ) : (
-                <div className="mb-3">
-                  <div className="text-lg font-bold text-blue-600">Your Company Name</div>
-                </div>
-              )}
-              <div className="text-xs leading-relaxed text-slate-700">
-                <p className="font-semibold">Your Company Address</p>
-                <p>City, State - PIN Code</p>
-                <p>India</p>
-                <p className="mt-2"><strong>GSTIN:</strong> Your GSTIN Number</p>
-                <p><strong>Sales:</strong> sales@company.com</p>
-                <p><strong>www.company.com</strong></p>
-              </div>
-            </div>
+          {/* Standard Sales PDF Header */}
+          <SalesPDFHeader
+            logo={branding?.logo || undefined}
+            documentTitle="Quote"
+            documentNumber={quote.quoteNumber}
+            date={quote.date}
+            referenceNumber={quote.referenceNumber}
+            organization={organization}
+          />
 
-            {/* Right: Quote Title and Number */}
-            <div className="text-right">
-              <h1 className="text-4xl font-bold mb-3" style={{ letterSpacing: '2px' }}>Quote</h1>
-              <div className="text-sm space-y-1">
-                <p><span className="font-semibold"># {quote.quoteNumber}</span></p>
-                <div className="mt-3 p-4 bg-slate-100 border border-slate-300">
-                  <p className="text-xs text-slate-600 mb-1">Total</p>
-                  <p className="text-2xl font-bold">{formatCurrency(quote.total)}</p>
-                </div>
-              </div>
+          {/* Total Badge */}
+          <div className="flex justify-end mb-6">
+            <div className="p-4 bg-slate-100 border border-slate-300">
+              <p className="text-xs text-slate-600 mb-1">Total</p>
+              <p className="text-2xl font-bold">{formatCurrency(quote.total)}</p>
             </div>
           </div>
 
@@ -630,14 +616,14 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
             const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              
+
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
                 htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
               }
 
               const computed = window.getComputedStyle(htmlEl);
-              
+
               const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
               colorProps.forEach(prop => {
                 const value = computed[prop as any];
@@ -648,7 +634,7 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
                   else htmlEl.style.setProperty(prop, 'inherit', 'important');
                 }
               });
-              
+
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
@@ -778,7 +764,7 @@ function QuoteDetailPanel({ quote, onClose, onEdit, onDelete, onConvert, onClone
 
       <div className="flex-1 overflow-auto p-4">
         {showPdfView ? (
-          <QuotePDFView quote={quote} branding={branding} />
+          <QuotePDFView quote={quote} branding={branding} organization={currentOrganization || undefined} />
         ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
             <div className="flex items-center px-0 border-b border-slate-200 dark:border-slate-700">
@@ -906,6 +892,7 @@ export default function Estimates() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [quoteToDelete, setQuoteToDelete] = useState<string | null>(null);
   const [branding, setBranding] = useState<any>(null);
+  const { currentOrganization } = useOrganization();
 
   useEffect(() => {
     fetchQuotes();

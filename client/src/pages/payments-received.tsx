@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useOrganization } from "@/context/OrganizationContext";
 import {
   Plus, Search, ChevronDown, MoreHorizontal, Pencil, Trash2,
   X, Send, FileText, Printer, Download, RefreshCw, Eye,
@@ -128,13 +129,14 @@ function formatDate(dateString: string): string {
 }
 
 // Wrapper component that uses the unified receipt for consistent rendering
-function PaymentReceiptView({ payment, branding, isPreview = false }: { payment: PaymentReceived; branding?: any; isPreview?: boolean }) {
-  return <UnifiedPaymentReceipt payment={payment} branding={branding} isPreview={isPreview} />;
+function PaymentReceiptView({ payment, branding, organization, isPreview = false }: { payment: PaymentReceived; branding?: any; organization?: any; isPreview?: boolean }) {
+  return <UnifiedPaymentReceipt payment={payment} branding={branding} organization={organization} isPreview={isPreview} />;
 }
 
 function PaymentDetailPanel({
   payment,
   branding,
+  organization,
   onClose,
   onEdit,
   onDelete,
@@ -142,6 +144,7 @@ function PaymentDetailPanel({
 }: {
   payment: PaymentReceived;
   branding?: any;
+  organization?: any;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -188,7 +191,7 @@ function PaymentDetailPanel({
     <div className="h-full flex flex-col bg-white border-l border-slate-200 overflow-hidden">
       <div className="hidden">
         <div id="payment-pdf-content" className="bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
-          <PaymentReceiptView payment={payment} branding={branding} />
+          <PaymentReceiptView payment={payment} branding={branding} organization={organization} />
         </div>
       </div>
 
@@ -282,7 +285,7 @@ function PaymentDetailPanel({
         <div className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
           <div className="p-4 bg-slate-100 dark:bg-slate-800 min-h-full flex justify-center items-start">
             <div className="shadow-lg bg-white">
-              <PaymentReceiptView payment={payment} branding={branding} isPreview={true} />
+              <PaymentReceiptView payment={payment} branding={branding} organization={organization} isPreview={true} />
             </div>
           </div>
         </div>
@@ -984,6 +987,7 @@ function PaymentCreateDialog({
 export default function PaymentsReceived() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
   const [payments, setPayments] = useState<PaymentReceived[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedPayment, setSelectedPayment] = useState<PaymentReceived | null>(null);
@@ -1298,6 +1302,7 @@ export default function PaymentsReceived() {
           <PaymentDetailPanel
             payment={selectedPayment}
             branding={branding}
+            organization={currentOrganization || undefined}
             onClose={handleClosePanel}
             onEdit={handleEditPayment}
             onDelete={() => handleDelete(selectedPayment.id)}

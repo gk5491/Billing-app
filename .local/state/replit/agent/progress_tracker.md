@@ -155,3 +155,6 @@
 [x] 155. Added full CRUD operations for Organizations (Create, Read, Update, Delete) with Edit button on organization cards (Dec 29, 2025)
 [x] 156. Updated Organization schema with all new fields and types (Dec 29, 2025)
 [x] 157. Session restart - reinstalled cross-env and verified application running (Dec 29, 2025 - current session)
+[x] 158. Created reusable PurchasePDFHeader component for standard PDF header across all Purchase modules (Dec 29, 2025)
+[x] 159. Implemented PDF header with Organization data fetching for Purchase Orders (Dec 29, 2025)
+[x] 160. Integrated PurchasePDFHeader into Bills, Payments Made, and Vendor Credits modules (Dec 29, 2025)

@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useOrganization } from "@/context/OrganizationContext";
+import { SalesPDFHeader } from "@/components/sales-pdf-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -187,9 +189,9 @@ interface SalesOrderDetailPanelProps {
   onConvertSelectedItems: () => void;
 }
 
-function SalesOrderPdfPreview({ order, branding }: { order: SalesOrderDetail; branding?: any }) {
+function SalesOrderPdfPreview({ order, branding, organization }: { order: SalesOrderDetail; branding?: any; organization?: any }) {
   return (
-    <div id="sales-order-pdf-preview" style={{ 
+    <div id="sales-order-pdf-preview" style={{
       fontFamily: 'Arial, sans-serif',
       backgroundColor: '#ffffff',
       color: '#000000',
@@ -199,21 +201,23 @@ function SalesOrderPdfPreview({ order, branding }: { order: SalesOrderDetail; br
       width: '794px',
       boxSizing: 'border-box'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-        <div>
-          {branding?.logo?.url ? (
-            <img src={branding.logo.url} alt="Company Logo" style={{ height: '48px', width: 'auto', marginBottom: '12px' }} />
-          ) : (
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b' }}>Company Logo</div>
-          )}
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#1e293b', marginBottom: '8px', margin: '0 0 8px 0' }}>SALES ORDER</h1>
-          <p style={{ fontSize: '14px', color: '#475569', margin: '0 0 12px 0' }}>{order.salesOrderNumber}</p>
-          <div style={{ marginTop: '16px', backgroundColor: '#eff6ff', padding: '12px 16px', borderRadius: '4px' }}>
-            <p style={{ fontSize: '12px', color: '#475569', margin: '0' }}>Total</p>
-            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0' }}>{formatCurrency(order.total)}</p>
-          </div>
+      {/* Standard Sales PDF Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <SalesPDFHeader
+          logo={branding?.logo || undefined}
+          documentTitle="Sales Order"
+          documentNumber={order.salesOrderNumber}
+          date={order.orderDate}
+          referenceNumber={order.referenceNumber}
+          organization={organization}
+        />
+      </div>
+
+      {/* Total Badge */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '32px' }}>
+        <div style={{ backgroundColor: '#eff6ff', padding: '12px 16px', borderRadius: '4px' }}>
+          <p style={{ fontSize: '12px', color: '#475569', margin: '0' }}>Total</p>
+          <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0' }}>{formatCurrency(order.total)}</p>
         </div>
       </div>
 
@@ -315,7 +319,7 @@ function SalesOrderPdfPreview({ order, branding }: { order: SalesOrderDetail; br
   );
 }
 
-function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onConvertToInvoice, onConvertSelectedItems }: SalesOrderDetailPanelProps & { branding?: any }) {
+function SalesOrderDetailPanel({ order, branding, organization, onClose, onEdit, onDelete, onConvertToInvoice, onConvertSelectedItems }: SalesOrderDetailPanelProps & { branding?: any; organization?: any }) {
   const [activeTab, setActiveTab] = useState("details");
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const { toast } = useToast();
@@ -328,7 +332,7 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
         const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
           .map(el => el.outerHTML)
           .join('');
-        
+
         printWindow.document.write(`
           <html>
             <head>
@@ -451,7 +455,7 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
       {showPdfPreview ? (
         <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-800 p-8">
           <div className="max-w-4xl mx-auto shadow-lg bg-white dark:bg-white">
-            <SalesOrderPdfPreview order={order} branding={branding} />
+            <SalesOrderPdfPreview order={order} branding={branding} organization={organization} />
           </div>
         </div>
       ) : (
@@ -679,6 +683,7 @@ function SalesOrderDetailPanel({ order, branding, onClose, onEdit, onDelete, onC
 export default function SalesOrdersPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
   const [salesOrders, setSalesOrders] = useState<SalesOrderListItem[]>([]);
   const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<SalesOrderDetail | null>(null);
@@ -1172,6 +1177,7 @@ export default function SalesOrdersPage() {
           <SalesOrderDetailPanel
             order={selectedOrder}
             branding={branding}
+            organization={currentOrganization || undefined}
             onClose={handleClosePanel}
             onEdit={handleEditOrder}
             onDelete={handleDeleteClick}

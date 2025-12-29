@@ -1,16 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-
-export interface Organization {
-    id: string;
-    name: string;
-    industry: string;
-    location: string;
-    gstRegistered: boolean;
-    gstin?: string;
-    createdAt: string;
-}
+import { Organization } from "@shared/schema";
 
 interface OrganizationContextType {
     organizations: Organization[];

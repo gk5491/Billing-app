@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useOrganization } from "@/context/OrganizationContext";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/table-pagination";
 import { Button } from "@/components/ui/button";
@@ -182,6 +183,7 @@ const getActivityIcon = (action: string) => {
 export default function DeliveryChallans() {
     const [, setLocation] = useLocation();
     const { toast } = useToast();
+    const { currentOrganization } = useOrganization();
     const [challans, setChallans] = useState<ChallanListItem[]>([]);
     const [selectedChallan, setSelectedChallan] = useState<ChallanDetail | null>(null);
     const [selectedChallans, setSelectedChallans] = useState<string[]>([]);
@@ -424,7 +426,7 @@ export default function DeliveryChallans() {
         <div className="flex h-full">
             {selectedChallan && (
                 <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
-                    <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} />
+                    <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} />
                 </div>
             )}
 
@@ -490,7 +492,7 @@ export default function DeliveryChallans() {
                 </div>
                 {selectedChallan && (
                     <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
-                        <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} />
+                        <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} />
                     </div>
                 )}
 
@@ -736,7 +738,7 @@ export default function DeliveryChallans() {
                     <ScrollArea className="flex-1">
                         <div className="p-6">
                             <div className="bg-white dark:bg-slate-900 border border-border/60 rounded-lg shadow-sm overflow-hidden">
-                                <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} isPreview={true} />
+                                <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} isPreview={true} />
                             </div>
                         </div>
 

@@ -42,6 +42,9 @@ import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/table-pagination";
 import { useToast } from "@/hooks/use-toast";
 import { useBranding } from "@/hooks/use-branding";
+import { useOrganization } from "@/context/OrganizationContext";
+import { PurchasePDFHeader } from "@/components/purchase-pdf-header";
+import { Organization } from "@shared/schema";
 
 interface VendorCreditItem {
   id: string;
@@ -169,6 +172,7 @@ export default function VendorCredits() {
   });
 
   const { data: branding } = useBranding();
+  const { currentOrganization } = useOrganization();
 
   const vendors = vendorsData?.data || [];
 
@@ -530,14 +534,14 @@ export default function VendorCredits() {
             const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              
+
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch') || inlineStyle.includes('oklab')) {
                 htmlEl.setAttribute('style', inlineStyle.replace(/ok(lch|lab)\([^)]+\)/g, 'inherit'));
               }
 
               const computed = window.getComputedStyle(htmlEl);
-              
+
               const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
               colorProps.forEach(prop => {
                 const value = computed[prop as any];
@@ -548,7 +552,7 @@ export default function VendorCredits() {
                   else htmlEl.style.setProperty(prop, 'inherit', 'important');
                 }
               });
-              
+
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
@@ -947,31 +951,21 @@ export default function VendorCredits() {
                       </div>
 
                       <div className="p-6 pt-12" id="vendor-credit-pdf-content">
-                        <div className="flex justify-between items-start mb-8">
-                          <div>
-                            {branding?.logo?.url ? (
-                              <img
-                                src={branding.logo.url}
-                                alt="Company Logo"
-                                className="h-12 w-auto mb-3"
-                                data-testid="img-vendor-credit-logo"
-                              />
-                            ) : (
-                              <div className="flex items-center gap-2 mb-3">
-                                <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-                                  <span className="text-white font-bold text-sm">C</span>
-                                </div>
-                                <span className="text-lg font-bold text-primary">Company Name</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-right">
-                            <h1 className="text-2xl font-bold text-muted-foreground mb-2">VENDOR CREDITS</h1>
-                            <p className="text-sm text-muted-foreground">CreditNote# {selectedCredit.creditNumber}</p>
-                            <div className="mt-4 bg-primary/10 px-4 py-3 rounded">
-                              <p className="text-xs text-muted-foreground">Credits Remaining</p>
-                              <p className="text-xl font-bold">{formatCurrency(selectedCredit.balance)}</p>
-                            </div>
+                        {/* Standard Purchase PDF Header */}
+                        <PurchasePDFHeader
+                          logo={branding?.logo}
+                          documentTitle="Vendor Credit"
+                          documentNumber={selectedCredit.creditNumber}
+                          date={selectedCredit.date}
+                          referenceNumber={selectedCredit.referenceNumber}
+                          organization={currentOrganization}
+                        />
+
+                        {/* Credits Remaining Badge */}
+                        <div className="flex justify-end mb-6">
+                          <div className="bg-primary/10 px-4 py-3 rounded">
+                            <p className="text-xs text-muted-foreground">Credits Remaining</p>
+                            <p className="text-xl font-bold">{formatCurrency(selectedCredit.balance)}</p>
                           </div>
                         </div>
 

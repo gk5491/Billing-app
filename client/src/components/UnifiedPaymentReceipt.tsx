@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { useOrganization } from "@/context/OrganizationContext";
+import { SalesPDFHeader } from "@/components/sales-pdf-header";
 
 interface JournalEntry {
     account: string;
@@ -57,10 +59,12 @@ function formatDate(dateString: string): string {
 export function UnifiedPaymentReceipt({
     payment,
     branding,
+    organization,
     isPreview = false
 }: {
     payment: PaymentReceived;
     branding?: any;
+    organization?: any;
     isPreview?: boolean;
 }) {
     // Fixed A4 dimensions - SINGLE SOURCE OF TRUTH
@@ -91,36 +95,14 @@ export function UnifiedPaymentReceipt({
         <div style={pageStyle}>
             <div style={containerStyle}>
                 {/* Header */}
-                <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #d1d5db' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                            {branding?.logo?.url ? (
-                                <img
-                                    src={branding.logo.url}
-                                    alt="Company Logo"
-                                    style={{ height: '64px', width: 'auto', marginBottom: '8px', display: 'block' }}
-                                />
-                            ) : (
-                                <div style={{ marginBottom: '8px' }}>
-                                    <span style={{ fontSize: '20px', fontWeight: 'bold', color: '#0f172a' }}>Your Company</span>
-                                </div>
-                            )}
-                            <div style={{ fontSize: '12px', color: '#4b5563', marginTop: '8px' }}>
-                                <p style={{ margin: '2px 0' }}>Hingewadi - Wakad road</p>
-                                <p style={{ margin: '2px 0' }}>Hingewadi</p>
-                                <p style={{ margin: '2px 0' }}>Pune, Maharashtra 411057</p>
-                                <p style={{ margin: '2px 0' }}>India</p>
-                                <p style={{ margin: '8px 0 2px 0' }}><strong>GSTIN:</strong> 27AZCPA5145K1ZH</p>
-                                <p style={{ margin: '2px 0' }}><strong>Sales:</strong> sales@company.com</p>
-                                <p style={{ margin: '2px 0' }}><strong>Website:</strong> www.company.com</p>
-                            </div>
-                        </div>
-                        <div>
-                            <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0f172a', margin: '0', textAlign: 'right' }}>
-                                PAYMENT RECEIPT
-                            </h1>
-                        </div>
-                    </div>
+                <div style={{ marginBottom: '24px' }}>
+                    <SalesPDFHeader
+                        organization={organization}
+                        logo={branding?.logo}
+                        documentTitle="PAYMENT RECEIPT"
+                        documentNumber={payment.paymentNumber}
+                        date={payment.date}
+                    />
                 </div>
 
                 {/* Payment Details */}

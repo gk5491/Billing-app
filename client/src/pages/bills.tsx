@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { PurchasePDFHeader } from "@/components/purchase-pdf-header";
+import { Organization } from "@shared/schema";
+import { useOrganization } from "@/context/OrganizationContext";
 import {
   Plus,
   Search,
@@ -189,7 +192,7 @@ function formatDate(dateString: string): string {
   });
 }
 
-function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
+function BillPDFView({ bill, branding, organization }: { bill: Bill; branding?: any; organization?: Organization }) {
   const paymentStatus = getPaymentStatus(bill);
 
   return (
@@ -199,8 +202,16 @@ function BillPDFView({ bill, branding }: { bill: Bill; branding?: any }) {
       style={{ backgroundColor: "#ffffff", color: "#0f172a" }}
     >
       <div className="p-8 pt-12">
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-12">
+        <PurchasePDFHeader
+          logo={branding?.logo}
+          documentTitle="BILL"
+          documentNumber={bill.billNumber}
+          date={bill.billDate}
+          organization={organization}
+        />
+
+        {/* Remaining Header Section - To Be Removed Later */}
+        <div className="flex justify-between items-start mb-12" style={{ display: 'none' }}>
           <div className="flex flex-col gap-1">
             {branding?.logo?.url ? (
               <img
@@ -579,8 +590,7 @@ function BillDetailView({ bill }: { bill: Bill }) {
             Bill# <span className="font-semibold">{bill.billNumber}</span>
           </p>
           <Badge
-            className={`mt-2 ${
-              paymentStatus === "PAID"
+            className={`mt-2 ${paymentStatus === "PAID"
                 ? "bg-green-500 text-white"
                 : paymentStatus === "PARTIALLY PAID"
                   ? "bg-amber-500 text-white"
@@ -589,7 +599,7 @@ function BillDetailView({ bill }: { bill: Bill }) {
                     : paymentStatus === "VOID"
                       ? "bg-slate-500 text-white"
                       : "bg-blue-500 text-white"
-            }`}
+              }`}
           >
             {paymentStatus}
           </Badge>
@@ -791,6 +801,7 @@ function BillDetailView({ bill }: { bill: Bill }) {
 function BillDetailPanel({
   bill,
   branding,
+  organization,
   onClose,
   onEdit,
   onDelete,
@@ -804,6 +815,7 @@ function BillDetailPanel({
 }: {
   bill: Bill;
   branding?: any;
+  organization?: Organization;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -849,7 +861,7 @@ function BillDetailPanel({
 
       // Find all elements and replace oklch colors with rgb/hex if found
       const allElements = element.querySelectorAll("*");
-      
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -868,7 +880,7 @@ function BillDetailPanel({
             const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              
+
               // Clear inline oklch
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch')) {
@@ -876,7 +888,7 @@ function BillDetailPanel({
               }
 
               const computed = window.getComputedStyle(htmlEl);
-              
+
               const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
               colorProps.forEach(prop => {
                 const value = computed[prop as any];
@@ -887,7 +899,7 @@ function BillDetailPanel({
                   else htmlEl.style.setProperty(prop, 'inherit', 'important');
                 }
               });
-              
+
               // Force standard fallback for TW variables
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
@@ -1493,6 +1505,9 @@ export default function Bills() {
   const [journalDialogOpen, setJournalDialogOpen] = useState(false);
   const [branding, setBranding] = useState<any>(null);
 
+  // Use organization context instead of local state
+  const { currentOrganization: organization } = useOrganization();
+
   useEffect(() => {
     fetchBills();
     fetchBranding();
@@ -2053,6 +2068,7 @@ export default function Bills() {
           <BillDetailPanel
             bill={selectedBill}
             branding={branding}
+            organization={organization || undefined}
             onClose={handleClosePanel}
             onEdit={handleEditBill}
             onDelete={() => handleDelete(selectedBill.id)}
@@ -2188,7 +2204,7 @@ export default function Bills() {
                   </TableHeader>
                   <TableBody>
                     {selectedBill.journalEntries &&
-                    selectedBill.journalEntries.length > 0 ? (
+                      selectedBill.journalEntries.length > 0 ? (
                       selectedBill.journalEntries.map((entry, index) => (
                         <TableRow key={index}>
                           <TableCell>{entry.account}</TableCell>

@@ -5,6 +5,8 @@ import { Plus, Search, Filter, CreditCard, MoreHorizontal, Trash2, X, Pencil, Ma
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/table-pagination";
 import { useBranding } from "@/hooks/use-branding";
+import { useOrganization } from "@/context/OrganizationContext";
+import { PurchasePDFHeader } from "@/components/purchase-pdf-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -150,6 +152,7 @@ export default function PaymentsMade() {
   });
 
   const { data: branding } = useBranding();
+  const { currentOrganization } = useOrganization();
 
   const payments = paymentsData?.data || [];
   const vendors = vendorsData?.data || [];
@@ -339,7 +342,7 @@ export default function PaymentsMade() {
 
   const handleDownloadPDF = async () => {
     if (!selectedPayment) return;
-    
+
     const element = document.getElementById('payment-receipt-content');
     if (!element) return;
 
@@ -404,7 +407,7 @@ export default function PaymentsMade() {
             const allElements = clonedDoc.querySelectorAll('*');
             allElements.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              
+
               // 1. Clear any inline styles that might use oklch
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch')) {
@@ -417,10 +420,10 @@ export default function PaymentsMade() {
               htmlEl.style.setProperty('--tw-ring-shadow', 'none', 'important');
               htmlEl.style.setProperty('--tw-shadow', 'none', 'important');
               htmlEl.style.setProperty('--tw-shadow-colored', 'none', 'important');
-              
+
               // 3. Force computed styles to fall back
               const computed = window.getComputedStyle(htmlEl);
-              
+
               // Check all potential color properties
               const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
               colorProps.forEach(prop => {
@@ -453,7 +456,7 @@ export default function PaymentsMade() {
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Payment-${getPaymentNumberString(selectedPayment.paymentNumber)}.pdf`);
-      
+
       toast({ title: "PDF downloaded successfully" });
     } catch (error) {
       console.error('PDF Generation Error:', error);
@@ -692,39 +695,20 @@ export default function PaymentsMade() {
                 </div>
               </div>
 
-              {/* Company Header */}
-              <div className="flex justify-between items-start mb-8">
-                <div className="flex-1">
-                  {branding?.logo?.url ? (
-                    <img
-                      src={branding.logo.url}
-                      alt="Company Logo"
-                      className="h-12 w-auto mb-2"
-                      data-testid="img-payment-made-logo"
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                        <span className="text-white font-bold text-base">S</span>
-                      </div>
-                      <span className="text-xl font-bold text-slate-900 dark:text-white">SkilltonIT</span>
-                    </div>
-                  )}
-                </div>
-                <div className="text-right text-[10px] leading-tight text-slate-500 max-w-[200px]">
-                  <p className="font-bold text-slate-900 dark:text-white mb-0.5">SkilltonIT</p>
-                  <p>Hinjewadi - Wakad road</p>
-                  <p>Hinjewadi, Pune</p>
-                  <p>Maharashtra 411057, India</p>
-                  <p>GSTIN 27AZCPA5145K1ZH</p>
-                  <p>Sales.SkilltonIT@skilltonit.com</p>
-                </div>
-              </div>
+              {/* Standard Purchase PDF Header */}
+              <PurchasePDFHeader
+                logo={branding?.logo || undefined}
+                documentTitle="Payment Made"
+                documentNumber={selectedPayment.paymentNumber}
+                date={selectedPayment.paymentDate}
+                referenceNumber={selectedPayment.reference}
+                organization={currentOrganization || undefined}
+              />
 
               <div className="border-t border-slate-100 mb-6"></div>
 
               {/* Title */}
-              <h3 className="text-center text-xs font-semibold tracking-[0.2em] mb-8 uppercase text-slate-700 dark:text-slate-300">PAYMENTS MADE</h3>
+              <h3 className="text-center text-xs font-semibold tracking-[0.2em] mb-8 uppercase text-slate-700 dark:text-slate-300">PAYMENT RECEIPT</h3>
 
               <div className="flex gap-8 mb-8">
                 {/* Left Column - Details */}

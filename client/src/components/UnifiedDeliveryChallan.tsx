@@ -5,6 +5,8 @@
  */
 
 import React from 'react';
+import { useOrganization } from "@/context/OrganizationContext";
+import { SalesPDFHeader } from "@/components/sales-pdf-header";
 
 interface ChallanItem {
     id: string;
@@ -80,10 +82,12 @@ function getChallanTypeLabel(type: string): string {
 export function UnifiedDeliveryChallan({
     challan,
     branding,
+    organization,
     isPreview = false
 }: {
     challan: ChallanDetail;
     branding?: any;
+    organization?: any;
     isPreview?: boolean;
 }) {
     // Fixed A4 dimensions
@@ -112,31 +116,14 @@ export function UnifiedDeliveryChallan({
         <div style={pageStyle}>
             <div style={containerStyle}>
                 {/* Header Section */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
-                    <div style={{ flex: 1 }}>
-                        {branding?.logo?.url ? (
-                            <img src={branding.logo.url} alt="Company Logo" style={{ height: '64px', width: 'auto', marginBottom: '8px', display: 'block' }} />
-                        ) : (
-                            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '# 2563eb', marginBottom: '8px' }}>
-                                Cybaem<br />tech
-                            </div>
-                        )}
-                        <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
-                            <p style={{ margin: '0' }}>Hingewadi</p>
-                            <p style={{ margin: '0' }}>Pune</p>
-                            <p style={{ margin: '0' }}>Maharashtra</p>
-                            <p style={{ margin: '0' }}>India</p>
-                            <p style={{ margin: '0' }}>411057</p>
-                        </div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                        <h1 style={{ fontSize: '36px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 8px 0' }}>
-                            DELIVERY CHALLAN
-                        </h1>
-                        <p style={{ fontSize: '14px', color: '#2563eb', margin: '0' }}>
-                            Delivery Challan# {challan.challanNumber}
-                        </p>
-                    </div>
+                <div style={{ marginBottom: '32px' }}>
+                    <SalesPDFHeader
+                        organization={organization}
+                        logo={branding?.logo}
+                        documentTitle="DELIVERY CHALLAN"
+                        documentNumber={challan.challanNumber}
+                        date={challan.date}
+                    />
                 </div>
 
                 {/* Deliver To & Details */}

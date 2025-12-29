@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
+import { useOrganization } from "@/context/OrganizationContext";
+import { SalesPDFHeader } from "@/components/sales-pdf-header";
 import {
   Plus,
   Search,
@@ -150,28 +152,13 @@ function CreditNotePdfPreview({ creditNote, branding }: { creditNote: CreditNote
               <span className="inline-block bg-green-500 text-white px-4 py-1 text-sm font-bold rounded">CLOSED</span>
             </div>
           )}
-          <div className="flex justify-between items-start border-b-2 border-green-600 pb-4">
-            <div>
-              {branding?.logo?.url ? (
-                <img
-                  src={branding.logo.url}
-                  alt="Company Logo"
-                  className="h-12 w-auto mb-3"
-                  data-testid="img-credit-note-logo"
-                />
-              ) : (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-green-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">C</span>
-                  </div>
-                  <span className="text-lg font-bold text-green-700">Company Name</span>
-                </div>
-              )}
-            </div>
-            <div className="text-right">
-              <h2 className="text-2xl font-bold text-green-700">CREDIT NOTE</h2>
-            </div>
-          </div>
+          <SalesPDFHeader
+            organization={currentOrganization || undefined}
+            logo={branding?.logo}
+            documentTitle="CREDIT NOTE"
+            documentNumber={creditNote.creditNoteNumber}
+            date={creditNote.date}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-8 mb-6">
@@ -338,14 +325,14 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
             const clonedAll = clonedDoc.querySelectorAll("*");
             clonedAll.forEach((el) => {
               const htmlEl = el as HTMLElement;
-              
+
               const inlineStyle = htmlEl.getAttribute('style') || '';
               if (inlineStyle.includes('oklch')) {
                 htmlEl.setAttribute('style', inlineStyle.replace(/oklch\([^)]+\)/g, 'inherit'));
               }
 
               const computed = window.getComputedStyle(htmlEl);
-              
+
               const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
               colorProps.forEach(prop => {
                 const value = computed[prop as any];
@@ -356,7 +343,7 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
                   else htmlEl.style.setProperty(prop, 'inherit', 'important');
                 }
               });
-              
+
               htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
               htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
@@ -582,6 +569,7 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
 export default function CreditNotes() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { currentOrganization } = useOrganization();
   const [creditNotes, setCreditNotes] = useState<CreditNoteListItem[]>([]);
   const [selectedCreditNote, setSelectedCreditNote] = useState<CreditNoteDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
