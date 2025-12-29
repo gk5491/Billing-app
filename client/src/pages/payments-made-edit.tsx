@@ -247,9 +247,10 @@ export default function PaymentsMadeEdit() {
     const newSelectedBills: { [key: string]: { payment: number; paymentMadeOn: string } } = {};
     for (const bill of sortedBills) {
       if (remainingAmount <= 0) break;
-      const billBalance = bill.amountDue > 0 ? bill.amountDue : bill.total;
-      if (billBalance > 0) {
-        const paymentAmount = Math.min(remainingAmount, billBalance);
+      // Only allocate to bills with remaining balance (amountDue > 0)
+      // Skip bills that are already fully paid (amountDue = 0)
+      if (bill.amountDue > 0) {
+        const paymentAmount = Math.min(remainingAmount, bill.amountDue);
         newSelectedBills[bill.id] = {
           payment: paymentAmount,
           paymentMadeOn: new Date().toISOString().split("T")[0]

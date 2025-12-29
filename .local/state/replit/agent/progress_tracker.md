@@ -149,3 +149,4 @@
 [x] 149. Session restart - reinstalled cross-env and verified application running (Dec 29, 2025)
 [x] 150. Fixed Credit Notes PDF download styling - implemented robust html2canvas approach matching Bills module (Dec 29, 2025)
 [x] 151. Fixed Payments Made edit form not fetching full data - ensures activeTab is set when loading existing payment (Dec 29, 2025)
+[x] 152. Fixed auto-allocation in Payments Made - now skips bills with Amount Due = 0 (Dec 29, 2025)
