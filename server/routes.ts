@@ -59,8 +59,17 @@ function readOrganizationsData() {
       name: "Default Organization",
       industry: "Technology",
       location: "India",
+      state: "",
+      street1: "",
+      street2: "",
+      city: "",
+      postalCode: "",
+      currency: "INR",
+      language: "English",
+      timezone: "IST (Asia/Kolkata)",
       gstRegistered: false,
       gstin: "",
+      note: "",
       createdAt: new Date().toISOString()
     };
     const defaultData = { organizations: [defaultOrg], nextOrgId: 2 };

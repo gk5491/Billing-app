@@ -31,3 +31,25 @@ export const organizationBrandingSchema = z.object({
 });
 
 export type OrganizationBranding = z.infer<typeof organizationBrandingSchema>;
+
+// Organization Schema
+export const organizationSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  industry: z.string(),
+  location: z.string(),
+  state: z.string().optional(),
+  street1: z.string().optional(),
+  street2: z.string().optional(),
+  city: z.string().optional(),
+  postalCode: z.string().optional(),
+  currency: z.string().optional().default("INR"),
+  language: z.string().optional().default("English"),
+  timezone: z.string().optional(),
+  gstRegistered: z.boolean().optional().default(false),
+  gstin: z.string().optional(),
+  note: z.string().optional(),
+  createdAt: z.string(),
+});
+
+export type Organization = z.infer<typeof organizationSchema>;
