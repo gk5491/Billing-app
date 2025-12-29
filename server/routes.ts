@@ -3,8 +3,13 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+import { Buffer } from "buffer";
 
-const DATA_DIR = path.join(import.meta.dirname, "data");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const DATA_DIR = path.join(__dirname, "data");
 const ITEMS_FILE = path.join(DATA_DIR, "items.json");
 const QUOTES_FILE = path.join(DATA_DIR, "quotes.json");
 const CUSTOMERS_FILE = path.join(DATA_DIR, "customers.json");
@@ -23,6 +28,7 @@ const PAYMENTS_RECEIVED_FILE = path.join(DATA_DIR, "paymentsReceived.json");
 const EWAY_BILLS_FILE = path.join(DATA_DIR, "ewayBills.json");
 const UNITS_FILE = path.join(DATA_DIR, "units.json");
 const TRANSPORTERS_FILE = path.join(DATA_DIR, "transporters.json");
+const ORGANIZATIONS_FILE = path.join(DATA_DIR, "organizations.json");
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -43,6 +49,30 @@ function readItems() {
 function writeItems(items: any[]) {
   ensureDataDir();
   fs.writeFileSync(ITEMS_FILE, JSON.stringify({ items }, null, 2));
+}
+
+function readOrganizationsData() {
+  ensureDataDir();
+  if (!fs.existsSync(ORGANIZATIONS_FILE)) {
+    const defaultOrg = {
+      id: "1",
+      name: "Default Organization",
+      industry: "Technology",
+      location: "India",
+      gstRegistered: false,
+      gstin: "",
+      createdAt: new Date().toISOString()
+    };
+    const defaultData = { organizations: [defaultOrg], nextOrgId: 2 };
+    fs.writeFileSync(ORGANIZATIONS_FILE, JSON.stringify(defaultData, null, 2));
+    return defaultData;
+  }
+  return JSON.parse(fs.readFileSync(ORGANIZATIONS_FILE, "utf-8"));
+}
+
+function writeOrganizationsData(data: any) {
+  ensureDataDir();
+  fs.writeFileSync(ORGANIZATIONS_FILE, JSON.stringify(data, null, 2));
 }
 
 const DEFAULT_UNITS = [
@@ -140,6 +170,14 @@ function readSalesOrdersData() {
   return JSON.parse(fs.readFileSync(SALES_ORDERS_FILE, "utf-8"));
 }
 
+function readSalesOrdersDataFiltered(orgId: string) {
+  const data = readSalesOrdersData();
+  if (orgId) {
+    data.salesOrders = data.salesOrders.filter((so: any) => (so.organizationId || "1") === orgId);
+  }
+  return data;
+}
+
 function writeSalesOrdersData(data: any) {
   ensureDataDir();
   fs.writeFileSync(SALES_ORDERS_FILE, JSON.stringify(data, null, 2));
@@ -161,6 +199,14 @@ function readInvoicesData() {
     return defaultData;
   }
   return JSON.parse(fs.readFileSync(INVOICES_FILE, "utf-8"));
+}
+
+function readInvoicesDataFiltered(orgId: string) {
+  const data = readInvoicesData();
+  if (orgId) {
+    data.invoices = data.invoices.filter((inv: any) => (inv.organizationId || "1") === orgId);
+  }
+  return data;
 }
 
 function readSalespersonsData() {
@@ -186,6 +232,14 @@ function readPaymentsReceivedData() {
     return defaultData;
   }
   return JSON.parse(fs.readFileSync(PAYMENTS_RECEIVED_FILE, "utf-8"));
+}
+
+function readPaymentsReceivedDataFiltered(orgId: string) {
+  const data = readPaymentsReceivedData();
+  if (orgId) {
+    data.paymentsReceived = data.paymentsReceived.filter((pr: any) => (pr.organizationId || "1") === orgId);
+  }
+  return data;
 }
 
 function writePaymentsReceivedData(data: any) {
@@ -301,6 +355,14 @@ function readVendorsData() {
   return JSON.parse(fs.readFileSync(VENDORS_FILE, "utf-8"));
 }
 
+function readVendorsDataFiltered(orgId: string) {
+  const data = readVendorsData();
+  if (orgId) {
+    data.vendors = data.vendors.filter((v: any) => (v.organizationId || "1") === orgId);
+  }
+  return data;
+}
+
 function writeVendorsData(data: any) {
   ensureDataDir();
   fs.writeFileSync(VENDORS_FILE, JSON.stringify(data, null, 2));
@@ -344,6 +406,14 @@ function readExpensesData() {
     return defaultData;
   }
   return JSON.parse(fs.readFileSync(EXPENSES_FILE, "utf-8"));
+}
+
+function readExpensesDataFiltered(orgId: string) {
+  const data = readExpensesData();
+  if (orgId) {
+    data.expenses = data.expenses.filter((exp: any) => (exp.organizationId || "1") === orgId);
+  }
+  return data;
 }
 
 function writeExpensesData(data: any) {
@@ -444,6 +514,14 @@ function readBillsData() {
   return JSON.parse(fs.readFileSync(BILLS_FILE, "utf-8"));
 }
 
+function readBillsDataFiltered(orgId: string) {
+  const data = readBillsData();
+  if (orgId) {
+    data.bills = data.bills.filter((bill: any) => (bill.organizationId || "1") === orgId);
+  }
+  return data;
+}
+
 function writeBillsData(data: any) {
   ensureDataDir();
   fs.writeFileSync(BILLS_FILE, JSON.stringify(data, null, 2));
@@ -466,6 +544,14 @@ function readPaymentsMadeDataGlobal() {
   return JSON.parse(fs.readFileSync(PAYMENTS_MADE_FILE_PATH, "utf-8"));
 }
 
+function readPaymentsMadeDataFiltered(orgId: string) {
+  const data = readPaymentsMadeDataGlobal();
+  if (orgId) {
+    data.paymentsMade = data.paymentsMade.filter((pm: any) => (pm.organizationId || "1") === orgId);
+  }
+  return data;
+}
+
 function writePaymentsMadeDataGlobal(data: any) {
   ensureDataDir();
   fs.writeFileSync(PAYMENTS_MADE_FILE_PATH, JSON.stringify(data, null, 2));
@@ -479,6 +565,80 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  // Organizations API
+  app.get("/api/organizations", (req: Request, res: Response) => {
+    try {
+      const data = readOrganizationsData();
+      res.json({ success: true, data: data.organizations });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to read organizations" });
+    }
+  });
+
+  app.get("/api/organizations/:id", (req: Request, res: Response) => {
+    try {
+      const data = readOrganizationsData();
+      const org = data.organizations.find((o: any) => o.id === req.params.id);
+      if (!org) {
+        return res.status(404).json({ success: false, error: "Organization not found" });
+      }
+      res.json({ success: true, data: org });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to read organization" });
+    }
+  });
+
+  app.post("/api/organizations", (req: Request, res: Response) => {
+    try {
+      const data = readOrganizationsData();
+      const newOrg = {
+        id: String(data.nextOrgId),
+        ...req.body,
+        createdAt: new Date().toISOString()
+      };
+      data.organizations.push(newOrg);
+      data.nextOrgId += 1;
+      writeOrganizationsData(data);
+      res.status(201).json({ success: true, data: newOrg });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to create organization" });
+    }
+  });
+
+  app.put("/api/organizations/:id", (req: Request, res: Response) => {
+    try {
+      const data = readOrganizationsData();
+      const index = data.organizations.findIndex((o: any) => o.id === req.params.id);
+      if (index === -1) {
+        return res.status(404).json({ success: false, error: "Organization not found" });
+      }
+      data.organizations[index] = { ...data.organizations[index], ...req.body };
+      writeOrganizationsData(data);
+      res.json({ success: true, data: data.organizations[index] });
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to update organization" });
+    }
+  });
+
+  app.delete("/api/organizations/:id", (req: Request, res: Response) => {
+    try {
+      const data = readOrganizationsData();
+      const index = data.organizations.findIndex((o: any) => o.id === req.params.id);
+      if (index === -1) {
+        return res.status(404).json({ success: false, error: "Organization not found" });
+      }
+      // Prevent deleting the last organization
+      if (data.organizations.length <= 1) {
+        return res.status(400).json({ success: false, error: "Cannot delete the only organization" });
+      }
+      data.organizations.splice(index, 1);
+      writeOrganizationsData(data);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ success: false, error: "Failed to delete organization" });
+    }
+  });
 
   // Units API
   app.get("/api/units", (req: Request, res: Response) => {
@@ -594,6 +754,16 @@ export async function registerRoutes(
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 1000;
       const status = req.query.status as string;
+      const orgId = req.headers['x-organization-id'] as string;
+
+      // Filter by Organization ID (if provided, otherwise show all/default)
+      // For migration: if item has no orgId, treat as belonging to org "1"
+      if (orgId) {
+        items = items.filter((item: any) => {
+          const itemOrgId = item.organizationId || "1";
+          return itemOrgId === orgId;
+        });
+      }
 
       // Filter by status
       if (status === 'active') {
@@ -641,6 +811,7 @@ export async function registerRoutes(
         id: Date.now().toString(),
         ...req.body,
         isActive: true,
+        organizationId: req.headers['x-organization-id'] || "1",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -698,6 +869,7 @@ export async function registerRoutes(
         ...item,
         id: Date.now().toString(),
         name: `${item.name} (Copy)`,
+        organizationId: req.headers['x-organization-id'] || item.organizationId || "1",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -734,9 +906,15 @@ export async function registerRoutes(
     try {
       const data = readCustomersData();
       const invoicesData = readInvoicesData();
+      const orgId = req.headers['x-organization-id'] as string;
+
+      let customers = data.customers;
+      if (orgId) {
+        customers = customers.filter((c: any) => (c.organizationId || "1") === orgId);
+      }
 
       // Calculate outstanding receivables for each customer
-      const customersWithReceivables = data.customers.map((customer: any) => {
+      const customersWithReceivables = customers.map((customer: any) => {
         // Find all invoices for this customer
         const customerInvoices = invoicesData.invoices.filter((inv: any) => inv.customerId === customer.id);
 
@@ -790,6 +968,7 @@ export async function registerRoutes(
         id: String(data.nextCustomerId),
         ...req.body,
         status: req.body.status || "active",
+        organizationId: req.headers['x-organization-id'] || "1",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -1440,6 +1619,7 @@ export async function registerRoutes(
 
       const newSalesOrder = {
         id: String(Date.now()),
+        organizationId: req.headers['x-organization-id'] || "1",
         salesOrderNumber,
         referenceNumber: req.body.referenceNumber || '',
         date: req.body.date || new Date().toISOString().split('T')[0],
@@ -1787,6 +1967,7 @@ export async function registerRoutes(
 
       const newInvoice = {
         id: String(Date.now()),
+        organizationId: req.headers['x-organization-id'] || "1",
         invoiceNumber,
         referenceNumber: req.body.referenceNumber || '',
         date: req.body.date || new Date().toISOString().split('T')[0],
@@ -2393,6 +2574,7 @@ export async function registerRoutes(
       const data = readVendorsData();
       const newVendor = {
         id: String(data.nextVendorId),
+        organizationId: req.headers['x-organization-id'] || "1",
         ...req.body,
         status: req.body.status || "active",
         payables: 0,
@@ -3118,6 +3300,7 @@ export async function registerRoutes(
 
       const newExpense = {
         id: String(data.nextExpenseId),
+        organizationId: req.headers['x-organization-id'] || "1",
         expenseNumber,
         date: req.body.date || new Date().toISOString().split('T')[0],
         expenseAccount: req.body.expenseAccount || '',
@@ -3867,6 +4050,7 @@ export async function registerRoutes(
 
       const newBill = {
         id: String(Date.now()),
+        organizationId: req.headers['x-organization-id'] || "1",
         billNumber,
         orderNumber: req.body.orderNumber || '',
         vendorId: req.body.vendorId || '',
@@ -4447,6 +4631,7 @@ export async function registerRoutes(
 
       const newPayment = {
         id: `pr-${Date.now()}`,
+        organizationId: req.headers['x-organization-id'] || "1",
         paymentNumber,
         ...req.body,
         amountInWords: numberToWords(req.body.amount || 0),
@@ -5142,6 +5327,7 @@ export async function registerRoutes(
 
       const newPayment = {
         id: `pm-${Date.now()}`,
+        organizationId: req.headers['x-organization-id'] || "1",
         paymentNumber,
         vendorId: req.body.vendorId,
         vendorName: req.body.vendorName,
@@ -5909,7 +6095,7 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Unsupported file format" });
       }
 
-      const uploadsDir = path.join(import.meta.dirname, "uploads", "logos");
+      const uploadsDir = path.join(__dirname, "uploads", "logos");
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
@@ -5942,7 +6128,7 @@ export async function registerRoutes(
       const branding = readBranding();
 
       if (branding.logo && branding.logo.url) {
-        const filePath = path.join(import.meta.dirname, branding.logo.url.replace("/uploads/logos/", "uploads/logos/"));
+        const filePath = path.join(__dirname, branding.logo.url.replace("/uploads/logos/", "uploads/logos/"));
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
@@ -5977,7 +6163,7 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Unsupported file format" });
       }
 
-      const uploadsDir = path.join(import.meta.dirname, "uploads", "signatures");
+      const uploadsDir = path.join(__dirname, "uploads", "signatures");
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
       }
@@ -6010,7 +6196,7 @@ export async function registerRoutes(
       const branding = readBranding();
 
       if (branding.signature && branding.signature.url) {
-        const filePath = path.join(import.meta.dirname, branding.signature.url.replace("/uploads/signatures/", "uploads/signatures/"));
+        const filePath = path.join(__dirname, branding.signature.url.replace("/uploads/signatures/", "uploads/signatures/"));
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
@@ -6027,7 +6213,7 @@ export async function registerRoutes(
   });
 
   // Serve uploaded logos as static files
-  const uploadsDir = path.join(import.meta.dirname, "uploads");
+  const uploadsDir = path.join(__dirname, "uploads");
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }

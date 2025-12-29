@@ -1,0 +1,14 @@
+{
+    "organizations": [
+        {
+            "id": "1",
+            "name": "Default Organization",
+            "industry": "Technology",
+            "location": "India",
+            "gstRegistered": false,
+            "gstin": "",
+            "createdAt": "2024-01-01T00:00:00.000Z"
+        }
+    ],
+    "nextOrgId": 2
+}

@@ -1,8 +1,32 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
-  Home,
-  Package,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useOrganization } from "@/context/OrganizationContext";
+import {
+  ChevronsUpDown,
+  Check,
+  PlusCircle,
+  LayoutDashboard,
   ShoppingCart,
+  Users,
+  FileText,
+  Settings as SettingsIcon,
+  Menu,
+  ChevronRight,
+  Package,
   ShoppingBag,
   Clock,
   Building2,
@@ -10,114 +34,133 @@ import {
   UserCog,
   BarChart3,
   FolderOpen,
-  ChevronRight,
-  Menu,
-  Settings as SettingsIcon,
-  CreditCard,
-  Star,
-  PanelLeftClose,
+  Home,
+  PanelLeftClose
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+
+interface NavItemProps {
+  href: string;
+  icon?: React.ElementType;
+  label: string;
+  indent?: boolean;
+  onClick?: () => void;
+}
+
+const NavItem = ({ href, icon: Icon, label, indent, onClick }: NavItemProps) => {
+  const [location] = useLocation();
+  const isActive = location === href;
+
+  return (
+    <Link href={href}>
+      <div
+        onClick={onClick}
+        className={cn(
+          "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer",
+          isActive
+            ? "bg-indigo-50 text-indigo-600"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+          indent && "pl-10"
+        )}
+      >
+        {Icon && <Icon className={cn("h-4 w-4", isActive ? "text-indigo-600" : "text-slate-500")} />}
+        {label}
+      </div>
+    </Link>
+  );
+};
+
+interface CollapsibleNavItemProps {
+  id: string;
+  icon: React.ElementType;
+  label: string;
+  children: React.ReactNode;
+}
+
+const CollapsibleNavItem = ({ id, icon: Icon, label, children }: CollapsibleNavItemProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [location] = useLocation();
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-0.5">
+      <CollapsibleTrigger asChild>
+        <div
+          className={cn(
+            "flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <Icon className="h-4 w-4 text-slate-500" />
+            {label}
+          </div>
+          <ChevronRight
+            className={cn(
+              "h-4 w-4 text-slate-400 transition-transform duration-200",
+              isOpen && "rotate-90"
+            )}
+          />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-0.5">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+};
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const { organizations, currentOrganization, setCurrentOrganization } = useOrganization();
 
-  const NavItem = ({
-    href,
-    icon: Icon,
-    label,
-    active,
-    indent = false
-  }: {
-    href: string;
-    icon?: any;
-    label: string;
-    active?: boolean;
-    indent?: boolean;
-  }) => {
-    const isActive = active || location === href || location.startsWith(href + "/");
-    return (
-      <Link href={href}>
-        <Button
-          variant="ghost"
-          className={cn(
-            "w-full justify-start gap-3 font-medium transition-all duration-200 h-10",
-            indent ? "pl-12" : "px-4",
-            isActive
-              ? "bg-indigo-50 text-indigo-700 font-semibold"
-              : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-          )}
-        >
-          {Icon && (
-            <Icon className={cn(
-              "h-4 w-4",
-              isActive ? "text-indigo-600" : "text-slate-400"
-            )} />
-          )}
-          {label}
-        </Button>
-      </Link>
-    );
-  };
-
-  const CollapsibleNavItem = ({
-    id,
-    icon: Icon,
-    label,
-    children
-  }: {
-    id: string;
-    icon: any;
-    label: string;
-    children: React.ReactNode;
-  }) => {
-    const isOpen = openMenu === id;
-
-    return (
-      <Collapsible open={isOpen} onOpenChange={(open) => setOpenMenu(open ? id : null)}>
-        <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className={cn(
-              "w-full justify-start gap-3 font-medium transition-all duration-200 px-4 h-10",
-              isOpen
-                ? "bg-indigo-50 text-indigo-700"
-                : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-            )}
-          >
-            <ChevronRight className={cn(
-              "h-3 w-3 text-slate-400 transition-transform duration-200",
-              isOpen && "rotate-90"
-            )} />
-            <Icon className={cn("h-4 w-4", isOpen ? "text-indigo-600" : "text-slate-400")} />
-            {label}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-0.5 mt-0.5">
-          {children}
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  };
+  // ... NavItem definitions
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white border-r border-slate-200">
-      <div className="p-4 flex items-center gap-3 border-b border-slate-100">
-        <div className="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center overflow-hidden shadow-md ring-2 ring-indigo-100">
-          <span className="font-display font-bold text-white text-xl">B</span>
-        </div>
-        <div>
-          <h1 className="font-display font-bold text-lg leading-tight tracking-tight text-slate-900">Billing</h1>
-          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">Accounting</p>
-        </div>
+      <div className="p-4 border-b border-slate-100">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="w-full justify-between h-14 px-3 border-slate-200 hover:bg-slate-50 hover:text-slate-900">
+              <div className="flex items-center gap-3 text-left">
+                <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center overflow-hidden shadow-md ring-2 ring-indigo-100">
+                  <span className="font-display font-bold text-white text-lg">
+                    {currentOrganization?.name.charAt(0).toUpperCase() || "B"}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm leading-tight truncate w-[120px]">
+                    {currentOrganization?.name || "Billing App"}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                    {currentOrganization?.industry || "Accounting"}
+                  </span>
+                </div>
+              </div>
+              <ChevronsUpDown className="h-4 w-4 text-slate-400" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-60" align="start">
+            <DropdownMenuLabel>My Organizations</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {organizations.map((org) => (
+              <DropdownMenuItem
+                key={org.id}
+                onSelect={() => setCurrentOrganization(org.id)}
+                className="flex items-center justify-between cursor-pointer"
+              >
+                <span className="truncate">{org.name}</span>
+                {currentOrganization?.id === org.id && (
+                  <Check className="h-4 w-4 text-indigo-600" />
+                )}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setLocation("/settings/organizations")} className="cursor-pointer">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Manage Organizations
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <ScrollArea className="flex-1 py-3">

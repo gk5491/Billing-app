@@ -290,6 +290,23 @@ export default function Settings() {
           <h2 className="text-lg font-semibold text-slate-900">Branding</h2>
         </div>
 
+        {/* Organizations Link Card */}
+        <Card className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setLocation("/settings/organizations")}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-base font-medium">
+              Manage Organizations
+            </CardTitle>
+            <Button variant="ghost" size="icon">
+              <Upload className="h-4 w-4 rotate-90" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Create and manage multiple organizations, switch between them, and configure organization-specific settings.
+            </p>
+          </CardContent>
+        </Card>
+
         {/* Organization Logo Card */}
         <Card>
           <CardHeader>

@@ -60,12 +60,21 @@ import PaymentsReceived from "@/pages/payments-received";
 import PaymentsReceivedCreate from "@/pages/payments-received-create";
 import EWayBills from "@/pages/e-way-bills";
 
+import { OrganizationProvider } from "@/context/OrganizationContext";
+import SettingsOrganizations from "@/pages/settings-organizations";
+
+// ... existing imports
+
 function Router() {
   return (
     <AppShell>
       <Switch>
+        {/* ... existing routes */}
+        <Route path="/settings/organizations" component={SettingsOrganizations} />
         <Route path="/" component={Dashboard} />
         <Route path="/invoices" component={Invoices} />
+        {/* ... rest of routes */}
+
         <Route path="/invoices/new" component={InvoiceCreate} />
         <Route path="/invoices/create" component={InvoiceCreate} />
         <Route path="/invoices/import" component={InvoiceImport} />
@@ -133,10 +142,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <OrganizationProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </OrganizationProvider>
       </AppProvider>
     </QueryClientProvider>
   );
