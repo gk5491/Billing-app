@@ -97,35 +97,67 @@ export async function generatePDFFromElement(
         clonedElement.style.position = 'absolute';
         clonedElement.style.left = '-9999px';
         clonedElement.style.top = '0';
+        clonedElement.style.width = '210mm';
+        clonedElement.style.backgroundColor = '#ffffff';
         document.body.appendChild(clonedElement);
 
-        // Convert all oklch/oklab colors and gradients to rgb in the cloned element
-        const allElements = [clonedElement, ...Array.from(clonedElement.querySelectorAll('*'))];
-        allElements.forEach((el) => {
-            if (el instanceof HTMLElement) {
-                const computed = window.getComputedStyle(el);
+        // Get all elements in both original and clone to preserve styles
+        const originalElements = [element, ...Array.from(element.querySelectorAll('*'))];
+        const clonedElements = [clonedElement, ...Array.from(clonedElement.querySelectorAll('*'))];
 
-                // Check and replace color properties that might have oklch
-                const colorProps = ['color', 'background-color', 'background-image', 'border-color', 'border-top-color',
-                    'border-right-color', 'border-bottom-color', 'border-left-color'];
+        // Copy all styles from original to clone, preserving inline styles
+        originalElements.forEach((originalEl, index) => {
+            if (originalEl instanceof HTMLElement && clonedElements[index] instanceof HTMLElement) {
+                const clonedEl = clonedElements[index] as HTMLElement;
+                const computed = window.getComputedStyle(originalEl);
+
+                // Get original inline style attribute to preserve !important declarations
+                const originalInlineStyle = originalEl.getAttribute('style') || '';
+
+                // Copy all computed styles first
+                const colorProps = ['color', 'background-color', 'background-image', 'border-color',
+                    'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color'];
 
                 colorProps.forEach((prop) => {
                     const value = computed.getPropertyValue(prop);
                     if (value && hasUnsupportedColorFunction(value)) {
-                        // Set a safe fallback color
+                        // Set safe fallback colors
                         if (prop === 'color') {
-                            el.style.setProperty(prop, 'rgb(0, 0, 0)', 'important');
+                            clonedEl.style.setProperty(prop, 'rgb(0, 0, 0)', 'important');
                         } else if (prop === 'background-image') {
-                            // Remove gradients with unsupported colors
-                            el.style.setProperty(prop, 'none', 'important');
-                            el.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
+                            clonedEl.style.setProperty(prop, 'none', 'important');
+                            clonedEl.style.setProperty('background-color', 'rgb(255, 255, 255)', 'important');
                         } else if (prop.includes('background')) {
-                            el.style.setProperty(prop, 'rgb(255, 255, 255)', 'important');
+                            clonedEl.style.setProperty(prop, 'rgb(255, 255, 255)', 'important');
                         } else if (prop.includes('border')) {
-                            el.style.setProperty(prop, 'rgb(226, 232, 240)', 'important');
+                            clonedEl.style.setProperty(prop, 'rgb(226, 232, 240)', 'important');
                         }
+                    } else if (value) {
+                        // Copy the computed value
+                        clonedEl.style.setProperty(prop, value);
                     }
                 });
+
+                // Re-apply original inline styles to preserve !important and specific colors
+                if (originalInlineStyle) {
+                    const styles = originalInlineStyle.split(';').filter(s => s.trim());
+                    styles.forEach(style => {
+                        const colonIndex = style.indexOf(':');
+                        if (colonIndex > 0) {
+                            const prop = style.substring(0, colonIndex).trim();
+                            const val = style.substring(colonIndex + 1).trim();
+                            const hasImportant = val.includes('!important');
+                            const cleanVal = val.replace('!important', '').trim();
+
+                            // Apply with or without !important as in original
+                            if (hasImportant) {
+                                clonedEl.style.setProperty(prop, cleanVal, 'important');
+                            } else {
+                                clonedEl.style.setProperty(prop, cleanVal);
+                            }
+                        }
+                    });
+                }
             }
         });
 
@@ -150,6 +182,8 @@ export async function generatePDFFromElement(
             scrollY: 0,
             allowTaint: true,
             foreignObjectRendering: false,
+            imageTimeout: 0,
+            removeContainer: false,
         });
 
         // Remove the cloned element

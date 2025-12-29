@@ -5,6 +5,7 @@ import {
   X, Send, FileText, Printer, Download, RefreshCw, Eye,
   Check, Filter
 } from "lucide-react";
+import { UnifiedPaymentReceipt } from "@/components/UnifiedPaymentReceipt";
 import { usePagination } from "@/hooks/use-pagination";
 import { TablePagination } from "@/components/table-pagination";
 import { Button } from "@/components/ui/button";
@@ -126,129 +127,9 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-function PaymentReceiptView({ payment, branding }: { payment: PaymentReceived; branding?: any }) {
-  return (
-    <div className="bg-white print:m-0" style={{ width: '210mm', minHeight: '297mm', color: 'black' }}>
-      <div className="p-12 text-black text-sm">
-        {/* Header with Logo and Company Details */}
-        <div className="mb-6 pb-4 border-b border-gray-300">
-          <div className="flex justify-between items-start">
-            <div>
-              {branding?.logo?.url ? (
-                <img
-                  src={branding.logo.url}
-                  alt="Company Logo"
-                  className="h-16 w-auto mb-2"
-                  data-testid="img-payment-logo"
-                />
-              ) : (
-                <div className="mb-2">
-                  <span className="text-xl font-bold text-slate-900">Your Company</span>
-                </div>
-              )}
-              <div className="text-xs text-gray-600 space-y-0.5 mt-2">
-                <p>Hingewadi - Wakad road</p>
-                <p>Hingewadi</p>
-                <p>Pune, Maharashtra 411057</p>
-                <p>India</p>
-                <p className="mt-2"><strong>GSTIN:</strong> 27AZCPA5145K1ZH</p>
-                <p><strong>Sales:</strong> sales@company.com</p>
-                <p><strong>Website:</strong> www.company.com</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold text-slate-900">PAYMENT RECEIPT</h1>
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Details Section */}
-        <div className="mb-8 space-y-2">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Payment Date</span>
-            <span className="font-semibold text-slate-900">{formatDate(payment.date)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Reference Number</span>
-            <span className="font-semibold text-slate-900">{payment.referenceNumber || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Payment Mode</span>
-            <span className="font-semibold text-slate-900">{payment.mode}</span>
-          </div>
-        </div>
-
-        {/* Amount Received and In Words Section */}
-        <div className="mb-8 grid grid-cols-2 gap-8">
-          <div>
-            <p className="text-gray-600 text-xs font-semibold mb-2">Amount Received In Words</p>
-            <p className="font-semibold text-slate-900">{payment.amountInWords || 'N/A'}</p>
-          </div>
-          <div className="flex justify-end items-start">
-            <div className="bg-green-600 text-white px-8 py-3 rounded text-center" style={{ backgroundColor: '#16a34a !important', color: 'white !important' }}>
-              <div className="text-xs font-medium text-white" style={{ color: 'white !important' }}>Amount Received</div>
-              <div className="text-2xl font-bold text-white" style={{ color: 'white !important' }}>{formatCurrency(payment.amount)}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Received From and Signature Section */}
-        <div className="mb-8 grid grid-cols-2 gap-12">
-          <div>
-            <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">RECEIVED FROM</h4>
-            <p className="font-bold text-slate-900 mb-2">{payment.customerName}</p>
-            <div className="text-xs text-gray-600 space-y-0.5">
-              <p>{payment.placeOfSupply || '(MH) - Maharashtra'}</p>
-              <p>India</p>
-            </div>
-          </div>
-          <div className="flex flex-col items-end justify-between">
-            <div className="text-right">
-              <p className="text-xs text-gray-600 mb-12">Authorized Signature</p>
-              {branding?.signature?.url && (
-                <img src={branding.signature.url} alt="Signature" className="h-12 w-auto mb-1" />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Payment For Table */}
-        {payment.invoices && payment.invoices.length > 0 && (
-          <div className="mb-8">
-            <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wide">Payment For</h4>
-            <table className="w-full text-xs border-collapse">
-              <thead>
-                <tr className="border-b-2 border-gray-300 bg-slate-100">
-                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Number</th>
-                  <th className="text-left py-2 px-2 font-semibold text-gray-700">Invoice Date</th>
-                  <th className="text-right py-2 px-2 font-semibold text-gray-700">Invoice Amount</th>
-                  <th className="text-right py-2 px-2 font-semibold text-gray-700">Payment Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payment.invoices.map((invoice: any, index: number) => (
-                  <tr key={index} className="border-b border-gray-200">
-                    <td className="py-2 px-2 text-gray-900">{invoice.invoiceNumber || '-'}</td>
-                    <td className="py-2 px-2 text-gray-900">{invoice.date ? formatDate(invoice.date) : '-'}</td>
-                    <td className="py-2 px-2 text-right text-gray-900">{formatCurrency(invoice.amount || 0)}</td>
-                    <td className="py-2 px-2 text-right text-gray-900">{formatCurrency(invoice.paymentAmount || invoice.amount || 0)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Over Payment Section */}
-        {payment.unusedAmount > 0 && (
-          <div className="pt-4 border-t border-gray-300 text-center">
-            <p className="text-xs text-gray-600 mb-1">Over payment</p>
-            <p className="text-xl font-bold text-slate-900">{formatCurrency(payment.unusedAmount)}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+// Wrapper component that uses the unified receipt for consistent rendering
+function PaymentReceiptView({ payment, branding, isPreview = false }: { payment: PaymentReceived; branding?: any; isPreview?: boolean }) {
+  return <UnifiedPaymentReceipt payment={payment} branding={branding} isPreview={isPreview} />;
 }
 
 function PaymentDetailPanel({
@@ -320,10 +201,10 @@ function PaymentDetailPanel({
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handlePrint} title="Print Receipt">
             <Printer className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={`h-8 w-8 ${showPdfView ? 'bg-blue-100 text-blue-600' : ''}`} 
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`h-8 w-8 ${showPdfView ? 'bg-blue-100 text-blue-600' : ''}`}
             onClick={() => setShowPdfView(!showPdfView)}
             title="Toggle PDF View"
           >
@@ -397,14 +278,16 @@ function PaymentDetailPanel({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        {showPdfView ? (
-          <div className="p-8 bg-slate-100 dark:bg-slate-800 flex justify-center overflow-auto">
+      {showPdfView ? (
+        <div className="flex-1 overflow-auto" style={{ minHeight: 0 }}>
+          <div className="p-4 bg-slate-100 dark:bg-slate-800 min-h-full flex justify-center items-start">
             <div className="shadow-lg bg-white">
-              <PaymentReceiptView payment={payment} branding={branding} />
+              <PaymentReceiptView payment={payment} branding={branding} isPreview={true} />
             </div>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <ScrollArea className="flex-1">
           <div className="p-4">
             <div className="space-y-6">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
@@ -500,8 +383,8 @@ function PaymentDetailPanel({
               )}
             </div>
           </div>
-        )}
-      </ScrollArea>
+        </ScrollArea>
+      )}
 
       <div className="border-t border-slate-200 p-3 text-center text-xs text-slate-500">
         PDF Template: <span className="text-blue-600">Elite Template</span>

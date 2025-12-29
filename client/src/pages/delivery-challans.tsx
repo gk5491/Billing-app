@@ -26,6 +26,7 @@ import {
     FileText,
     ArrowRight
 } from "lucide-react";
+import { UnifiedDeliveryChallan } from "@/components/UnifiedDeliveryChallan";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -176,81 +177,7 @@ const getActivityIcon = (action: string) => {
     }
 };
 
-function ChallanPDFView({ challan, branding }: { challan: ChallanDetail; branding?: any }) {
-    return (
-        <div id="challan-pdf-content" className="bg-white p-8 text-black min-h-full">
-            <div className="max-w-3xl mx-auto">
-                <div className="flex justify-between items-start mb-8 border-b-2 border-primary pb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-primary">DELIVERY CHALLAN</h1>
-                        <p className="text-sm text-muted-foreground mt-1">{challan.challanNumber}</p>
-                    </div>
-                    <div className="text-right">
-                        {branding?.logo?.url ? (
-                            <img src={branding.logo.url} alt="Logo" className="h-12 w-auto" />
-                        ) : (
-                            <p className="font-semibold text-lg">Company Name</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-8 mb-8">
-                    <div>
-                        <h3 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Deliver To</h3>
-                        <p className="font-semibold">{challan.customerName}</p>
-                        <div className="text-sm text-muted-foreground">
-                            {formatAddress(challan.shippingAddress).map((line, i) => (
-                                <p key={i}>{line}</p>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="text-right">
-                        <div className="space-y-1">
-                            <p className="text-sm"><span className="text-muted-foreground">Date:</span> {formatDate(challan.date)}</p>
-                            <p className="text-sm"><span className="text-muted-foreground">Type:</span> {getChallanTypeLabel(challan.challanType)}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <table className="w-full mb-8 text-sm">
-                    <thead>
-                        <tr className="bg-muted/50">
-                            <th className="px-3 py-2 text-left">#</th>
-                            <th className="px-3 py-2 text-left">Item</th>
-                            <th className="px-3 py-2 text-right">Qty</th>
-                            <th className="px-3 py-2 text-right">Rate</th>
-                            <th className="px-3 py-2 text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {challan.items.map((item, index) => (
-                            <tr key={index} className="border-b">
-                                <td className="px-3 py-2">{index + 1}</td>
-                                <td className="px-3 py-2">{item.name}</td>
-                                <td className="px-3 py-2 text-right">{item.quantity}</td>
-                                <td className="px-3 py-2 text-right">{formatCurrency(item.rate)}</td>
-                                <td className="px-3 py-2 text-right font-medium">{formatCurrency(item.amount)}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                <div className="flex justify-end">
-                    <div className="w-64 space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Sub Total</span>
-                            <span>{formatCurrency(challan.subTotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm font-bold border-t pt-2">
-                            <span>Total</span>
-                            <span>{formatCurrency(challan.total)}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
+// ChallanPDFView removed in favor of UnifiedDeliveryChallan
 
 export default function DeliveryChallans() {
     const [, setLocation] = useLocation();
@@ -497,132 +424,7 @@ export default function DeliveryChallans() {
         <div className="flex h-full">
             {selectedChallan && (
                 <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
-                    <div className="bg-white" style={{ width: '210mm', minHeight: '297mm' }}>
-                        <div className="p-12 text-black">
-                            {/* Header Section */}
-                            <div className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200">
-                                <div className="flex-1">
-                                    {branding?.logo?.url ? (
-                                        <img src={branding.logo.url} alt="Company Logo" className="h-16 w-auto mb-2" />
-                                    ) : (
-                                        <div className="text-xl font-bold text-blue-600 mb-2">Cybaem<br />tech</div>
-                                    )}
-                                    <div className="text-xs text-slate-600 mt-2">
-                                        <p>Your Company Address</p>
-                                        <p>City, State - PIN Code</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <h1 className="text-4xl font-bold text-slate-900 mb-2">DELIVERY CHALLAN</h1>
-                                    <p className="text-sm text-blue-600">Delivery Challan# {selectedChallan.challanNumber}</p>
-                                </div>
-                            </div>
-
-                            {/* Bill To & Invoice Details */}
-                            <div className="grid grid-cols-2 gap-12 mb-6">
-                                <div>
-                                    <h4 className="text-xs uppercase tracking-wide text-slate-600 font-bold mb-3">DELIVER TO</h4>
-                                    <p className="font-bold text-blue-600 text-base mb-1">{selectedChallan.customerName}</p>
-                                    <div className="text-sm text-slate-600 space-y-0.5">
-                                        {formatAddress(selectedChallan.shippingAddress).map((line, i) => (
-                                            <p key={i}>{line}</p>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="text-right space-y-2">
-                                    <div>
-                                        <span className="text-sm text-slate-600">Challan Date:</span>
-                                        <span className="ml-2 text-sm font-semibold">{formatDate(selectedChallan.date)}</span>
-                                    </div>
-                                    <div>
-                                        <span className="text-sm text-slate-600">Challan Type:</span>
-                                        <span className="ml-2 text-sm font-semibold">{getChallanTypeLabel(selectedChallan.challanType)}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Items Table */}
-                            <table className="w-full mb-6 text-sm border-collapse">
-                                <thead>
-                                    <tr className="bg-blue-600 text-white">
-                                        <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">#</th>
-                                        <th className="px-3 py-3 text-left text-xs font-bold uppercase tracking-wider">Item & Description</th>
-                                        <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">HSN/SAC</th>
-                                        <th className="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider">Qty</th>
-                                        <th className="px-3 py-3 text-right text-xs font-bold uppercase tracking-wider">Rate</th>
-                                        <th className="px-3 py-3 text-right text-xs font-bold uppercase tracking-wider">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {selectedChallan.items.map((item, index) => (
-                                        <tr key={item.id} className="border-b border-slate-100">
-                                            <td className="px-3 py-4">{index + 1}</td>
-                                            <td className="px-3 py-4">
-                                                <div className="font-semibold">{item.name}</div>
-                                                {item.description && (
-                                                    <div className="text-xs text-slate-600 mt-1">{item.description}</div>
-                                                )}
-                                            </td>
-                                            <td className="px-3 py-4 text-center">{item.hsnSac || '-'}</td>
-                                            <td className="px-3 py-4 text-center">{item.quantity}</td>
-                                            <td className="px-3 py-4 text-right">{formatCurrency(item.rate)}</td>
-                                            <td className="px-3 py-4 text-right font-semibold">{formatCurrency(item.amount)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-
-                            {/* Summary */}
-                            <div className="flex justify-end mb-8">
-                                <div className="w-96 border border-slate-300 rounded-lg overflow-hidden">
-                                    <div className="bg-slate-50 px-4 py-3 border-b border-slate-300">
-                                        <h4 className="text-sm font-bold uppercase text-slate-700">SUMMARY</h4>
-                                    </div>
-                                    <div className="p-4 space-y-3">
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-slate-600">Sub Total</span>
-                                            <span className="font-semibold">{formatCurrency(selectedChallan.subTotal)}</span>
-                                        </div>
-                                        {selectedChallan.cgst > 0 && (
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-600">CGST (9%)</span>
-                                                <span className="font-semibold">{formatCurrency(selectedChallan.cgst)}</span>
-                                            </div>
-                                        )}
-                                        {selectedChallan.sgst > 0 && (
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-slate-600">SGST (9%)</span>
-                                                <span className="font-semibold">{formatCurrency(selectedChallan.sgst)}</span>
-                                            </div>
-                                        )}
-                                        <div className="flex justify-between py-3 border-t-2 border-slate-300 text-lg font-bold">
-                                            <span className="text-slate-900">Total</span>
-                                            <span className="text-slate-900">{formatCurrency(selectedChallan.total)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Signature */}
-                            <div className="mt-12 pt-6 border-t border-slate-200">
-                                {branding?.signature?.url ? (
-                                    <div className="flex flex-col gap-2">
-                                        <img
-                                            src={branding.signature.url}
-                                            alt="Authorized Signature"
-                                            style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-                                        />
-                                        <p className="text-xs text-slate-600">Authorized Signature</p>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-2">
-                                        <div className="text-base font-cursive text-slate-800">Signature</div>
-                                        <p className="text-xs text-slate-600">Authorized Signature</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                    <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} />
                 </div>
             )}
 
@@ -686,6 +488,11 @@ export default function DeliveryChallans() {
                         Filters
                     </Button>
                 </div>
+                {selectedChallan && (
+                    <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
+                        <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} />
+                    </div>
+                )}
 
                 <div className="flex-1 overflow-hidden">
                     <ScrollArea className="h-full">
@@ -928,134 +735,8 @@ export default function DeliveryChallans() {
 
                     <ScrollArea className="flex-1">
                         <div className="p-6">
-                            <div className="bg-white dark:bg-slate-900 border border-border/60 rounded-lg shadow-sm">
-                                <div className="p-6 border-b border-border/40 relative">
-                                    {selectedChallan.status === 'DRAFT' && (
-                                        <div className="absolute top-4 left-4 transform -rotate-12">
-                                            <span className="text-4xl font-bold text-slate-200 dark:text-slate-700 uppercase tracking-wider">
-                                                Draft
-                                            </span>
-                                        </div>
-                                    )}
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            {branding?.logo?.url ? (
-                                                <img src={branding.logo.url} alt="Company Logo" className="h-16 w-auto mb-4" data-testid="img-challan-logo" />
-                                            ) : (
-                                                <div className="h-16 w-16 bg-slate-200 rounded flex items-center justify-center mb-4">
-                                                    <span className="text-xs text-slate-500">No Logo</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="text-right">
-                                            <h2 className="text-2xl font-bold text-foreground mb-2">DELIVERY CHALLAN</h2>
-                                            <p className="text-sm font-medium">Delivery Challan# {selectedChallan.challanNumber}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="p-6 border-b border-border/40">
-                                    <div className="grid grid-cols-2 gap-8">
-                                        <div>
-                                            <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Deliver To</h4>
-                                            <p className="font-semibold text-primary">{selectedChallan.customerName}</p>
-                                            <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-                                                {formatAddress(selectedChallan.shippingAddress).map((line, i) => (
-                                                    <p key={i}>{line}</p>
-                                                ))}
-                                                {selectedChallan.gstin && <p className="mt-2">GSTIN: {selectedChallan.gstin}</p>}
-                                            </div>
-                                        </div>
-                                        <div className="text-right space-y-2">
-                                            <div>
-                                                <span className="text-xs text-muted-foreground">Challan Date:</span>
-                                                <span className="ml-2 text-sm">{formatDate(selectedChallan.date)}</span>
-                                            </div>
-                                            <div>
-                                                <span className="text-xs text-muted-foreground">Challan Type:</span>
-                                                <span className="ml-2 text-sm">{getChallanTypeLabel(selectedChallan.challanType)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {selectedChallan.placeOfSupply && (
-                                        <div className="mt-4 pt-4 border-t border-border/40">
-                                            <span className="text-xs text-muted-foreground">Place Of Supply:</span>
-                                            <span className="ml-2 text-sm">{selectedChallan.placeOfSupply}</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="p-6">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="bg-primary text-primary-foreground">
-                                                <th className="p-2 text-left">#</th>
-                                                <th className="p-2 text-left">Item & Description</th>
-                                                <th className="p-2 text-center">HSN/SAC</th>
-                                                <th className="p-2 text-center">Qty</th>
-                                                <th className="p-2 text-right">Rate</th>
-                                                <th className="p-2 text-right">Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {selectedChallan.items.map((item, index) => (
-                                                <tr key={item.id} className="border-b border-border/40">
-                                                    <td className="p-2">{index + 1}</td>
-                                                    <td className="p-2">
-                                                        <div className="font-medium">{item.name}</div>
-                                                        {item.description && (
-                                                            <div className="text-xs text-muted-foreground">{item.description}</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="p-2 text-center">{item.hsnSac || '-'}</td>
-                                                    <td className="p-2 text-center">{item.quantity}</td>
-                                                    <td className="p-2 text-right">{formatCurrency(item.rate)}</td>
-                                                    <td className="p-2 text-right">{formatCurrency(item.amount)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-
-                                    <div className="mt-4 flex justify-end">
-                                        <div className="w-64 space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span>Sub Total</span>
-                                                <span>{formatCurrency(selectedChallan.subTotal)}</span>
-                                            </div>
-                                            {selectedChallan.cgst > 0 && (
-                                                <div className="flex justify-between text-muted-foreground">
-                                                    <span>CGST (9%)</span>
-                                                    <span>{formatCurrency(selectedChallan.cgst)}</span>
-                                                </div>
-                                            )}
-                                            {selectedChallan.sgst > 0 && (
-                                                <div className="flex justify-between text-muted-foreground">
-                                                    <span>SGST (9%)</span>
-                                                    <span>{formatCurrency(selectedChallan.sgst)}</span>
-                                                </div>
-                                            )}
-                                            <div className="flex justify-between font-bold bg-primary/10 p-2 rounded">
-                                                <span>Total</span>
-                                                <span>{formatCurrency(selectedChallan.total)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-8 pt-8 border-t border-border/40">
-                                        {branding?.signature?.url ? (
-                                            <div className="flex flex-col gap-2">
-                                                <img
-                                                    src={branding.signature.url}
-                                                    alt="Authorized Signature"
-                                                    style={{ maxWidth: '180px', maxHeight: '60px', objectFit: 'contain' }}
-                                                />
-                                                <p className="text-xs text-muted-foreground">Authorized Signature</p>
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm">Authorized Signature ____________________</p>
-                                        )}
-                                    </div>
-                                </div>
+                            <div className="bg-white dark:bg-slate-900 border border-border/60 rounded-lg shadow-sm overflow-hidden">
+                                <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} isPreview={true} />
                             </div>
                         </div>
 
