@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 import {
   Plus,
   Search,
@@ -294,9 +296,95 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
   const [showPdfPreview, setShowPdfPreview] = useState(true);
 
   const handleDownloadPDF = async () => {
+    const element = document.getElementById("pdf-content");
+    if (!element) return;
+
+    const originalStyle = element.style.cssText;
+    element.style.backgroundColor = "#ffffff";
+    element.style.color = "#000000";
+    element.style.width = "800px";
+    element.style.maxWidth = "none";
+
     try {
-      const { generatePDFFromElement } = await import("@/lib/pdf-utils");
-      await generatePDFFromElement("pdf-content", `CreditNote-${creditNote.creditNoteNumber}.pdf`);
+      const polyfillStyles = document.createElement('style');
+      polyfillStyles.innerHTML = `
+        * {
+          --tw-ring-color: transparent !important;
+          --tw-ring-offset-color: transparent !important;
+          --tw-ring-shadow: none !important;
+          --tw-shadow: none !important;
+          --tw-shadow-colored: none !important;
+          outline-color: transparent !important;
+          caret-color: transparent !important;
+          accent-color: transparent !important;
+        }
+      `;
+      document.head.appendChild(polyfillStyles);
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 800,
+        onclone: (clonedDoc: Document) => {
+          const clonedElement = clonedDoc.getElementById("pdf-content");
+          if (clonedElement) {
+            clonedElement.style.width = "800px";
+            clonedElement.style.maxWidth = "none";
+            clonedElement.style.backgroundColor = "#ffffff";
+            clonedElement.style.color = "#000000";
+
+            const clonedAll = clonedDoc.querySelectorAll("*");
+            clonedAll.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              
+              const inlineStyle = htmlEl.getAttribute('style') || '';
+              if (inlineStyle.includes('oklch')) {
+                htmlEl.setAttribute('style', inlineStyle.replace(/oklch\([^)]+\)/g, 'inherit'));
+              }
+
+              const computed = window.getComputedStyle(htmlEl);
+              
+              const colorProps = ['color', 'backgroundColor', 'borderColor', 'outlineColor', 'fill', 'stroke', 'stopColor', 'floodColor', 'lightingColor'];
+              colorProps.forEach(prop => {
+                const value = computed[prop as any];
+                if (value && value.includes('oklch')) {
+                  if (prop === 'color') htmlEl.style.setProperty('color', '#000000', 'important');
+                  else if (prop === 'backgroundColor') htmlEl.style.setProperty('background-color', '#f3f4f6', 'important');
+                  else if (prop === 'borderColor') htmlEl.style.setProperty('border-color', '#d1d5db', 'important');
+                  else htmlEl.style.setProperty(prop, 'inherit', 'important');
+                }
+              });
+              
+              htmlEl.style.setProperty("--tw-ring-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-offset-color", "transparent", "important");
+              htmlEl.style.setProperty("--tw-ring-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow", "none", "important");
+              htmlEl.style.setProperty("--tw-shadow-colored", "none", "important");
+            });
+          }
+        },
+      });
+
+      document.head.removeChild(polyfillStyles);
+
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdfWidth,
+        pdfHeight,
+        undefined,
+        "FAST",
+      );
+      pdf.save(`CreditNote-${creditNote.creditNoteNumber}.pdf`);
 
       const { toast } = await import("@/hooks/use-toast");
       toast({
@@ -311,21 +399,53 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
         description: "Please try again.",
         variant: "destructive"
       });
+    } finally {
+      element.style.cssText = originalStyle;
     }
   };
 
   const handlePrint = () => {
-    import("@/lib/pdf-utils").then(({ printPDFView }) => {
-      printPDFView("pdf-content", `Credit Note - ${creditNote.creditNoteNumber}`);
-    }).catch(error => {
-      console.error("Print error:", error);
-      const { toast } = require("@/hooks/use-toast");
-      toast({
-        title: "Failed to print",
-        description: "Please try again.",
-        variant: "destructive"
-      });
-    });
+    const content = document.getElementById("pdf-content")?.innerHTML;
+    if (!content) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Credit Note ${creditNote.creditNoteNumber}</title>
+          <script src="https://cdn.tailwindcss.com"><\/script>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            @media print {
+              body { margin: 0; padding: 0; }
+              #pdf-content { border: none !important; box-shadow: none !important; width: 100% !important; max-width: none !important; }
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body class="bg-white">
+          <div id="pdf-content" class="w-full">
+            ${content}
+          </div>
+          <script>
+            window.onload = () => {
+              setTimeout(() => {
+                window.print();
+                window.close();
+              }, 500);
+            }
+          <\/script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (

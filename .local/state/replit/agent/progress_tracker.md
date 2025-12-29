@@ -147,3 +147,4 @@
 [x] 147. Fixed invoicePdfRef runtime error - added useRef import and initialized ref in Invoices component (Dec 26, 2025)
 [x] 148. Session restart - reinstalled cross-env and verified application running (Dec 26, 2025 - current session)
 [x] 149. Session restart - reinstalled cross-env and verified application running (Dec 29, 2025)
+[x] 150. Fixed Credit Notes PDF download styling - implemented robust html2canvas approach matching Bills module (Dec 29, 2025)
