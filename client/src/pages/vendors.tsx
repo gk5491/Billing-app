@@ -44,6 +44,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -1508,175 +1513,184 @@ export default function VendorsPage() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${selectedVendor ? 'w-80' : 'w-full'}`}>
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">Active Vendors</h1>
-            <ChevronDown className="h-4 w-4 text-slate-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setLocation("/vendors/new")}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-vendor"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel className="text-xs text-slate-500">SORT BY</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => setSortBy('name')} className={sortBy === 'name' ? 'bg-blue-50' : ''}>
-                  <ArrowUpDown className="mr-2 h-4 w-4" /> Name
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('companyName')} className={sortBy === 'companyName' ? 'bg-blue-50' : ''}>
-                  <ArrowUpDown className="mr-2 h-4 w-4" /> Company Name
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setSortBy('payables')} className={sortBy === 'payables' ? 'bg-blue-50' : ''}>
-                  <ArrowUpDown className="mr-2 h-4 w-4" /> Payables (BCY)
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Upload className="mr-2 h-4 w-4" /> Import
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" /> Export
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" /> Preferences
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={fetchVendors}>
-                  <RefreshCw className="mr-2 h-4 w-4" /> Refresh List
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading vendors...</div>
-          ) : sortedVendors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <Building2 className="h-8 w-8 text-slate-400" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">No vendors yet</h3>
-              <p className="text-slate-500 mb-4 max-w-sm">
-                Add your first vendor to start tracking purchases and managing supplier relationships.
-              </p>
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="vendors-layout">
+        <ResizablePanel
+          defaultSize={selectedVendor ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">Active Vendors</h1>
+              <ChevronDown className="h-4 w-4 text-slate-500" />
+            </div>
+            <div className="flex items-center gap-2">
               <Button
                 onClick={() => setLocation("/vendors/new")}
-                className="bg-blue-600 hover:bg-blue-700"
-                data-testid="button-add-first-vendor"
+                className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                data-testid="button-new-vendor"
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Your First Vendor
+                <Plus className="h-4 w-4" />
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel className="text-xs text-slate-500">SORT BY</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => setSortBy('name')} className={sortBy === 'name' ? 'bg-blue-50' : ''}>
+                    <ArrowUpDown className="mr-2 h-4 w-4" /> Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('companyName')} className={sortBy === 'companyName' ? 'bg-blue-50' : ''}>
+                    <ArrowUpDown className="mr-2 h-4 w-4" /> Company Name
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSortBy('payables')} className={sortBy === 'payables' ? 'bg-blue-50' : ''}>
+                    <ArrowUpDown className="mr-2 h-4 w-4" /> Payables (BCY)
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Upload className="mr-2 h-4 w-4" /> Import
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Download className="mr-2 h-4 w-4" /> Export
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Settings className="mr-2 h-4 w-4" /> Preferences
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={fetchVendors}>
+                    <RefreshCw className="mr-2 h-4 w-4" /> Refresh List
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
-                <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <th className="w-10 px-3 py-3 text-left">
-                    <Checkbox
-                      checked={selectedVendors.length === sortedVendors.length && sortedVendors.length > 0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (selectedVendors.length === sortedVendors.length) {
-                          setSelectedVendors([]);
-                        } else {
-                          setSelectedVendors(sortedVendors.map(v => v.id));
-                        }
-                      }}
-                    />
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Name</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Work Phone</th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Payables (BCY)</th>
-                  <th className="w-10 px-3 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {paginatedItems.map((vendor) => (
-                  <tr
-                    key={vendor.id}
-                    className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedVendor?.id === vendor.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                      }`}
-                    onClick={() => handleVendorClick(vendor)}
-                    data-testid={`row-vendor-${vendor.id}`}
-                  >
-                    <td className="px-3 py-3">
+          </div>
+
+          <div className="flex-1 overflow-auto">
+            {loading ? (
+              <div className="p-8 text-center text-slate-500">Loading vendors...</div>
+            ) : sortedVendors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <Building2 className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No vendors yet</h3>
+                <p className="text-slate-500 mb-4 max-w-sm">
+                  Add your first vendor to start tracking purchases and managing supplier relationships.
+                </p>
+                <Button
+                  onClick={() => setLocation("/vendors/new")}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  data-testid="button-add-first-vendor"
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Add Your First Vendor
+                </Button>
+              </div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
+                  <tr className="border-b border-slate-200 dark:border-slate-700">
+                    <th className="w-10 px-3 py-3 text-left">
                       <Checkbox
-                        checked={selectedVendors.includes(vendor.id)}
-                        onClick={(e) => toggleSelectVendor(vendor.id, e)}
-                      />
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className="font-medium text-blue-600 dark:text-blue-400">{vendor.displayName}</span>
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {vendor.companyName || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {vendor.email || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {vendor.workPhone || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
-                      {formatCurrencyLocal(vendor.payables || 0)}
-                    </td>
-                    <td className="px-3 py-3">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
+                        checked={selectedVendors.length === sortedVendors.length && sortedVendors.length > 0}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedVendorForAttachments(vendor);
-                          setShowAttachmentsDialog(true);
+                          if (selectedVendors.length === sortedVendors.length) {
+                            setSelectedVendors([]);
+                          } else {
+                            setSelectedVendors(sortedVendors.map(v => v.id));
+                          }
                         }}
-                        data-testid={`button-attachments-${vendor.id}`}
-                      >
-                        <Paperclip className={`h-4 w-4 ${vendor.attachments && vendor.attachments.length > 0 ? 'text-blue-600' : 'text-slate-400'}`} />
-                      </Button>
-                    </td>
+                      />
+                    </th>
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Name</th>
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Work Phone</th>
+                    <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Payables (BCY)</th>
+                    <th className="w-10 px-3 py-3"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          {sortedVendors.length > 0 && (
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          )}
-        </div>
-      </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  {paginatedItems.map((vendor) => (
+                    <tr
+                      key={vendor.id}
+                      className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedVendor?.id === vendor.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                        }`}
+                      onClick={() => handleVendorClick(vendor)}
+                      data-testid={`row-vendor-${vendor.id}`}
+                    >
+                      <td className="px-3 py-3">
+                        <Checkbox
+                          checked={selectedVendors.includes(vendor.id)}
+                          onClick={(e) => toggleSelectVendor(vendor.id, e)}
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <span className="font-medium text-blue-600 dark:text-blue-400">{vendor.displayName}</span>
+                      </td>
+                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                        {vendor.companyName || '-'}
+                      </td>
+                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                        {vendor.email || '-'}
+                      </td>
+                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                        {vendor.workPhone || '-'}
+                      </td>
+                      <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
+                        {formatCurrencyLocal(vendor.payables || 0)}
+                      </td>
+                      <td className="px-3 py-3">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedVendorForAttachments(vendor);
+                            setShowAttachmentsDialog(true);
+                          }}
+                          data-testid={`button-attachments-${vendor.id}`}
+                        >
+                          <Paperclip className={`h-4 w-4 ${vendor.attachments && vendor.attachments.length > 0 ? 'text-blue-600' : 'text-slate-400'}`} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {sortedVendors.length > 0 && (
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={goToPage}
+              />
+            )}
+          </div>
+        </ResizablePanel>
 
-      {selectedVendor && (
-        <div className="flex-1 min-w-0">
-          <VendorDetailPanel
-            vendor={selectedVendor}
-            onClose={handleClosePanel}
-            onEdit={handleEditVendor}
-            onClone={handleClone}
-            onToggleStatus={handleToggleStatus}
-            onDelete={() => handleDelete(selectedVendor.id)}
-          />
-        </div>
-      )}
+        {selectedVendor && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <VendorDetailPanel
+                vendor={selectedVendor}
+                onClose={handleClosePanel}
+                onEdit={handleEditVendor}
+                onClone={handleClone}
+                onToggleStatus={handleToggleStatus}
+                onDelete={() => handleDelete(selectedVendor.id)}
+              />
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       {showAttachmentsDialog && selectedVendorForAttachments && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

@@ -37,6 +37,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -1029,160 +1034,176 @@ export default function Estimates() {
   const { currentPage, totalPages, totalItems, itemsPerPage, paginatedItems, goToPage } = usePagination(filteredQuotes, 10);
 
   return (
-    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${selectedQuote ? 'w-80' : 'w-full'}`}>
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">All Quotes</h1>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8">
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => setStatusFilter("all")}>All Quotes</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("DRAFT")}>Draft</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("SENT")}>Sent</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("ACCEPTED")}>Accepted</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("CONVERTED")}>Converted</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setStatusFilter("DECLINED")}>Declined</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setLocation("/estimates/create")}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-quote"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading quotes...</div>
-          ) : filteredQuotes.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
-                <FileText className="h-8 w-8 text-slate-400" />
+    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="estimates-layout">
+        <ResizablePanel
+          defaultSize={selectedQuote ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-slate-900 dark:text-white">All Quotes</h1>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8">
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => setStatusFilter("all")}>All Quotes</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("DRAFT")}>Draft</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("SENT")}>Sent</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("ACCEPTED")}>Accepted</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("CONVERTED")}>Converted</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setStatusFilter("DECLINED")}>Declined</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <p className="mb-4">No quotes found.</p>
-              <Button
-                onClick={() => setLocation("/estimates/create")}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Create your first quote
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setLocation("/estimates/create")}
+                  className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                  data-testid="button-new-quote"
+                >
+                  <Plus className="h-4 w-4" /> New
+                </Button>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          ) : (
-            <>
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
-                  <tr className="border-b border-slate-200 dark:border-slate-700">
-                    <th className="w-10 px-3 py-3 text-left">
-                      <Checkbox
-                        checked={selectedQuotes.length === filteredQuotes.length && filteredQuotes.length > 0}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (selectedQuotes.length === filteredQuotes.length) {
-                            setSelectedQuotes([]);
-                          } else {
-                            setSelectedQuotes(filteredQuotes.map(q => q.id));
-                          }
-                        }}
-                      />
-                    </th>
-                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Quote Number</th>
-                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Reference#</th>
-                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer Name</th>
-                    <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                    <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
-                    <th className="w-10 px-3 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                  {paginatedItems.map((quote) => (
-                    <tr
-                      key={quote.id}
-                      className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedQuote?.id === quote.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                        }`}
-                      onClick={() => handleQuoteClick(quote)}
-                      data-testid={`row-quote-${quote.id}`}
-                    >
-                      <td className="px-3 py-3">
-                        <Checkbox
-                          checked={selectedQuotes.includes(quote.id)}
-                          onClick={(e) => toggleSelectQuote(quote.id, e)}
-                        />
-                      </td>
-                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                        {formatDate(quote.date)}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="font-medium text-blue-600 dark:text-blue-400">{quote.quoteNumber}</span>
-                      </td>
-                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                        {quote.referenceNumber || '-'}
-                      </td>
-                      <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                        {quote.customerName}
-                      </td>
-                      <td className="px-3 py-3">
-                        {getStatusBadge(quote.status, quote.convertedTo)}
-                      </td>
-                      <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
-                        {formatCurrency(quote.total)}
-                      </td>
-                      <td className="px-3 py-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <Search className="h-4 w-4 text-slate-400" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleQuoteClick(quote); }}>
-                              View Details
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={goToPage}
-              />
-            </>
-          )}
-        </div>
-      </div>
 
-      {selectedQuote && (
-        <div className="flex-1 min-w-0">
-          <QuoteDetailPanel
-            quote={selectedQuote}
-            branding={branding}
-            onClose={handleClosePanel}
-            onEdit={handleEditQuote}
-            onDelete={handleDeleteClick}
-            onConvert={handleConvert}
-            onClone={handleClone}
-          />
-        </div>
-      )}
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full overflow-auto">
+                {loading ? (
+                  <div className="p-8 text-center text-slate-500">Loading quotes...</div>
+                ) : filteredQuotes.length === 0 ? (
+                  <div className="p-8 text-center text-slate-500">
+                    <div className="h-16 w-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-4">
+                      <FileText className="h-8 w-8 text-slate-400" />
+                    </div>
+                    <p className="mb-4">No quotes found.</p>
+                    <Button
+                      onClick={() => setLocation("/estimates/create")}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" /> Create your first quote
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
+                        <tr className="border-b border-slate-200 dark:border-slate-700">
+                          <th className="w-10 px-3 py-3 text-left">
+                            <Checkbox
+                              checked={selectedQuotes.length === filteredQuotes.length && filteredQuotes.length > 0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (selectedQuotes.length === filteredQuotes.length) {
+                                  setSelectedQuotes([]);
+                                } else {
+                                  setSelectedQuotes(filteredQuotes.map(q => q.id));
+                                }
+                              }}
+                            />
+                          </th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Quote Number</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Reference#</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer Name</th>
+                          <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                          <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
+                          <th className="w-10 px-3 py-3"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                        {paginatedItems.map((quote) => (
+                          <tr
+                            key={quote.id}
+                            className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedQuote?.id === quote.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                              }`}
+                            onClick={() => handleQuoteClick(quote)}
+                            data-testid={`row-quote-${quote.id}`}
+                          >
+                            <td className="px-3 py-3">
+                              <Checkbox
+                                checked={selectedQuotes.includes(quote.id)}
+                                onClick={(e) => toggleSelectQuote(quote.id, e)}
+                              />
+                            </td>
+                            <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                              {formatDate(quote.date)}
+                            </td>
+                            <td className="px-3 py-3">
+                              <span className="font-medium text-blue-600 dark:text-blue-400">{quote.quoteNumber}</span>
+                            </td>
+                            <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                              {quote.referenceNumber || '-'}
+                            </td>
+                            <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                              {quote.customerName}
+                            </td>
+                            <td className="px-3 py-3">
+                              {getStatusBadge(quote.status, quote.convertedTo)}
+                            </td>
+                            <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
+                              {formatCurrency(quote.total)}
+                            </td>
+                            <td className="px-3 py-3">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Search className="h-4 w-4 text-slate-400" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleQuoteClick(quote); }}>
+                                    View Details
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={goToPage}
+                />
+              </>
+            )}
+            </div>
+          </div>
+        </ResizablePanel>
+
+        {selectedQuote && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <div className="h-full flex flex-col overflow-hidden bg-white">
+                <QuoteDetailPanel
+                  quote={selectedQuote}
+                  branding={branding}
+                  onClose={handleClosePanel}
+                  onEdit={handleEditQuote}
+                  onDelete={handleDeleteClick}
+                  onConvert={handleConvert}
+                  onClone={handleClone}
+                />
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

@@ -14,6 +14,11 @@ import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -635,522 +640,533 @@ export default function VendorCredits() {
 
   return (
     <div className="h-full flex animate-in fade-in duration-500">
-      <div className={`${selectedCredit ? 'w-80' : 'w-full'} flex flex-col border-r bg-background transition-all duration-300`}>
-        <div className="flex items-center justify-between gap-2 p-4 border-b">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-1 text-lg font-semibold" data-testid="dropdown-all-vendor-credits">
-                All Vendor Credits
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem>All Vendor Credits</DropdownMenuItem>
-              <DropdownMenuItem>Open</DropdownMenuItem>
-              <DropdownMenuItem>Closed</DropdownMenuItem>
-              <DropdownMenuItem>Draft</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              className="gap-1"
-              onClick={() => setLocation('/vendor-credits/new')}
-              data-testid="button-add-vendor-credit"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="vendor-credits-layout">
+        <ResizablePanel
+          defaultSize={selectedCredit ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex items-center justify-between gap-2 p-4 border-b">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" data-testid="button-more-options">
-                  <MoreHorizontal className="h-4 w-4" />
+                <Button variant="ghost" className="gap-1 text-lg font-semibold" data-testid="dropdown-all-vendor-credits">
+                  All Vendor Credits
+                  <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Import Vendor Credits</DropdownMenuItem>
-                <DropdownMenuItem>Export Vendor Credits</DropdownMenuItem>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem>All Vendor Credits</DropdownMenuItem>
+                <DropdownMenuItem>Open</DropdownMenuItem>
+                <DropdownMenuItem>Closed</DropdownMenuItem>
+                <DropdownMenuItem>Draft</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        </div>
 
-        {!selectedCredit && (
-          <div className="p-4 border-b">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search vendor credits..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                data-testid="input-search-vendor-credits"
-              />
-            </div>
-          </div>
-        )}
-
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        ) : vendorCredits.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center px-4">
-            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-              <Receipt className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2" data-testid="text-vendor-credits-empty">No vendor credits</h3>
-            <p className="text-muted-foreground mb-4 max-w-sm text-sm">
-              Record credits from vendors for returns or adjustments to apply against future bills.
-            </p>
-            <Button
-              className="gap-2"
-              onClick={() => setLocation('/vendor-credits/new')}
-              data-testid="button-add-first-vendor-credit"
-            >
-              <Plus className="h-4 w-4" /> Add Your First Vendor Credit
-            </Button>
-          </div>
-        ) : selectedCredit ? (
-          <div className="flex-1 overflow-auto">
-            {paginatedItems.map((credit) => (
-              <div
-                key={credit.id}
-                className={`p-3 border-b cursor-pointer transition-colors ${selectedCredit?.id === credit.id ? 'bg-primary/5 border-l-2 border-l-primary' : 'hover:bg-muted/50'
-                  }`}
-                onClick={() => setSelectedCredit(credit)}
-                data-testid={`row-vendor-credit-${credit.id}`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2">
-                    <Checkbox
-                      onClick={(e) => e.stopPropagation()}
-                      data-testid={`checkbox-vendor-credit-${credit.id}`}
-                    />
-                    <div>
-                      <p className="font-medium text-sm">{credit.vendorName}</p>
-                      <p className="text-primary text-xs">{credit.creditNumber} | {formatDate(credit.date)}</p>
-                      <Badge
-                        variant="outline"
-                        className={`mt-1 text-xs ${credit.status === 'OPEN' ? 'text-blue-600 border-blue-200' :
-                          credit.status === 'CLOSED' ? 'text-gray-600 border-gray-200' :
-                            'text-yellow-600 border-yellow-200'
-                          }`}
-                      >
-                        {credit.status}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-sm">{formatCurrency(credit.amount)}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex-1 overflow-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 sticky top-0">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    <Checkbox data-testid="checkbox-select-all" />
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Date</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Credit Note#</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Reference Number</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Vendor Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Status</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Amount</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Balance</th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase">
-                    <Search className="h-4 w-4 mx-auto" />
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {paginatedItems.map((credit) => (
-                  <tr
-                    key={credit.id}
-                    className="hover:bg-muted/30 cursor-pointer transition-colors"
-                    onClick={() => setSelectedCredit(credit)}
-                    data-testid={`row-vendor-credit-${credit.id}`}
-                  >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox data-testid={`checkbox-vendor-credit-${credit.id}`} />
-                    </td>
-                    <td className="px-4 py-3 text-sm">{formatDate(credit.date)}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-primary">{credit.creditNumber}</td>
-                    <td className="px-4 py-3 text-sm text-muted-foreground">{credit.referenceNumber || credit.orderNumber || '-'}</td>
-                    <td className="px-4 py-3 text-sm uppercase">{credit.vendorName}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <Badge
-                        variant="outline"
-                        className={`${credit.status === 'OPEN' ? 'text-blue-600 border-blue-200 bg-blue-50' :
-                          credit.status === 'CLOSED' ? 'text-gray-600 border-gray-200 bg-gray-50' :
-                            'text-yellow-600 border-yellow-200 bg-yellow-50'
-                          }`}
-                      >
-                        {credit.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right font-medium">
-                      {formatCurrency(credit.amount)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right">
-                      {formatCurrency(credit.balance)}
-                    </td>
-                    <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" data-testid={`button-vendor-credit-actions-${credit.id}`}>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => setLocation(`/vendor-credits/${credit.id}/edit`)}
-                            data-testid={`action-edit-${credit.id}`}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem data-testid={`action-clone-${credit.id}`}>
-                            <FileText className="mr-2 h-4 w-4" />
-                            Clone
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleDelete(credit.id)}
-                            data-testid={`action-delete-${credit.id}`}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          </div>
-        )}
-      </div>
-
-      {selectedCredit && (
-        <div className="flex-1 flex flex-col overflow-hidden bg-muted/20">
-          <div className="flex items-center justify-between gap-2 p-3 border-b bg-background">
-            <h2 className="font-semibold text-lg">{selectedCredit.creditNumber}</h2>
             <div className="flex items-center gap-2">
               <Button
-                variant="outline"
                 size="sm"
                 className="gap-1"
-                onClick={() => setLocation(`/vendor-credits/${selectedCredit.id}/edit`)}
-                data-testid="button-edit-credit"
+                onClick={() => setLocation('/vendor-credits/new')}
+                data-testid="button-add-vendor-credit"
               >
-                <Edit className="h-4 w-4" /> Edit
+                <Plus className="h-4 w-4" /> New
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1" data-testid="button-pdf-print">
-                    <Printer className="h-4 w-4" /> PDF/Print
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={handlePrintPDF} data-testid="menu-print-pdf">
-                    <Printer className="h-4 w-4 mr-2" />
-                    Print
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadPDF} data-testid="menu-download-pdf">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button variant="outline" size="sm" data-testid="button-apply-to-bills" onClick={handleApplyToBills} disabled={!selectedCredit || selectedCredit.balance <= 0}>
-                Apply to Bills
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" data-testid="button-more-actions">
+                  <Button variant="outline" size="icon" data-testid="button-more-options">
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem
-                    onClick={handleRefund}
-                    className="text-primary font-medium"
-                    data-testid="menu-refund"
-                  >
-                    Refund
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleVoid}
-                    data-testid="menu-void"
-                  >
-                    Void
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleClone}
-                    data-testid="menu-clone"
-                  >
-                    Clone
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleViewJournal}
-                    data-testid="menu-view-journal"
-                  >
-                    View Journal
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => handleDelete(selectedCredit.id)}
-                    data-testid="menu-delete"
-                  >
-                    Delete
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Import Vendor Credits</DropdownMenuItem>
+                  <DropdownMenuItem>Export Vendor Credits</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedCredit(null)}
-                data-testid="button-close-detail"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto p-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="document">Document</TabsTrigger>
-                <TabsTrigger value="journal" ref={journalTabRef}>Journal</TabsTrigger>
-              </TabsList>
+          {!selectedCredit && (
+            <div className="p-4 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search vendor credits..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="input-search-vendor-credits"
+                />
+              </div>
+            </div>
+          )}
 
-              <TabsContent value="document">
-                <Card className="bg-white dark:bg-card">
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <div className="absolute top-0 left-0 -rotate-45 origin-center transform -translate-x-6 translate-y-8">
-                        <Badge className="bg-blue-500 text-white px-6 py-1 text-xs">
-                          {selectedCredit.status}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : vendorCredits.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center px-4">
+              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                <Receipt className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" data-testid="text-vendor-credits-empty">No vendor credits</h3>
+              <p className="text-muted-foreground mb-4 max-w-sm text-sm">
+                Record credits from vendors for returns or adjustments to apply against future bills.
+              </p>
+              <Button
+                className="gap-2"
+                onClick={() => setLocation('/vendor-credits/new')}
+                data-testid="button-add-first-vendor-credit"
+              >
+                <Plus className="h-4 w-4" /> Add Your First Vendor Credit
+              </Button>
+            </div>
+          ) : selectedCredit ? (
+            <div className="flex-1 overflow-auto">
+              {paginatedItems.map((credit) => (
+                <div
+                  key={credit.id}
+                  className={`p-3 border-b cursor-pointer transition-colors ${selectedCredit?.id === credit.id ? 'bg-primary/5 border-l-2 border-l-primary' : 'hover:bg-muted/50'
+                    }`}
+                  onClick={() => setSelectedCredit(credit)}
+                  data-testid={`row-vendor-credit-${credit.id}`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2">
+                      <Checkbox
+                        onClick={(e) => e.stopPropagation()}
+                        data-testid={`checkbox-vendor-credit-${credit.id}`}
+                      />
+                      <div>
+                        <p className="font-medium text-sm">{credit.vendorName}</p>
+                        <p className="text-primary text-xs">{credit.creditNumber} | {formatDate(credit.date)}</p>
+                        <Badge
+                          variant="outline"
+                          className={`mt-1 text-xs ${credit.status === 'OPEN' ? 'text-blue-600 border-blue-200' :
+                            credit.status === 'CLOSED' ? 'text-gray-600 border-gray-200' :
+                              'text-yellow-600 border-yellow-200'
+                            }`}
+                        >
+                          {credit.status}
                         </Badge>
                       </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-sm">{formatCurrency(credit.amount)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex-1 overflow-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                      <Checkbox data-testid="checkbox-select-all" />
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Credit Note#</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Reference Number</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Vendor Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Status</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Amount</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Balance</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase">
+                      <Search className="h-4 w-4 mx-auto" />
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {paginatedItems.map((credit) => (
+                    <tr
+                      key={credit.id}
+                      className="hover:bg-muted/30 cursor-pointer transition-colors"
+                      onClick={() => setSelectedCredit(credit)}
+                      data-testid={`row-vendor-credit-${credit.id}`}
+                    >
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox data-testid={`checkbox-vendor-credit-${credit.id}`} />
+                      </td>
+                      <td className="px-4 py-3 text-sm">{formatDate(credit.date)}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-primary">{credit.creditNumber}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{credit.referenceNumber || credit.orderNumber || '-'}</td>
+                      <td className="px-4 py-3 text-sm uppercase">{credit.vendorName}</td>
+                      <td className="px-4 py-3 text-sm">
+                        <Badge
+                          variant="outline"
+                          className={`${credit.status === 'OPEN' ? 'text-blue-600 border-blue-200 bg-blue-50' :
+                            credit.status === 'CLOSED' ? 'text-gray-600 border-gray-200 bg-gray-50' :
+                              'text-yellow-600 border-yellow-200 bg-yellow-50'
+                            }`}
+                        >
+                          {credit.status}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right font-medium">
+                        {formatCurrency(credit.amount)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        {formatCurrency(credit.balance)}
+                      </td>
+                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" data-testid={`button-vendor-credit-actions-${credit.id}`}>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setLocation(`/vendor-credits/${credit.id}/edit`)}
+                              data-testid={`action-edit-${credit.id}`}
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem data-testid={`action-clone-${credit.id}`}>
+                              <FileText className="mr-2 h-4 w-4" />
+                              Clone
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => handleDelete(credit.id)}
+                              data-testid={`action-delete-${credit.id}`}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={goToPage}
+              />
+            </div>
+          )}
+        </ResizablePanel>
 
-                      <div className="p-6 pt-12" id="vendor-credit-pdf-content">
-                        {/* Standard Purchase PDF Header */}
-                        <PurchasePDFHeader
-                          logo={branding?.logo}
-                          documentTitle="Vendor Credit"
-                          documentNumber={selectedCredit.creditNumber}
-                          date={selectedCredit.date}
-                          referenceNumber={selectedCredit.referenceNumber}
-                          organization={currentOrganization}
-                        />
+        {selectedCredit && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <div className="flex flex-col overflow-hidden bg-muted/20 h-full">
+                <div className="flex items-center justify-between gap-2 p-3 border-b bg-background">
+                  <h2 className="font-semibold text-lg">{selectedCredit.creditNumber}</h2>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => setLocation(`/vendor-credits/${selectedCredit.id}/edit`)}
+                      data-testid="button-edit-credit"
+                    >
+                      <Edit className="h-4 w-4" /> Edit
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1" data-testid="button-pdf-print">
+                          <Printer className="h-4 w-4" /> PDF/Print
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={handlePrintPDF} data-testid="menu-print-pdf">
+                          <Printer className="h-4 w-4 mr-2" />
+                          Print
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDownloadPDF} data-testid="menu-download-pdf">
+                          <Download className="h-4 w-4 mr-2" />
+                          Download PDF
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button variant="outline" size="sm" data-testid="button-apply-to-bills" onClick={handleApplyToBills} disabled={!selectedCredit || selectedCredit.balance <= 0}>
+                      Apply to Bills
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" data-testid="button-more-actions">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={handleRefund}
+                          className="text-primary font-medium"
+                          data-testid="menu-refund"
+                        >
+                          Refund
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={handleVoid}
+                          data-testid="menu-void"
+                        >
+                          Void
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={handleClone}
+                          data-testid="menu-clone"
+                        >
+                          Clone
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={handleViewJournal}
+                          data-testid="menu-view-journal"
+                        >
+                          View Journal
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => handleDelete(selectedCredit.id)}
+                          data-testid="menu-delete"
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSelectedCredit(null)}
+                      data-testid="button-close-detail"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
 
-                        {/* Credits Remaining Badge */}
-                        <div className="flex justify-end mb-6">
-                          <div className="bg-primary/10 px-4 py-3 rounded">
-                            <p className="text-xs text-muted-foreground">Credits Remaining</p>
-                            <p className="text-xl font-bold">{formatCurrency(selectedCredit.balance)}</p>
-                          </div>
-                        </div>
+                <div className="flex-1 overflow-auto p-4">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="mb-4">
+                      <TabsTrigger value="document">Document</TabsTrigger>
+                      <TabsTrigger value="journal" ref={journalTabRef}>Journal</TabsTrigger>
+                    </TabsList>
 
-                        <Separator className="my-6" />
-
-                        <div className="grid grid-cols-2 gap-8 mb-8">
-                          <div>
-                            <h3 className="text-sm font-medium text-muted-foreground mb-2">Vendor Address</h3>
-                            <p className="text-sm font-semibold text-primary uppercase">{selectedCredit.vendorName}</p>
-                            {(() => {
-                              const vendor = getVendorDetails(selectedCredit.vendorId);
-                              if (vendor?.billingAddress) {
-                                return (
-                                  <>
-                                    {vendor.billingAddress.attention && (
-                                      <p className="text-sm text-muted-foreground">{vendor.billingAddress.attention}</p>
-                                    )}
-                                    {vendor.billingAddress.street1 && (
-                                      <p className="text-sm text-muted-foreground">{vendor.billingAddress.street1}</p>
-                                    )}
-                                    {vendor.billingAddress.city && (
-                                      <p className="text-sm text-muted-foreground">{vendor.billingAddress.city}</p>
-                                    )}
-                                    {vendor.billingAddress.state && (
-                                      <p className="text-sm text-muted-foreground">{vendor.billingAddress.state}</p>
-                                    )}
-                                    {vendor.billingAddress.pinCode && (
-                                      <p className="text-sm text-muted-foreground">{vendor.billingAddress.pinCode}</p>
-                                    )}
-                                    <p className="text-sm text-muted-foreground">India</p>
-                                    {vendor.gstin && (
-                                      <p className="text-sm text-muted-foreground">GSTIN {vendor.gstin}</p>
-                                    )}
-                                  </>
-                                );
-                              }
-                              return <p className="text-sm text-muted-foreground">India</p>;
-                            })()}
-                          </div>
-                          <div className="text-right">
-                            <div className="inline-block text-left">
-                              <p className="text-sm"><span className="text-muted-foreground">Date:</span> {formatDate(selectedCredit.date)}</p>
+                    <TabsContent value="document">
+                      <Card className="bg-white dark:bg-card">
+                        <CardContent className="p-0">
+                          <div className="relative">
+                            <div className="absolute top-0 left-0 -rotate-45 origin-center transform -translate-x-6 translate-y-8">
+                              <Badge className="bg-blue-500 text-white px-6 py-1 text-xs">
+                                {selectedCredit.status}
+                              </Badge>
                             </div>
-                          </div>
-                        </div>
 
-                        <div className="border rounded-lg overflow-hidden mb-6">
-                          <table className="w-full">
-                            <thead className="bg-primary text-primary-foreground">
-                              <tr>
-                                <th className="px-4 py-2 text-left text-xs font-medium">#</th>
-                                <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
-                                <th className="px-4 py-2 text-center text-xs font-medium">HSN/SAC</th>
-                                <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
-                                <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
-                                <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {selectedCredit.items.map((item, index) => (
-                                <tr key={item.id} className="border-b">
-                                  <td className="px-4 py-3 text-sm">{index + 1}</td>
-                                  <td className="px-4 py-3 text-sm">
-                                    <div>
-                                      <p className="font-medium">{item.itemName}</p>
-                                      {item.description && (
-                                        <p className="text-xs text-muted-foreground">{item.description}</p>
-                                      )}
-                                    </div>
-                                  </td>
-                                  <td className="px-4 py-3 text-sm text-center">{item.hsnSac || '-'}</td>
-                                  <td className="px-4 py-3 text-sm text-center">{item.quantity}</td>
-                                  <td className="px-4 py-3 text-sm text-right">{formatCurrency(parseFloat(item.rate.toString()))}</td>
-                                  <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.amount)}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                            <div className="p-6 pt-12" id="vendor-credit-pdf-content">
+                              {/* Standard Purchase PDF Header */}
+                              <PurchasePDFHeader
+                                logo={branding?.logo ?? undefined}
+                                documentTitle="Vendor Credit"
+                                documentNumber={selectedCredit.creditNumber}
+                                date={selectedCredit.date}
+                                referenceNumber={selectedCredit.referenceNumber}
+                                organization={currentOrganization ?? undefined}
+                              />
 
-                        <div className="flex justify-end mb-6">
-                          <div className="w-72">
-                            <div className="flex justify-between py-2 text-sm">
-                              <span className="text-muted-foreground">Sub Total</span>
-                              <span className="font-medium">{formatCurrency(selectedCredit.subTotal)}</span>
-                            </div>
-                            {(() => {
-                              const { cgst, sgst } = calculateTaxDetails(selectedCredit);
-                              return (
-                                <>
-                                  {cgst > 0 && (
-                                    <div className="flex justify-between py-2 text-sm">
-                                      <span className="text-muted-foreground">CGST (9%)</span>
-                                      <span className="font-medium">{formatCurrency(cgst)}</span>
-                                    </div>
-                                  )}
-                                  {sgst > 0 && (
-                                    <div className="flex justify-between py-2 text-sm">
-                                      <span className="text-muted-foreground">SGST (9%)</span>
-                                      <span className="font-medium">{formatCurrency(sgst)}</span>
-                                    </div>
-                                  )}
-                                </>
-                              );
-                            })()}
-                            {(selectedCredit.discountAmount || 0) > 0 && (
-                              <div className="flex justify-between py-2 text-sm">
-                                <span className="text-muted-foreground">Discount</span>
-                                <span className="font-medium text-red-500">-{formatCurrency(selectedCredit.discountAmount || 0)}</span>
+                              {/* Credits Remaining Badge */}
+                              <div className="flex justify-end mb-6">
+                                <div className="bg-primary/10 px-4 py-3 rounded">
+                                  <p className="text-xs text-muted-foreground">Credits Remaining</p>
+                                  <p className="text-xl font-bold">{formatCurrency(selectedCredit.balance)}</p>
+                                </div>
                               </div>
-                            )}
-                            <Separator className="my-2" />
-                            <div className="flex justify-between py-2 text-sm font-semibold">
-                              <span>Total</span>
-                              <span className="text-primary">{formatCurrency(selectedCredit.amount)}</span>
-                            </div>
-                            <div className="flex justify-between py-2 bg-green-50 dark:bg-green-950 px-3 rounded text-sm">
-                              <span className="font-medium">Credits Remaining</span>
-                              <span className="font-bold text-green-600">{formatCurrency(selectedCredit.balance)}</span>
+
+                              <Separator className="my-6" />
+
+                              <div className="grid grid-cols-2 gap-8 mb-8">
+                                <div>
+                                  <h3 className="text-sm font-medium text-muted-foreground mb-2">Vendor Address</h3>
+                                  <p className="text-sm font-semibold text-primary uppercase">{selectedCredit.vendorName}</p>
+                                  {(() => {
+                                    const vendor = getVendorDetails(selectedCredit.vendorId);
+                                    if (vendor?.billingAddress) {
+                                      return (
+                                        <>
+                                          {vendor.billingAddress.attention && (
+                                            <p className="text-sm text-muted-foreground">{vendor.billingAddress.attention}</p>
+                                          )}
+                                          {vendor.billingAddress.street1 && (
+                                            <p className="text-sm text-muted-foreground">{vendor.billingAddress.street1}</p>
+                                          )}
+                                          {vendor.billingAddress.city && (
+                                            <p className="text-sm text-muted-foreground">{vendor.billingAddress.city}</p>
+                                          )}
+                                          {vendor.billingAddress.state && (
+                                            <p className="text-sm text-muted-foreground">{vendor.billingAddress.state}</p>
+                                          )}
+                                          {vendor.billingAddress.pinCode && (
+                                            <p className="text-sm text-muted-foreground">{vendor.billingAddress.pinCode}</p>
+                                          )}
+                                          <p className="text-sm text-muted-foreground">India</p>
+                                          {vendor.gstin && (
+                                            <p className="text-sm text-muted-foreground">GSTIN {vendor.gstin}</p>
+                                          )}
+                                        </>
+                                      );
+                                    }
+                                    return <p className="text-sm text-muted-foreground">India</p>;
+                                  })()}
+                                </div>
+                                <div className="text-right">
+                                  <div className="inline-block text-left">
+                                    <p className="text-sm"><span className="text-muted-foreground">Date:</span> {formatDate(selectedCredit.date)}</p>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="border rounded-lg overflow-hidden mb-6">
+                                <table className="w-full">
+                                  <thead className="bg-primary text-primary-foreground">
+                                    <tr>
+                                      <th className="px-4 py-2 text-left text-xs font-medium">#</th>
+                                      <th className="px-4 py-2 text-left text-xs font-medium">Item & Description</th>
+                                      <th className="px-4 py-2 text-center text-xs font-medium">HSN/SAC</th>
+                                      <th className="px-4 py-2 text-center text-xs font-medium">Qty</th>
+                                      <th className="px-4 py-2 text-right text-xs font-medium">Rate</th>
+                                      <th className="px-4 py-2 text-right text-xs font-medium">Amount</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {selectedCredit.items.map((item, index) => (
+                                      <tr key={item.id} className="border-b">
+                                        <td className="px-4 py-3 text-sm">{index + 1}</td>
+                                        <td className="px-4 py-3 text-sm">
+                                          <div>
+                                            <p className="font-medium">{item.itemName}</p>
+                                            {item.description && (
+                                              <p className="text-xs text-muted-foreground">{item.description}</p>
+                                            )}
+                                          </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-sm text-center">{item.hsnSac || '-'}</td>
+                                        <td className="px-4 py-3 text-sm text-center">{item.quantity}</td>
+                                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(parseFloat(item.rate.toString()))}</td>
+                                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(item.amount)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              <div className="flex justify-end mb-6">
+                                <div className="w-72">
+                                  <div className="flex justify-between py-2 text-sm">
+                                    <span className="text-muted-foreground">Sub Total</span>
+                                    <span className="font-medium">{formatCurrency(selectedCredit.subTotal)}</span>
+                                  </div>
+                                  {(() => {
+                                    const { cgst, sgst } = calculateTaxDetails(selectedCredit);
+                                    return (
+                                      <>
+                                        {cgst > 0 && (
+                                          <div className="flex justify-between py-2 text-sm">
+                                            <span className="text-muted-foreground">CGST (9%)</span>
+                                            <span className="font-medium">{formatCurrency(cgst)}</span>
+                                          </div>
+                                        )}
+                                        {sgst > 0 && (
+                                          <div className="flex justify-between py-2 text-sm">
+                                            <span className="text-muted-foreground">SGST (9%)</span>
+                                            <span className="font-medium">{formatCurrency(sgst)}</span>
+                                          </div>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
+                                  {(selectedCredit.discountAmount || 0) > 0 && (
+                                    <div className="flex justify-between py-2 text-sm">
+                                      <span className="text-muted-foreground">Discount</span>
+                                      <span className="font-medium text-red-500">-{formatCurrency(selectedCredit.discountAmount || 0)}</span>
+                                    </div>
+                                  )}
+                                  <Separator className="my-2" />
+                                  <div className="flex justify-between py-2 text-sm font-semibold">
+                                    <span>Total</span>
+                                    <span className="text-primary">{formatCurrency(selectedCredit.amount)}</span>
+                                  </div>
+                                  <div className="flex justify-between py-2 bg-green-50 dark:bg-green-950 px-3 rounded text-sm">
+                                    <span className="font-medium">Credits Remaining</span>
+                                    <span className="font-bold text-green-600">{formatCurrency(selectedCredit.balance)}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="mt-12 border-t pt-4">
+                                <SignatureLine />
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
 
-                        <div className="mt-12 border-t pt-4">
-                          <SignatureLine />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                    <TabsContent value="journal">
+                      <Card>
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">INR</Badge>
+                            <span className="text-sm text-muted-foreground">Amount is displayed in your base currency</span>
+                          </div>
 
-              <TabsContent value="journal">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">INR</Badge>
-                      <span className="text-sm text-muted-foreground">Amount is displayed in your base currency</span>
-                    </div>
+                          <h3 className="font-semibold mb-4">Vendor Credits</h3>
 
-                    <h3 className="font-semibold mb-4">Vendor Credits</h3>
-
-                    <div className="border rounded-lg overflow-hidden">
-                      <table className="w-full">
-                        <thead className="bg-muted/50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Account</th>
-                            <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Debit</th>
-                            <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Credit</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(() => {
-                            const { entries, totalDebit, totalCredit } = getJournalEntries(selectedCredit);
-                            return (
-                              <>
-                                {entries.map((entry, index) => (
-                                  <tr key={index} className="border-b">
-                                    <td className="px-4 py-3 text-sm">{entry.account}</td>
-                                    <td className="px-4 py-3 text-sm text-right">
-                                      {entry.debit > 0 ? formatCurrency(entry.debit) : '0.00'}
-                                    </td>
-                                    <td className="px-4 py-3 text-sm text-right">
-                                      {entry.credit > 0 ? formatCurrency(entry.credit) : '0.00'}
-                                    </td>
-                                  </tr>
-                                ))}
-                                <tr className="bg-muted/30 font-semibold">
-                                  <td className="px-4 py-3 text-sm"></td>
-                                  <td className="px-4 py-3 text-sm text-right">{formatCurrency(totalDebit)}</td>
-                                  <td className="px-4 py-3 text-sm text-right">{formatCurrency(totalCredit)}</td>
+                          <div className="border rounded-lg overflow-hidden">
+                            <table className="w-full">
+                              <thead className="bg-muted/50">
+                                <tr>
+                                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Account</th>
+                                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Debit</th>
+                                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Credit</th>
                                 </tr>
-                              </>
-                            );
-                          })()}
-                        </tbody>
-                      </table>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      )}
+                              </thead>
+                              <tbody>
+                                {(() => {
+                                  const { entries, totalDebit, totalCredit } = getJournalEntries(selectedCredit);
+                                  return (
+                                    <>
+                                      {entries.map((entry, index) => (
+                                        <tr key={index} className="border-b">
+                                          <td className="px-4 py-3 text-sm">{entry.account}</td>
+                                          <td className="px-4 py-3 text-sm text-right">
+                                            {entry.debit > 0 ? formatCurrency(entry.debit) : '0.00'}
+                                          </td>
+                                          <td className="px-4 py-3 text-sm text-right">
+                                            {entry.credit > 0 ? formatCurrency(entry.credit) : '0.00'}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                      <tr className="bg-muted/30 font-semibold">
+                                        <td className="px-4 py-3 text-sm"></td>
+                                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(totalDebit)}</td>
+                                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(totalCredit)}</td>
+                                      </tr>
+                                    </>
+                                  );
+                                })()}
+                              </tbody>
+                            </table>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

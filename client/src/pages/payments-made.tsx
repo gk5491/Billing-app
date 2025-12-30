@@ -14,6 +14,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -466,166 +471,174 @@ export default function PaymentsMade() {
 
   return (
     <div className="flex h-full">
-      {/* Main List View */}
-      <div className={`flex-1 transition-all duration-300 ${selectedPayment ? 'pr-0' : ''}`}>
-        <div className="max-w-full mx-auto space-y-6 animate-in fade-in duration-500 p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="gap-1 text-xl font-semibold">
-                    All Payments <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem>All Payments</DropdownMenuItem>
-                  <DropdownMenuItem>Paid</DropdownMenuItem>
-                  <DropdownMenuItem>Refunded</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                className="gap-2"
-                onClick={() => setLocation('/payments-made/new')}
-                data-testid="button-record-payment"
-              >
-                <Plus className="h-4 w-4" /> New
-              </Button>
-              <Button variant="outline" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search payments..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                data-testid="input-search-payments"
-              />
-            </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" /> Filter
-            </Button>
-          </div>
-
-          {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : payments.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                  <CreditCard className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2" data-testid="text-payments-empty">No payments recorded</h3>
-                <p className="text-muted-foreground mb-4 max-w-sm">
-                  Record payments made to vendors to keep track of your accounts payable.
-                </p>
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="payments-made-layout">
+        <ResizablePanel
+          defaultSize={selectedPayment ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          {/* Main List View */}
+          <div className="max-w-full mx-auto space-y-6 animate-in fade-in duration-500 p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-1 text-xl font-semibold">
+                      All Payments <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem>All Payments</DropdownMenuItem>
+                    <DropdownMenuItem>Paid</DropdownMenuItem>
+                    <DropdownMenuItem>Refunded</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center gap-2">
                 <Button
                   className="gap-2"
                   onClick={() => setLocation('/payments-made/new')}
-                  data-testid="button-record-first-payment"
+                  data-testid="button-record-payment"
                 >
-                  <Plus className="h-4 w-4" /> Record Your First Payment
+                  <Plus className="h-4 w-4" /> New
                 </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900">
-              <table className="w-full">
-                <thead className="bg-slate-50 dark:bg-slate-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                      <Checkbox data-testid="checkbox-select-all" />
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment #</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reference#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Vendor Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Bill#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Mode</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Amount</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Unused Amount</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">
-                      <Search className="h-4 w-4 mx-auto" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {paginatedItems.map((payment) => (
-                    <tr
-                      key={payment.id}
-                      className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedPayment?.id === payment.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                      onClick={() => handleRowClick(payment)}
-                      data-testid={`row-payment-${payment.id}`}
-                    >
-                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                        <Checkbox data-testid={`checkbox-payment-${payment.id}`} />
-                      </td>
-                      <td className="px-4 py-3 text-sm">{formatDate(payment.paymentDate)}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-primary">{getPaymentNumberString(payment.paymentNumber)}</td>
-                      <td className="px-4 py-3 text-sm">{payment.reference || '-'}</td>
-                      <td className="px-4 py-3 text-sm">{payment.vendorName}</td>
-                      <td className="px-4 py-3 text-sm">{getBillNumbers(payment)}</td>
-                      <td className="px-4 py-3 text-sm capitalize">{getPaymentModeLabel(payment.paymentMode)}</td>
-                      <td className="px-4 py-3 text-sm">{getStatusBadge(payment.status)}</td>
-                      <td className="px-4 py-3 text-sm text-right font-medium">
-                        {formatCurrency(payment.paymentAmount)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right">
-                        {formatCurrency(calculateUnusedAmount(payment))}
-                      </td>
-                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" data-testid={`button-payment-actions-${payment.id}`}>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleRowClick(payment)} data-testid={`action-view-${payment.id}`}>View</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setLocation(`/payments-made/edit/${payment.id}`)} data-testid={`action-edit-${payment.id}`}>Edit</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => handleDelete(payment.id)}
-                              data-testid={`action-delete-${payment.id}`}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={goToPage}
-              />
+                <Button variant="outline" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Detail Panel */}
-      {selectedPayment && (
-        <div className="w-[600px] border-l bg-white dark:bg-slate-900 flex flex-col h-full overflow-hidden">
-          {/* Detail Header - Sidebar with List */}
-          {/* <div className="border-b">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search payments..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  data-testid="input-search-payments"
+                />
+              </div>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" /> Filter
+              </Button>
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : payments.length === 0 ? (
+              <Card className="border-dashed">
+                <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <CreditCard className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2" data-testid="text-payments-empty">No payments recorded</h3>
+                  <p className="text-muted-foreground mb-4 max-w-sm">
+                    Record payments made to vendors to keep track of your accounts payable.
+                  </p>
+                  <Button
+                    className="gap-2"
+                    onClick={() => setLocation('/payments-made/new')}
+                    data-testid="button-record-first-payment"
+                  >
+                    <Plus className="h-4 w-4" /> Record Your First Payment
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900">
+                <table className="w-full">
+                  <thead className="bg-slate-50 dark:bg-slate-800">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                        <Checkbox data-testid="checkbox-select-all" />
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment #</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reference#</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Vendor Name</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Bill#</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Mode</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Amount</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Unused Amount</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">
+                        <Search className="h-4 w-4 mx-auto" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {paginatedItems.map((payment) => (
+                      <tr
+                        key={payment.id}
+                        className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedPayment?.id === payment.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                        onClick={() => handleRowClick(payment)}
+                        data-testid={`row-payment-${payment.id}`}
+                      >
+                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                          <Checkbox data-testid={`checkbox-payment-${payment.id}`} />
+                        </td>
+                        <td className="px-4 py-3 text-sm">{formatDate(payment.paymentDate)}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-primary">{getPaymentNumberString(payment.paymentNumber)}</td>
+                        <td className="px-4 py-3 text-sm">{payment.reference || '-'}</td>
+                        <td className="px-4 py-3 text-sm">{payment.vendorName}</td>
+                        <td className="px-4 py-3 text-sm">{getBillNumbers(payment)}</td>
+                        <td className="px-4 py-3 text-sm capitalize">{getPaymentModeLabel(payment.paymentMode)}</td>
+                        <td className="px-4 py-3 text-sm">{getStatusBadge(payment.status)}</td>
+                        <td className="px-4 py-3 text-sm text-right font-medium">
+                          {formatCurrency(payment.paymentAmount)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right">
+                          {formatCurrency(calculateUnusedAmount(payment))}
+                        </td>
+                        <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" data-testid={`button-payment-actions-${payment.id}`}>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleRowClick(payment)} data-testid={`action-view-${payment.id}`}>View</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setLocation(`/payments-made/edit/${payment.id}`)} data-testid={`action-edit-${payment.id}`}>Edit</DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => handleDelete(payment.id)}
+                                data-testid={`action-delete-${payment.id}`}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={goToPage}
+                />
+              </div>
+            )}
+          </div>
+        </ResizablePanel>
+
+        {/* Detail Panel */}
+        {selectedPayment && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <div className="flex flex-col h-full overflow-hidden">
+                {/* Detail Header - Sidebar with List */}
+                {/* <div className="border-b">
             <div className="max-h-[200px] overflow-y-auto">
               {filteredPayments.map((payment) => (
                 <div
@@ -651,234 +664,237 @@ export default function PaymentsMade() {
             </div>
           </div> */}
 
-          {/* Detail Actions */}
-          <div className="flex items-center justify-between p-3 border-b bg-slate-50 dark:bg-slate-800">
-            <div className="font-semibold">{getPaymentNumberString(selectedPayment.paymentNumber)}</div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1">
-                <Plus className="h-3 w-3" />
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1" onClick={() => setLocation(`/payments-made/edit/${selectedPayment.id}`)}>
-                <Pencil className="h-3 w-3" /> Edit
-              </Button>
-              <Button variant="outline" size="sm" className="gap-1">
-                <Mail className="h-3 w-3" /> Send Email
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <Printer className="h-3 w-3" /> PDF/Print <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={handlePrint}>Print</DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDownloadPDF}>Download PDF</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedPayment(null)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Detail Content */}
-          <div className="flex-1 overflow-y-auto p-6 bg-slate-100 dark:bg-slate-950">
-            {/* Receipt Preview */}
-            <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] relative p-10 text-slate-800 dark:text-slate-200">
-              {/* Paid Badge Overlay */}
-              <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none paid-badge-overlay">
-                <div className="bg-green-500 text-white text-[10px] font-bold py-1 px-10 absolute top-4 -left-8 -rotate-45 shadow-sm uppercase tracking-wider">
-                  Paid
-                </div>
-              </div>
-
-              {/* Standard Purchase PDF Header */}
-              <PurchasePDFHeader
-                logo={branding?.logo || undefined}
-                documentTitle="Payment Made"
-                documentNumber={selectedPayment.paymentNumber}
-                date={selectedPayment.paymentDate}
-                referenceNumber={selectedPayment.reference}
-                organization={currentOrganization || undefined}
-              />
-
-              <div className="border-t border-slate-100 mb-6"></div>
-
-              {/* Title */}
-              <h3 className="text-center text-xs font-semibold tracking-[0.2em] mb-8 uppercase text-slate-700 dark:text-slate-300">PAYMENT RECEIPT</h3>
-
-              <div className="flex gap-8 mb-8">
-                {/* Left Column - Details */}
-                <div className="flex-1 space-y-3">
-                  {[
-                    { label: "Payment#", value: getPaymentNumberString(selectedPayment.paymentNumber) },
-                    { label: "Payment Date", value: formatDate(selectedPayment.paymentDate) },
-                    { label: "Reference Number", value: selectedPayment.reference || '' },
-                    { label: "Paid To", value: selectedPayment.vendorName, highlight: true },
-                    { label: "Place Of Supply", value: selectedPayment.sourceOfSupply || '-' },
-                    { label: "Payment Mode", value: getPaymentModeLabel(selectedPayment.paymentMode) },
-                    { label: "Paid Through", value: getPaidThroughLabel(selectedPayment.paidThrough) },
-                    { label: "Amount Paid In Words", value: numberToWords(selectedPayment.paymentAmount) },
-                  ].map((row, i) => (
-                    <div key={i} className="flex border-b border-slate-50 pb-1.5">
-                      <div className="w-32 text-[10px] text-slate-400">{row.label}</div>
-                      <div className={`flex-1 text-[10px] font-medium ${row.highlight ? 'text-blue-600' : 'text-slate-800 dark:text-slate-200'}`}>
-                        {row.value}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Right Column - Amount Box */}
-                <div className="w-40 pt-2">
-                  <div className="bg-[#82b366] text-white p-4 rounded-sm text-center shadow-sm">
-                    <div className="text-[10px] mb-0.5 opacity-90">Amount Paid</div>
-                    <div className="text-lg font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
+                {/* Detail Actions */}
+                <div className="flex items-center justify-between p-3 border-b bg-slate-50 dark:bg-slate-800">
+                  <div className="font-semibold">{getPaymentNumberString(selectedPayment.paymentNumber)}</div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setLocation(`/payments-made/edit/${selectedPayment.id}`)}>
+                      <Pencil className="h-3 w-3" /> Edit
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <Mail className="h-3 w-3" /> Send Email
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1">
+                          <Printer className="h-3 w-3" /> PDF/Print <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={handlePrint}>Print</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDownloadPDF}>Download PDF</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedPayment(null)}>
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              </div>
 
-              {/* Paid To Section */}
-              <div className="mb-8">
-                <h4 className="text-[10px] font-semibold text-slate-400 mb-2">Paid To</h4>
-                <div className="text-[10px] space-y-0.5 text-slate-700 dark:text-slate-300">
-                  <p className="font-bold text-slate-900 dark:text-white uppercase">{selectedPayment.vendorName}</p>
-                  {(() => {
-                    const vendor = getVendorDetails(selectedPayment);
-                    if (vendor) {
-                      return (
-                        <>
-                          {vendor.address && <p>{vendor.address}</p>}
-                          {(vendor.city || vendor.state || vendor.pincode) && (
-                            <p>{[vendor.city, vendor.state, vendor.pincode].filter(Boolean).join(', ')}</p>
-                          )}
-                          {vendor.country && <p>{vendor.country}</p>}
-                          {vendor.gstin && <p className="mt-1 text-slate-500 uppercase">GSTIN {vendor.gstin}</p>}
-                        </>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
-              </div>
-
-              <div className="border-t border-slate-100 mb-6"></div>
-
-              {/* Payment for Section */}
-              {getBillPaymentsArray(selectedPayment).length > 0 && (
-                <div>
-                  <h4 className="text-xs font-bold mb-4 text-slate-800 dark:text-slate-200">Payment for</h4>
-                  <table className="w-full text-[10px]">
-                    <thead>
-                      <tr className="bg-slate-100 dark:bg-slate-800/50">
-                        <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Number</th>
-                        <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Date</th>
-                        <th className="px-3 py-2 text-right font-bold text-slate-700">Bill Amount</th>
-                        <th className="px-3 py-2 text-right font-bold text-slate-700">Payment Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {getBillPaymentsArray(selectedPayment).map((bp, index) => (
-                        <tr key={index}>
-                          <td className="px-3 py-2 text-blue-600 font-medium">{bp.billNumber}</td>
-                          <td className="px-3 py-2 text-slate-600">{formatDate(bp.billDate)}</td>
-                          <td className="px-3 py-2 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
-                          <td className="px-3 py-2 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount || 0)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Journal Section */}
-            <div className="mt-6">
-              <Tabs defaultValue="journal">
-                <TabsList>
-                  <TabsTrigger value="journal">Journal</TabsTrigger>
-                </TabsList>
-                <TabsContent value="journal" className="mt-4">
-                  <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="text-sm text-muted-foreground">
-                        Amount is displayed in your base currency <Badge variant="secondary" className="ml-2">INR</Badge>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Accrual</Button>
-                        <Button variant="ghost" size="sm">Cash</Button>
+                {/* Detail Content */}
+                <div className="flex-1 overflow-y-auto p-6 bg-slate-100 dark:bg-slate-950">
+                  {/* Receipt Preview */}
+                  <div id="payment-receipt-content" className="bg-white dark:bg-slate-900 border shadow-sm mx-auto max-w-[800px] relative p-10 text-slate-800 dark:text-slate-200">
+                    {/* Paid Badge Overlay */}
+                    <div className="absolute top-0 left-0 w-32 h-32 overflow-hidden pointer-events-none paid-badge-overlay">
+                      <div className="bg-green-500 text-white text-[10px] font-bold py-1 px-10 absolute top-4 -left-8 -rotate-45 shadow-sm uppercase tracking-wider">
+                        Paid
                       </div>
                     </div>
 
-                    <div className="font-semibold mb-2">Vendor Payment - {getPaymentNumberString(selectedPayment.paymentNumber)}</div>
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-100 dark:bg-slate-700">
-                        <tr>
-                          <th className="px-3 py-2 text-left">ACCOUNT</th>
-                          <th className="px-3 py-2 text-right">DEBIT</th>
-                          <th className="px-3 py-2 text-right">CREDIT</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="border-b">
-                          <td className="px-3 py-2">{getPaidThroughLabel(selectedPayment.paidThrough)}</td>
-                          <td className="px-3 py-2 text-right">0.00</td>
-                          <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                        </tr>
-                        <tr className="border-b">
-                          <td className="px-3 py-2">Prepaid Expenses</td>
-                          <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-right">0.00</td>
-                        </tr>
-                        <tr className="font-bold bg-slate-100 dark:bg-slate-700">
-                          <td className="px-3 py-2"></td>
-                          <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                          <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    {/* Standard Purchase PDF Header */}
+                    <PurchasePDFHeader
+                      logo={branding?.logo || undefined}
+                      documentTitle="Payment Made"
+                      documentNumber={selectedPayment.paymentNumber}
+                      date={selectedPayment.paymentDate}
+                      referenceNumber={selectedPayment.reference}
+                      organization={currentOrganization || undefined}
+                    />
 
+                    <div className="border-t border-slate-100 mb-6"></div>
+
+                    {/* Title */}
+                    <h3 className="text-center text-xs font-semibold tracking-[0.2em] mb-8 uppercase text-slate-700 dark:text-slate-300">PAYMENT RECEIPT</h3>
+
+                    <div className="flex gap-8 mb-8">
+                      {/* Left Column - Details */}
+                      <div className="flex-1 space-y-3">
+                        {[
+                          { label: "Payment#", value: getPaymentNumberString(selectedPayment.paymentNumber) },
+                          { label: "Payment Date", value: formatDate(selectedPayment.paymentDate) },
+                          { label: "Reference Number", value: selectedPayment.reference || '' },
+                          { label: "Paid To", value: selectedPayment.vendorName, highlight: true },
+                          { label: "Place Of Supply", value: selectedPayment.sourceOfSupply || '-' },
+                          { label: "Payment Mode", value: getPaymentModeLabel(selectedPayment.paymentMode) },
+                          { label: "Paid Through", value: getPaidThroughLabel(selectedPayment.paidThrough) },
+                          { label: "Amount Paid In Words", value: numberToWords(selectedPayment.paymentAmount) },
+                        ].map((row, i) => (
+                          <div key={i} className="flex border-b border-slate-50 pb-1.5">
+                            <div className="w-32 text-[10px] text-slate-400">{row.label}</div>
+                            <div className={`flex-1 text-[10px] font-medium ${row.highlight ? 'text-blue-600' : 'text-slate-800 dark:text-slate-200'}`}>
+                              {row.value}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Right Column - Amount Box */}
+                      <div className="w-40 pt-2">
+                        <div className="bg-[#82b366] text-white p-4 rounded-sm text-center shadow-sm">
+                          <div className="text-[10px] mb-0.5 opacity-90">Amount Paid</div>
+                          <div className="text-lg font-bold">{formatCurrency(selectedPayment.paymentAmount)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Paid To Section */}
+                    <div className="mb-8">
+                      <h4 className="text-[10px] font-semibold text-slate-400 mb-2">Paid To</h4>
+                      <div className="text-[10px] space-y-0.5 text-slate-700 dark:text-slate-300">
+                        <p className="font-bold text-slate-900 dark:text-white uppercase">{selectedPayment.vendorName}</p>
+                        {(() => {
+                          const vendor = getVendorDetails(selectedPayment);
+                          if (vendor) {
+                            return (
+                              <>
+                                {vendor.address && <p>{vendor.address}</p>}
+                                {(vendor.city || vendor.state || vendor.pincode) && (
+                                  <p>{[vendor.city, vendor.state, vendor.pincode].filter(Boolean).join(', ')}</p>
+                                )}
+                                {vendor.country && <p>{vendor.country}</p>}
+                                {vendor.gstin && <p className="mt-1 text-slate-500 uppercase">GSTIN {vendor.gstin}</p>}
+                              </>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 mb-6"></div>
+
+                    {/* Payment for Section */}
                     {getBillPaymentsArray(selectedPayment).length > 0 && (
-                      <>
-                        <div className="font-semibold mb-2 mt-6">Payments Made - {getBillNumbers(selectedPayment)}</div>
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-100 dark:bg-slate-700">
-                            <tr>
-                              <th className="px-3 py-2 text-left">ACCOUNT</th>
-                              <th className="px-3 py-2 text-right">DEBIT</th>
-                              <th className="px-3 py-2 text-right">CREDIT</th>
+                      <div>
+                        <h4 className="text-xs font-bold mb-4 text-slate-800 dark:text-slate-200">Payment for</h4>
+                        <table className="w-full text-[10px]">
+                          <thead>
+                            <tr className="bg-slate-100 dark:bg-slate-800/50">
+                              <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Number</th>
+                              <th className="px-3 py-2 text-left font-bold text-slate-700">Bill Date</th>
+                              <th className="px-3 py-2 text-right font-bold text-slate-700">Bill Amount</th>
+                              <th className="px-3 py-2 text-right font-bold text-slate-700">Payment Amount</th>
                             </tr>
                           </thead>
-                          <tbody>
-                            <tr className="border-b">
-                              <td className="px-3 py-2">Prepaid Expenses</td>
-                              <td className="px-3 py-2 text-right">0.00</td>
-                              <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                            </tr>
-                            <tr className="border-b">
-                              <td className="px-3 py-2">Accounts Payable</td>
-                              <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                              <td className="px-3 py-2 text-right">0.00</td>
-                            </tr>
-                            <tr className="font-bold bg-slate-100 dark:bg-slate-700">
-                              <td className="px-3 py-2"></td>
-                              <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                              <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
-                            </tr>
+                          <tbody className="divide-y divide-slate-200">
+                            {getBillPaymentsArray(selectedPayment).map((bp, index) => (
+                              <tr key={index}>
+                                <td className="px-3 py-2 text-blue-600 font-medium">{bp.billNumber}</td>
+                                <td className="px-3 py-2 text-slate-600">{formatDate(bp.billDate)}</td>
+                                <td className="px-3 py-2 text-right text-slate-600">{formatCurrency(bp.billAmount)}</td>
+                                <td className="px-3 py-2 text-right text-slate-900 dark:text-white font-medium">{formatCurrency(bp.paymentAmount || 0)}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
-                      </>
+                      </div>
                     )}
                   </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </div>
-      )}
+
+                  {/* Journal Section */}
+                  <div className="mt-6">
+                    <Tabs defaultValue="journal">
+                      <TabsList>
+                        <TabsTrigger value="journal">Journal</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="journal" className="mt-4">
+                        <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="text-sm text-muted-foreground">
+                              Amount is displayed in your base currency <Badge variant="secondary" className="ml-2">INR</Badge>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button variant="outline" size="sm">Accrual</Button>
+                              <Button variant="ghost" size="sm">Cash</Button>
+                            </div>
+                          </div>
+
+                          <div className="font-semibold mb-2">Vendor Payment - {getPaymentNumberString(selectedPayment.paymentNumber)}</div>
+                          <table className="w-full text-sm">
+                            <thead className="bg-slate-100 dark:bg-slate-700">
+                              <tr>
+                                <th className="px-3 py-2 text-left">ACCOUNT</th>
+                                <th className="px-3 py-2 text-right">DEBIT</th>
+                                <th className="px-3 py-2 text-right">CREDIT</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr className="border-b">
+                                <td className="px-3 py-2">{getPaidThroughLabel(selectedPayment.paidThrough)}</td>
+                                <td className="px-3 py-2 text-right">0.00</td>
+                                <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                              </tr>
+                              <tr className="border-b">
+                                <td className="px-3 py-2">Prepaid Expenses</td>
+                                <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                <td className="px-3 py-2 text-right">0.00</td>
+                              </tr>
+                              <tr className="font-bold bg-slate-100 dark:bg-slate-700">
+                                <td className="px-3 py-2"></td>
+                                <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+
+                          {getBillPaymentsArray(selectedPayment).length > 0 && (
+                            <>
+                              <div className="font-semibold mb-2 mt-6">Payments Made - {getBillNumbers(selectedPayment)}</div>
+                              <table className="w-full text-sm">
+                                <thead className="bg-slate-100 dark:bg-slate-700">
+                                  <tr>
+                                    <th className="px-3 py-2 text-left">ACCOUNT</th>
+                                    <th className="px-3 py-2 text-right">DEBIT</th>
+                                    <th className="px-3 py-2 text-right">CREDIT</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr className="border-b">
+                                    <td className="px-3 py-2">Prepaid Expenses</td>
+                                    <td className="px-3 py-2 text-right">0.00</td>
+                                    <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                  </tr>
+                                  <tr className="border-b">
+                                    <td className="px-3 py-2">Accounts Payable</td>
+                                    <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">0.00</td>
+                                  </tr>
+                                  <tr className="font-bold bg-slate-100 dark:bg-slate-700">
+                                    <td className="px-3 py-2"></td>
+                                    <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                    <td className="px-3 py-2 text-right">{selectedPayment.paymentAmount.toFixed(2)}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </>
+                          )}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                </div>
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

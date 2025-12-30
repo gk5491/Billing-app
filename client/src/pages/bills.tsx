@@ -49,6 +49,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -591,14 +596,14 @@ function BillDetailView({ bill }: { bill: Bill }) {
           </p>
           <Badge
             className={`mt-2 ${paymentStatus === "PAID"
-                ? "bg-green-500 text-white"
-                : paymentStatus === "PARTIALLY PAID"
-                  ? "bg-amber-500 text-white"
-                  : paymentStatus === "OVERDUE"
-                    ? "bg-red-500 text-white"
-                    : paymentStatus === "VOID"
-                      ? "bg-slate-500 text-white"
-                      : "bg-blue-500 text-white"
+              ? "bg-green-500 text-white"
+              : paymentStatus === "PARTIALLY PAID"
+                ? "bg-amber-500 text-white"
+                : paymentStatus === "OVERDUE"
+                  ? "bg-red-500 text-white"
+                  : paymentStatus === "VOID"
+                    ? "bg-slate-500 text-white"
+                    : "bg-blue-500 text-white"
               }`}
           >
             {paymentStatus}
@@ -1765,323 +1770,330 @@ export default function Bills() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div
-        className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedBill ? "flex-1 min-w-[400px]" : "flex-1"}`}
-      >
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900">All Bills</h1>
-            <ChevronDown className="h-4 w-4 text-slate-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            {!selectedBill && (
-              <>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`h-9 w-9 ${viewMode === "list" ? "bg-slate-100" : ""}`}
-                  onClick={() => setViewMode("list")}
-                  data-testid="button-list-view"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`h-9 w-9 ${viewMode === "table" ? "bg-slate-100" : ""}`}
-                  onClick={() => setViewMode("table")}
-                  data-testid="button-table-view"
-                >
-                  <Grid3X3 className="h-4 w-4" />
-                </Button>
-              </>
-            )}
-            <Button
-              onClick={() => setLocation("/bills/new")}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-bill"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9"
-                  data-testid="button-more-options"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" /> Export
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={fetchBills}>
-                  Refresh List
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {!selectedBill && (
-          <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search bills..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-                data-testid="input-search"
-              />
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="bills-layout">
+        <ResizablePanel
+          defaultSize={selectedBill ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex items-center justify-between p-4 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold text-slate-900">All Bills</h1>
+              <ChevronDown className="h-4 w-4 text-slate-500" />
             </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" /> Filter
-            </Button>
-          </div>
-        )}
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">
-              Loading bills...
-            </div>
-          ) : filteredBills.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <FileText className="h-8 w-8 text-slate-400" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">No bills found</h3>
-              <p className="text-slate-500 mb-4">
-                {searchTerm
-                  ? "Try adjusting your search criteria"
-                  : "Create your first bill to get started"}
-              </p>
-              {!searchTerm && (
-                <Button
-                  onClick={() => setLocation("/bills/new")}
-                  className="gap-2"
-                  data-testid="button-create-first-bill"
-                >
-                  <Plus className="h-4 w-4" /> Create New Bill
-                </Button>
+            <div className="flex items-center gap-2">
+              {!selectedBill && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className={`h-9 w-9 ${viewMode === "list" ? "bg-slate-100" : ""}`}
+                    onClick={() => setViewMode("list")}
+                    data-testid="button-list-view"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className={`h-9 w-9 ${viewMode === "table" ? "bg-slate-100" : ""}`}
+                    onClick={() => setViewMode("table")}
+                    data-testid="button-table-view"
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                </>
               )}
+              <Button
+                onClick={() => setLocation("/bills/new")}
+                className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                data-testid="button-new-bill"
+              >
+                <Plus className="h-4 w-4" /> New
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9"
+                    data-testid="button-more-options"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>
+                    <Download className="mr-2 h-4 w-4" /> Export
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={fetchBills}>
+                    Refresh List
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          ) : selectedBill ? (
-            // When a bill is selected, show only the table view (not the list view with names)
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead className="w-10"></TableHead>
-                  <TableHead className="text-xs">DATE</TableHead>
-                  <TableHead className="text-xs">BILL#</TableHead>
-                  <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
-                  <TableHead className="text-xs">VENDOR NAME</TableHead>
-                  <TableHead className="text-xs">STATUS</TableHead>
-                  <TableHead className="text-xs">DUE DATE</TableHead>
-                  <TableHead className="text-xs text-right">AMOUNT</TableHead>
-                  <TableHead className="text-xs text-right">
-                    BALANCE DUE
-                  </TableHead>
-                  <TableHead className="w-10"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedItems.map((bill) => (
-                  <TableRow
-                    key={bill.id}
-                    onClick={() => handleBillClick(bill)}
-                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
-                    data-testid={`row-bill-${bill.id}`}
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedBills.includes(bill.id)}
-                        onClick={(e) => toggleSelectBill(bill.id, e)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(bill.billDate)}
-                    </TableCell>
-                    <TableCell className="text-sm text-blue-600 font-medium">
-                      {bill.billNumber}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {bill.orderNumber || "-"}
-                    </TableCell>
-                    <TableCell className="text-sm">{bill.vendorName}</TableCell>
-                    <TableCell>{getStatusBadge(bill.status)}</TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(bill.dueDate)}
-                    </TableCell>
-                    <TableCell className="text-sm text-right font-medium">
-                      {formatCurrency(bill.total)}
-                    </TableCell>
-                    <TableCell className="text-sm text-right">
-                      {formatCurrency(bill.balanceDue)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          asChild
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              setLocation(`/bills/${bill.id}/edit`)
-                            }
-                          >
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => handleDelete(bill.id)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-50">
-                  <TableHead className="w-10"></TableHead>
-                  <TableHead className="text-xs">DATE</TableHead>
-                  <TableHead className="text-xs">BILL#</TableHead>
-                  <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
-                  <TableHead className="text-xs">VENDOR NAME</TableHead>
-                  <TableHead className="text-xs">STATUS</TableHead>
-                  <TableHead className="text-xs">DUE DATE</TableHead>
-                  <TableHead className="text-xs text-right">AMOUNT</TableHead>
-                  <TableHead className="text-xs text-right">
-                    BALANCE DUE
-                  </TableHead>
-                  <TableHead className="w-10"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedItems.map((bill) => (
-                  <TableRow
-                    key={bill.id}
-                    onClick={() => handleBillClick(bill)}
-                    className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
-                    data-testid={`row-bill-${bill.id}`}
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedBills.includes(bill.id)}
-                        onClick={(e) => toggleSelectBill(bill.id, e)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(bill.billDate)}
-                    </TableCell>
-                    <TableCell className="text-sm text-blue-600 font-medium">
-                      {bill.billNumber}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {bill.orderNumber || "-"}
-                    </TableCell>
-                    <TableCell className="text-sm">{bill.vendorName}</TableCell>
-                    <TableCell>{getStatusBadge(bill.status)}</TableCell>
-                    <TableCell className="text-sm">
-                      {formatDate(bill.dueDate)}
-                    </TableCell>
-                    <TableCell className="text-sm text-right">
-                      {formatCurrency(bill.total)}
-                    </TableCell>
-                    <TableCell className="text-sm text-right">
-                      {formatCurrency(bill.balanceDue)}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          asChild
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setLocation(`/bills/${bill.id}/edit`);
-                            }}
-                          >
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(bill.id);
-                            }}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          {filteredBills.length > 0 && (
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          )}
-        </div>
-      </div>
+          </div>
 
-      {selectedBill && (
-        <div className="w-full max-w-[600px] lg:w-[600px] shrink-0 border-l border-slate-200">
-          <BillDetailPanel
-            bill={selectedBill}
-            branding={branding}
-            organization={organization || undefined}
-            onClose={handleClosePanel}
-            onEdit={handleEditBill}
-            onDelete={() => handleDelete(selectedBill.id)}
-            onMarkPaid={handleMarkPaid}
-            onRecordPayment={handleRecordPayment}
-            onVoid={handleVoid}
-            onClone={handleClone}
-            onCreateVendorCredits={handleCreateVendorCredits}
-            onViewJournal={handleViewJournal}
-            onExpectedPaymentDate={handleExpectedPaymentDate}
-          />
-        </div>
-      )}
+          {!selectedBill && (
+            <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search bills..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                  data-testid="input-search"
+                />
+              </div>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" /> Filter
+              </Button>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-auto">
+            {loading ? (
+              <div className="p-8 text-center text-slate-500">
+                Loading bills...
+              </div>
+            ) : filteredBills.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                  <FileText className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No bills found</h3>
+                <p className="text-slate-500 mb-4">
+                  {searchTerm
+                    ? "Try adjusting your search criteria"
+                    : "Create your first bill to get started"}
+                </p>
+                {!searchTerm && (
+                  <Button
+                    onClick={() => setLocation("/bills/new")}
+                    className="gap-2"
+                    data-testid="button-create-first-bill"
+                  >
+                    <Plus className="h-4 w-4" /> Create New Bill
+                  </Button>
+                )}
+              </div>
+            ) : selectedBill ? (
+              // When a bill is selected, show only the table view (not the list view with names)
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead className="w-10"></TableHead>
+                    <TableHead className="text-xs">DATE</TableHead>
+                    <TableHead className="text-xs">BILL#</TableHead>
+                    <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
+                    <TableHead className="text-xs">VENDOR NAME</TableHead>
+                    <TableHead className="text-xs">STATUS</TableHead>
+                    <TableHead className="text-xs">DUE DATE</TableHead>
+                    <TableHead className="text-xs text-right">AMOUNT</TableHead>
+                    <TableHead className="text-xs text-right">
+                      BALANCE DUE
+                    </TableHead>
+                    <TableHead className="w-10"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedItems.map((bill) => (
+                    <TableRow
+                      key={bill.id}
+                      onClick={() => handleBillClick(bill)}
+                      className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
+                      data-testid={`row-bill-${bill.id}`}
+                    >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedBills.includes(bill.id)}
+                          onClick={(e) => toggleSelectBill(bill.id, e)}
+                        />
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {formatDate(bill.billDate)}
+                      </TableCell>
+                      <TableCell className="text-sm text-blue-600 font-medium">
+                        {bill.billNumber}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {bill.orderNumber || "-"}
+                      </TableCell>
+                      <TableCell className="text-sm">{bill.vendorName}</TableCell>
+                      <TableCell>{getStatusBadge(bill.status)}</TableCell>
+                      <TableCell className="text-sm">
+                        {formatDate(bill.dueDate)}
+                      </TableCell>
+                      <TableCell className="text-sm text-right font-medium">
+                        {formatCurrency(bill.total)}
+                      </TableCell>
+                      <TableCell className="text-sm text-right">
+                        {formatCurrency(bill.balanceDue)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            asChild
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                setLocation(`/bills/${bill.id}/edit`)
+                              }
+                            >
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDelete(bill.id)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead className="w-10"></TableHead>
+                    <TableHead className="text-xs">DATE</TableHead>
+                    <TableHead className="text-xs">BILL#</TableHead>
+                    <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
+                    <TableHead className="text-xs">VENDOR NAME</TableHead>
+                    <TableHead className="text-xs">STATUS</TableHead>
+                    <TableHead className="text-xs">DUE DATE</TableHead>
+                    <TableHead className="text-xs text-right">AMOUNT</TableHead>
+                    <TableHead className="text-xs text-right">
+                      BALANCE DUE
+                    </TableHead>
+                    <TableHead className="w-10"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedItems.map((bill) => (
+                    <TableRow
+                      key={bill.id}
+                      onClick={() => handleBillClick(bill)}
+                      className={`cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? "bg-blue-50" : ""}`}
+                      data-testid={`row-bill-${bill.id}`}
+                    >
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={selectedBills.includes(bill.id)}
+                          onClick={(e) => toggleSelectBill(bill.id, e)}
+                        />
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {formatDate(bill.billDate)}
+                      </TableCell>
+                      <TableCell className="text-sm text-blue-600 font-medium">
+                        {bill.billNumber}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {bill.orderNumber || "-"}
+                      </TableCell>
+                      <TableCell className="text-sm">{bill.vendorName}</TableCell>
+                      <TableCell>{getStatusBadge(bill.status)}</TableCell>
+                      <TableCell className="text-sm">
+                        {formatDate(bill.dueDate)}
+                      </TableCell>
+                      <TableCell className="text-sm text-right">
+                        {formatCurrency(bill.total)}
+                      </TableCell>
+                      <TableCell className="text-sm text-right">
+                        {formatCurrency(bill.balanceDue)}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            asChild
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLocation(`/bills/${bill.id}/edit`);
+                              }}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(bill.id);
+                              }}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            {filteredBills.length > 0 && (
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={goToPage}
+              />
+            )}
+          </div>
+        </ResizablePanel>
+
+        {selectedBill && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <BillDetailPanel
+                bill={selectedBill}
+                branding={branding}
+                organization={organization || undefined}
+                onClose={handleClosePanel}
+                onEdit={handleEditBill}
+                onDelete={() => handleDelete(selectedBill.id)}
+                onMarkPaid={handleMarkPaid}
+                onRecordPayment={handleRecordPayment}
+                onVoid={handleVoid}
+                onClone={handleClone}
+                onCreateVendorCredits={handleCreateVendorCredits}
+                onViewJournal={handleViewJournal}
+                onExpectedPaymentDate={handleExpectedPaymentDate}
+              />
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       {/* Record Payment Dialog */}
       <RecordPaymentDialog

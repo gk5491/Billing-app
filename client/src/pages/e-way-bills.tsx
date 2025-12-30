@@ -10,6 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
     Plus,
     X,
     Settings,
@@ -1030,777 +1035,798 @@ export default function EWayBills() {
     const { currentPage, totalPages, totalItems, itemsPerPage, paginatedItems, goToPage } = usePagination(ewayBills, 10);
 
     return (
-        <div className="flex h-full" data-testid="eway-bills-page">
-            <div className={`${(viewMode || showCreateForm) ? 'hidden md:flex md:w-80 lg:w-96' : 'flex-1'} border-r flex flex-col bg-background transition-all duration-300`}>
-                <div className="p-4 border-b space-y-4">
-                    <div className="flex items-center justify-between gap-2">
-                        <h1 className="text-xl font-semibold" data-testid="text-page-title">e-Way Bills</h1>
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" className="text-blue-600" data-testid="button-portal-settings">
-                                <Settings className="w-4 h-4 mr-1" />
-                                Change e-Way Bill Portal Settings
-                            </Button>
-                            <Button onClick={handleNewEWayBill} size="sm" data-testid="button-new-eway-bill">
-                                <Plus className="w-4 h-4 mr-1" />
-                                New
-                            </Button>
-                        </div>
-                    </div>
+        <div className="flex h-full w-full overflow-hidden bg-slate-50" data-testid="eway-bills-page">
+            <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="eway-bills-layout">
+                <ResizablePanel
+                    defaultSize={(viewMode || showCreateForm) ? 30 : 100}
+                    minSize={20}
+                    className="flex flex-col overflow-hidden bg-white"
+                >
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <div className="p-4 border-b space-y-4 bg-white sticky top-0 z-10">
+                            <div className="flex items-center justify-between gap-2">
+                                <h1 className="text-xl font-semibold" data-testid="text-page-title">e-Way Bills</h1>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm" className="text-blue-600" data-testid="button-portal-settings">
+                                        <Settings className="w-4 h-4 mr-1" />
+                                        Change e-Way Bill Portal Settings
+                                    </Button>
+                                    <Button onClick={handleNewEWayBill} size="sm" data-testid="button-new-eway-bill">
+                                        <Plus className="w-4 h-4 mr-1" />
+                                        New
+                                    </Button>
+                                </div>
+                            </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">Transaction Period:</span>
-                            <Select value={periodFilter} onValueChange={setPeriodFilter} data-testid="select-period-filter">
-                                <SelectTrigger className="w-[140px]" data-testid="select-trigger-period">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {transactionPeriods.map((period) => (
-                                        <SelectItem key={period.value} value={period.value}>
-                                            {period.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <div className="flex flex-wrap items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">Transaction Period:</span>
+                                    <Select value={periodFilter} onValueChange={setPeriodFilter} data-testid="select-period-filter">
+                                        <SelectTrigger className="w-[140px]" data-testid="select-trigger-period">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {transactionPeriods.map((period) => (
+                                                <SelectItem key={period.value} value={period.value}>
+                                                    {period.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">Transaction Type:</span>
+                                    <Select value={transactionTypeFilter} onValueChange={setTransactionTypeFilter} data-testid="select-type-filter">
+                                        <SelectTrigger className="w-[140px]" data-testid="select-trigger-type">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {transactionTypeFilters.map((type) => (
+                                                <SelectItem key={type.value} value={type.value}>
+                                                    {type.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">e-Way Bill Status:</span>
+                                    <Select value={statusFilter} onValueChange={setStatusFilter} data-testid="select-status-filter">
+                                        <SelectTrigger className="w-[160px]" data-testid="select-trigger-status">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {ewayBillStatuses.map((status) => (
+                                                <SelectItem key={status.value} value={status.value}>
+                                                    {status.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">Transaction Type:</span>
-                            <Select value={transactionTypeFilter} onValueChange={setTransactionTypeFilter} data-testid="select-type-filter">
-                                <SelectTrigger className="w-[140px]" data-testid="select-trigger-type">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {transactionTypeFilters.map((type) => (
-                                        <SelectItem key={type.value} value={type.value}>
-                                            {type.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">e-Way Bill Status:</span>
-                            <Select value={statusFilter} onValueChange={setStatusFilter} data-testid="select-status-filter">
-                                <SelectTrigger className="w-[160px]" data-testid="select-trigger-status">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {ewayBillStatuses.map((status) => (
-                                        <SelectItem key={status.value} value={status.value}>
-                                            {status.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex-1 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full" data-testid="table-eway-bills">
-                            <thead className="bg-muted/50 sticky top-0">
-                                <tr className="border-b">
-                                    <th className="p-3 text-left w-10">
-                                        <Checkbox
-                                            checked={selectedBills.length === ewayBills.length && ewayBills.length > 0}
-                                            onCheckedChange={handleSelectAll}
-                                            data-testid="checkbox-select-all"
-                                        />
-                                    </th>
-                                    <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                        Date
-                                        <ChevronDown className="w-3 h-3 inline ml-1" />
-                                    </th>
-                                    <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Transaction#</th>
-                                    <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer Name</th>
-                                    <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer GSTIN</th>
-                                    <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expiry Date</th>
-                                    <th className="p-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={7} className="p-8 text-center text-muted-foreground" data-testid="text-loading">
-                                            Loading e-way bills...
-                                        </td>
-                                    </tr>
-                                ) : ewayBills.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={7} className="p-8 text-center text-muted-foreground" data-testid="text-empty">
-                                            Yay! You do not have any pending invoices for which e-way bills have to be generated.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    paginatedItems.map((bill) => (
-                                        <tr
-                                            key={bill.id}
-                                            className={`border-b cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? 'bg-accent' : ''
-                                                }`}
-                                            onClick={() => handleSelectBill(bill)}
-                                            data-testid={`row-eway-bill-${bill.id}`}
-                                        >
-                                            <td className="p-3">
+                        <div className="flex-1 overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <table className="w-full" data-testid="table-eway-bills">
+                                    <thead className="bg-muted/50 sticky top-0">
+                                        <tr className="border-b">
+                                            <th className="p-3 text-left w-10">
                                                 <Checkbox
-                                                    checked={selectedBills.includes(bill.id)}
-                                                    onCheckedChange={(checked) => handleSelectOne(bill.id, checked as boolean)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    data-testid={`checkbox-select-${bill.id}`}
+                                                    checked={selectedBills.length === ewayBills.length && ewayBills.length > 0}
+                                                    onCheckedChange={handleSelectAll}
+                                                    data-testid="checkbox-select-all"
                                                 />
-                                            </td>
-                                            <td className="p-3 text-sm" data-testid={`text-date-${bill.id}`}>
-                                                {formatDate(bill.date)}
-                                            </td>
-                                            <td className="p-3 text-sm text-blue-600" data-testid={`text-transaction-${bill.id}`}>
-                                                {bill.documentNumber || bill.ewayBillNumber}
-                                            </td>
-                                            <td className="p-3 text-sm" data-testid={`text-customer-${bill.id}`}>
-                                                {bill.customerName}
-                                            </td>
-                                            <td className="p-3 text-sm" data-testid={`text-gstin-${bill.id}`}>
-                                                {bill.customerGstin || '-'}
-                                            </td>
-                                            <td className="p-3 text-sm" data-testid={`text-expiry-${bill.id}`}>
-                                                {formatDate(bill.expiryDate)}
-                                            </td>
-                                            <td className="p-3 text-sm text-right" data-testid={`text-total-${bill.id}`}>
-                                                {formatCurrency(bill.total)}
-                                            </td>
+                                            </th>
+                                            <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                                Date
+                                                <ChevronDown className="w-3 h-3 inline ml-1" />
+                                            </th>
+                                            <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Transaction#</th>
+                                            <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer Name</th>
+                                            <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer GSTIN</th>
+                                            <th className="p-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Expiry Date</th>
+                                            <th className="p-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</th>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                        <TablePagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            totalItems={totalItems}
-                            itemsPerPage={itemsPerPage}
-                            onPageChange={goToPage}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {viewMode && selectedBill && !showCreateForm && (
-                <EWayBillDetailPanel
-                    bill={selectedBill}
-                    onClose={handleCloseDetail}
-                    onEdit={() => {
-                        setViewMode(false);
-                        setShowCreateForm(true);
-                    }}
-                    onDelete={() => {
-                        setBillToDelete(selectedBill.id);
-                        setDeleteDialogOpen(true);
-                    }}
-                />
-            )}
-
-            {showCreateForm && (
-                <div className="flex-1 flex flex-col bg-background">
-                    <div className="p-4 border-b flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-2">
-                            <FileText className="w-5 h-5" />
-                            <h2 className="text-lg font-semibold" data-testid="text-form-title">
-                                {selectedBill ? 'Edit E-Way Bill' : 'New e-Way Bill'}
-                            </h2>
-                            {fromInvoiceNumber && (
-                                <Badge className="bg-blue-100 text-blue-700 border-blue-200">
-                                    From Invoice #{fromInvoiceNumber}
-                                </Badge>
-                            )}
-                        </div>
-                        <Button variant="ghost" size="icon" onClick={handleCloseDetail} data-testid="button-close-form">
-                            <X className="w-4 h-4" />
-                        </Button>
-                    </div>
-
-                    <ScrollArea className="flex-1 p-6">
-                        <div className="max-w-4xl space-y-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-red-500">Document Type*</Label>
-                                    <Select
-                                        value={formData.documentType}
-                                        onValueChange={(value) => setFormData({ ...formData, documentType: value })}
-                                        data-testid="select-document-type"
-                                    >
-                                        <SelectTrigger data-testid="select-trigger-document-type">
-                                            <SelectValue placeholder="Select document type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {documentTypes.map((type) => (
-                                                <SelectItem key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-red-500">Transaction Sub Type*</Label>
-                                    <Select
-                                        value={formData.transactionSubType}
-                                        onValueChange={(value) => setFormData({ ...formData, transactionSubType: value })}
-                                        data-testid="select-transaction-sub-type"
-                                    >
-                                        <SelectTrigger data-testid="select-trigger-transaction-sub-type">
-                                            <SelectValue placeholder="Select sub type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {transactionSubTypes.map((type) => (
-                                                <SelectItem key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-red-500">Customer Name*</Label>
-                                <Select
-                                    value={formData.customerId}
-                                    onValueChange={handleCustomerChange}
-                                    data-testid="select-customer-name"
-                                >
-                                    <SelectTrigger data-testid="select-trigger-customer-name">
-                                        <SelectValue placeholder="Select customer" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {customers.map((customer) => (
-                                            <SelectItem key={customer.id} value={customer.id}>
-                                                {customer.displayName || customer.companyName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {formData.documentType === 'credit_notes' && (
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Credit Note#*</Label>
-                                        <Select
-                                            value={formData.documentId}
-                                            onValueChange={handleCreditNoteChange}
-                                            data-testid="select-credit-note"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-credit-note">
-                                                <SelectValue placeholder="Select credit note" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {creditNotes.map((cn) => (
-                                                    <SelectItem key={cn.id} value={cn.id}>
-                                                        {cn.creditNoteNumber}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Date</Label>
-                                        <Input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            data-testid="input-date"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Transaction Type*</Label>
-                                        <Select
-                                            value={formData.transactionType}
-                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
-                                            data-testid="select-transaction-type"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-transaction-type">
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {transactionTypes.map((type) => (
-                                                    <SelectItem key={type.value} value={type.value}>
-                                                        {type.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {formData.documentType === 'invoices' && (
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Invoice#*</Label>
-                                        <Select
-                                            value={formData.documentId}
-                                            onValueChange={handleInvoiceChange}
-                                            data-testid="select-invoice"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-invoice">
-                                                <SelectValue placeholder="Select invoice" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {invoices.map((inv) => (
-                                                    <SelectItem key={inv.id} value={inv.id}>
-                                                        {inv.invoiceNumber}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Date</Label>
-                                        <Input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            data-testid="input-date-invoice"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Transaction Type*</Label>
-                                        <Select
-                                            value={formData.transactionType}
-                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
-                                            data-testid="select-transaction-type-invoice"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-transaction-type-invoice">
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {transactionTypes.map((type) => (
-                                                    <SelectItem key={type.value} value={type.value}>
-                                                        {type.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {formData.documentType === 'delivery_challans' && (
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Delivery Challan#*</Label>
-                                        <Select
-                                            value={formData.documentId}
-                                            onValueChange={handleDeliveryChallanChange}
-                                            data-testid="select-delivery-challan"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-delivery-challan">
-                                                <SelectValue placeholder="Select delivery challan" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {deliveryChallans.map((dc) => (
-                                                    <SelectItem key={dc.id} value={dc.id}>
-                                                        {dc.challanNumber}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Date</Label>
-                                        <Input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            data-testid="input-date-delivery-challan"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Transaction Type*</Label>
-                                        <Select
-                                            value={formData.transactionType}
-                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
-                                            data-testid="select-transaction-type-delivery-challan"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-transaction-type-delivery-challan">
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {transactionTypes.map((type) => (
-                                                    <SelectItem key={type.value} value={type.value}>
-                                                        {type.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {formData.documentType === 'sales_orders' && (
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Sales Order#*</Label>
-                                        <Select
-                                            value={formData.documentId}
-                                            onValueChange={handleSalesOrderChange}
-                                            data-testid="select-sales-order"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-sales-order">
-                                                <SelectValue placeholder="Select sales order" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {salesOrders.map((so) => (
-                                                    <SelectItem key={so.id} value={so.id}>
-                                                        {so.salesOrderNumber}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Date</Label>
-                                        <Input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                            data-testid="input-date-sales-order"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-red-500">Transaction Type*</Label>
-                                        <Select
-                                            value={formData.transactionType}
-                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
-                                            data-testid="select-transaction-type-sales-order"
-                                        >
-                                            <SelectTrigger data-testid="select-trigger-transaction-type-sales-order">
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {transactionTypes.map((type) => (
-                                                    <SelectItem key={type.value} value={type.value}>
-                                                        {type.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="space-y-4">
-                                <h3 className="font-medium text-sm text-muted-foreground">Address Details</h3>
-                                <div className="grid grid-cols-4 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                                            DISPATCH FROM <Pencil className="w-3 h-3 cursor-pointer text-blue-500" />
-                                        </Label>
-                                        <div className="text-sm space-y-0.5">
-                                            {formatAddress(addressData.dispatchFrom).map((line, i) => (
-                                                <p key={i}>{line}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-medium text-muted-foreground">BILL FROM</Label>
-                                        <div className="text-sm space-y-0.5">
-                                            {formatAddress(addressData.billFrom).map((line, i) => (
-                                                <p key={i}>{line}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-medium text-muted-foreground">BILL TO</Label>
-                                        <div className="text-sm space-y-0.5">
-                                            {formatAddress(addressData.billTo).map((line, i) => (
-                                                <p key={i}>{line}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-xs font-medium text-muted-foreground">SHIP TO</Label>
-                                        <div className="text-sm space-y-0.5">
-                                            {formatAddress(addressData.shipTo).map((line, i) => (
-                                                <p key={i}>{line}</p>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-red-500">Place of Delivery*</Label>
-                                <Popover open={placeOfDeliveryOpen} onOpenChange={setPlaceOfDeliveryOpen}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={placeOfDeliveryOpen}
-                                            className="w-full justify-between font-normal"
-                                            data-testid="select-trigger-place-of-delivery"
-                                        >
-                                            {formData.placeOfDelivery || "Select state"}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[300px] p-0" align="start">
-                                        <Command>
-                                            <CommandInput placeholder="Search state..." />
-                                            <CommandList>
-                                                <CommandEmpty>No state found.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {INDIAN_STATES_WITH_CODES.map((state) => (
-                                                        <CommandItem
-                                                            key={state.code}
-                                                            value={`${state.code} ${state.name}`}
-                                                            onSelect={() => {
-                                                                setFormData({ ...formData, placeOfDelivery: `[${state.code}] - ${state.name}` });
-                                                                setPlaceOfDeliveryOpen(false);
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    formData.placeOfDelivery === `[${state.code}] - ${state.name}` ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            [{state.code}] - {state.name}
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
-                            </div>
-
-                            {/* Item Details Section */}
-                            {selectedItems.length > 0 && (
-                                <div className="border rounded-lg p-4 space-y-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setItemDetailsOpen(!itemDetailsOpen)}
-                                        className="flex items-center gap-2 text-blue-600 hover:underline"
-                                        data-testid="button-toggle-item-details"
-                                    >
-                                        <FileText className="w-4 h-4" />
-                                        <span className="text-sm font-medium">Item Details</span>
-                                        <ChevronDown
-                                            className={`w-4 h-4 transition-transform ${
-                                                itemDetailsOpen ? "rotate-180" : ""
-                                            }`}
-                                        />
-                                    </button>
-
-                                    {itemDetailsOpen && (
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full text-sm">
-                                                <thead>
-                                                    <tr className="border-b">
-                                                        <th className="text-left py-2 px-3 font-semibold">#</th>
-                                                        <th className="text-left py-2 px-3 font-semibold">Item & Description</th>
-                                                        <th className="text-left py-2 px-3 font-semibold">HSN Code</th>
-                                                        <th className="text-left py-2 px-3 font-semibold">Quantity</th>
-                                                        <th className="text-right py-2 px-3 font-semibold">Taxable Amount</th>
-                                                        <th className="text-right py-2 px-3 font-semibold">CGST</th>
-                                                        <th className="text-right py-2 px-3 font-semibold">SGST</th>
-                                                        <th className="text-right py-2 px-3 font-semibold">Cess</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedItems.map((item, index) => {
-                                                        const taxableAmount = (item.amount || item.total) || 0;
-                                                        const cgst = item.cgst || 0;
-                                                        const sgst = item.sgst || 0;
-                                                        const cess = item.cess || 0;
-
-                                                        return (
-                                                            <tr key={index} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800">
-                                                                <td className="py-3 px-3">{index + 1}</td>
-                                                                <td className="py-3 px-3">
-                                                                    <div>
-                                                                        <p className="font-medium">{item.itemName || item.name || '-'}</p>
-                                                                        {item.description && (
-                                                                            <p className="text-xs text-muted-foreground">{item.description}</p>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                                <td className="py-3 px-3 text-muted-foreground">{item.hsnSac || item.hsn || '-'}</td>
-                                                                <td className="py-3 px-3">
-                                                                    {item.quantity} {item.unit || item.usageUnit || ''}
-                                                                </td>
-                                                                <td className="py-3 px-3 text-right font-medium">
-                                                                    {formatCurrency(taxableAmount)}
-                                                                </td>
-                                                                <td className="py-3 px-3 text-right text-muted-foreground">
-                                                                    {cgst ? `₹${cgst.toFixed(2)}` : '₹0.00'} {item.cgstPercent ? `(${item.cgstPercent}%)` : ''}
-                                                                </td>
-                                                                <td className="py-3 px-3 text-right text-muted-foreground">
-                                                                    {sgst ? `₹${sgst.toFixed(2)}` : '₹0.00'} {item.sgstPercent ? `(${item.sgstPercent}%)` : ''}
-                                                                </td>
-                                                                <td className="py-3 px-3 text-right text-muted-foreground">
-                                                                    {cess ? `₹${cess.toFixed(2)}` : '₹0.00'}
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-
-                                            {/* Summary Row */}
-                                            <div className="mt-4 space-y-2 text-sm">
-                                                <div className="flex justify-end items-center gap-8">
-                                                    <span className="font-medium">Taxable Amount</span>
-                                                    <span className="font-semibold min-w-[120px] text-right">
-                                                        {formatCurrency(
-                                                            selectedItems.reduce((sum, item) => sum + ((item.amount || item.total || 0) * (100 - (item.discount || 0)) / 100), 0)
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-end items-center gap-8 text-base font-bold border-t pt-2">
-                                                    <span>TOTAL</span>
-                                                    <span className="min-w-[120px] text-right text-blue-600">
-                                                        {formatCurrency(selectedItems.reduce((sum, item) => sum + (item.amount || item.total || 0), 0))}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Total Amount Display */}
-                            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg border p-4">
-                                <h3 className="font-semibold text-sm text-muted-foreground mb-2">Total Amount</h3>
-                                <p className="text-2xl font-bold text-blue-600" data-testid="text-form-total">
-                                    {formatCurrency(selectedItems.reduce((sum, item) => sum + (item.amount || item.total || 0), 0) || formData.total)}
-                                </p>
-                            </div>
-
-                            <div className="space-y-4 pt-4 border-t">
-                                <h3 className="font-semibold text-sm">TRANSPORTATION DETAILS</h3>
-
-                                <TransporterSelect
-                                    value={formData.transporter}
-                                    onValueChange={(value) => setFormData({ ...formData, transporter: value })}
-                                    placeholder="Select the transporter's name"
-                                    data_testid="select-transporter"
+                                    </thead>
+                                    <tbody>
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan={7} className="p-8 text-center text-muted-foreground" data-testid="text-loading">
+                                                    Loading e-way bills...
+                                                </td>
+                                            </tr>
+                                        ) : ewayBills.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={7} className="p-8 text-center text-muted-foreground" data-testid="text-empty">
+                                                    Yay! You do not have any pending invoices for which e-way bills have to be generated.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            paginatedItems.map((bill) => (
+                                                <tr
+                                                    key={bill.id}
+                                                    className={`border-b cursor-pointer hover-elevate ${selectedBill?.id === bill.id ? 'bg-accent' : ''
+                                                        }`}
+                                                    onClick={() => handleSelectBill(bill)}
+                                                    data-testid={`row-eway-bill-${bill.id}`}
+                                                >
+                                                    <td className="p-3">
+                                                        <Checkbox
+                                                            checked={selectedBills.includes(bill.id)}
+                                                            onCheckedChange={(checked) => handleSelectOne(bill.id, checked as boolean)}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                            data-testid={`checkbox-select-${bill.id}`}
+                                                        />
+                                                    </td>
+                                                    <td className="p-3 text-sm" data-testid={`text-date-${bill.id}`}>
+                                                        {formatDate(bill.date)}
+                                                    </td>
+                                                    <td className="p-3 text-sm text-blue-600" data-testid={`text-transaction-${bill.id}`}>
+                                                        {bill.documentNumber || bill.ewayBillNumber}
+                                                    </td>
+                                                    <td className="p-3 text-sm" data-testid={`text-customer-${bill.id}`}>
+                                                        {bill.customerName}
+                                                    </td>
+                                                    <td className="p-3 text-sm" data-testid={`text-gstin-${bill.id}`}>
+                                                        {bill.customerGstin || '-'}
+                                                    </td>
+                                                    <td className="p-3 text-sm" data-testid={`text-expiry-${bill.id}`}>
+                                                        {formatDate(bill.expiryDate)}
+                                                    </td>
+                                                    <td className="p-3 text-sm text-right" data-testid={`text-total-${bill.id}`}>
+                                                        {formatCurrency(bill.total)}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                                <TablePagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    totalItems={totalItems}
+                                    itemsPerPage={itemsPerPage}
+                                    onPageChange={goToPage}
                                 />
+                            </div>
+                        </div>
+                    </div>
+                </ResizablePanel>
 
-                                <div className="space-y-2">
-                                    <Label className="text-red-500">Distance (In Km)*</Label>
-                                    <div className="flex items-center gap-4">
-                                        <Input
-                                            type="number"
-                                            value={formData.distance}
-                                            onChange={(e) => setFormData({ ...formData, distance: parseInt(e.target.value) || 0 })}
-                                            placeholder="0"
-                                            className="max-w-[200px]"
-                                            data-testid="input-distance"
-                                        />
-                                        <a href="#" className="text-blue-600 text-sm hover:underline flex items-center gap-1" data-testid="link-calculate-distance">
-                                            Calculate Distance
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
+                {viewMode && selectedBill && !showCreateForm && (
+                    <>
+                        <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+                        <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+                            <div className="h-full flex flex-col overflow-hidden bg-white">
+                                <EWayBillDetailPanel
+                                    bill={selectedBill}
+                                    onClose={handleCloseDetail}
+                                    onEdit={() => {
+                                        setViewMode(false);
+                                        setShowCreateForm(true);
+                                    }}
+                                    onDelete={() => {
+                                        setBillToDelete(selectedBill.id);
+                                        setDeleteDialogOpen(true);
+                                    }}
+                                />
+                            </div>
+                        </ResizablePanel>
+                    </>
+                )}
+
+                {showCreateForm && (
+                    <>
+                        <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+                        <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+                            <div className="h-full flex flex-col overflow-hidden bg-white">
+                                <div className="flex-1 flex flex-col bg-background">
+                                    <div className="p-4 border-b flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-2">
+                                            <FileText className="w-5 h-5" />
+                                            <h2 className="text-lg font-semibold" data-testid="text-form-title">
+                                                {selectedBill ? 'Edit E-Way Bill' : 'New e-Way Bill'}
+                                            </h2>
+                                            {fromInvoiceNumber && (
+                                                <Badge className="bg-blue-100 text-blue-700 border-blue-200">
+                                                    From Invoice #{fromInvoiceNumber}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <Button variant="ghost" size="icon" onClick={handleCloseDetail} data-testid="button-close-form">
+                                            <X className="w-4 h-4" />
+                                        </Button>
                                     </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        If you enter 0 as the distance, e-Way Bill system will automatically calculate it based on the dispatch and delivery locations.
-                                    </p>
-                                </div>
 
-                                <div className="space-y-4 pt-4">
-                                    <h4 className="font-medium text-sm">PART B</h4>
+                                    <ScrollArea className="flex-1 p-6">
+                                        <div className="max-w-4xl space-y-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-red-500">Document Type*</Label>
+                                                    <Select
+                                                        value={formData.documentType}
+                                                        onValueChange={(value) => setFormData({ ...formData, documentType: value })}
+                                                        data-testid="select-document-type"
+                                                    >
+                                                        <SelectTrigger data-testid="select-trigger-document-type">
+                                                            <SelectValue placeholder="Select document type" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {documentTypes.map((type) => (
+                                                                <SelectItem key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Mode of Transportation</Label>
-                                        <Tabs value={formData.modeOfTransportation} onValueChange={(value) => setFormData({ ...formData, modeOfTransportation: value })}>
-                                            <TabsList className="grid grid-cols-4 w-fit" data-testid="tabs-transport-mode">
-                                                <TabsTrigger value="road" className="flex items-center gap-1" data-testid="tab-road">
-                                                    <Truck className="w-4 h-4" /> Road
-                                                </TabsTrigger>
-                                                <TabsTrigger value="rail" className="flex items-center gap-1" data-testid="tab-rail">
-                                                    <Train className="w-4 h-4" /> Rail
-                                                </TabsTrigger>
-                                                <TabsTrigger value="air" className="flex items-center gap-1" data-testid="tab-air">
-                                                    <Plane className="w-4 h-4" /> Air
-                                                </TabsTrigger>
-                                                <TabsTrigger value="ship" className="flex items-center gap-1" data-testid="tab-ship">
-                                                    <Ship className="w-4 h-4" /> Ship
-                                                </TabsTrigger>
-                                            </TabsList>
-                                        </Tabs>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label>Vehicle Type</Label>
-                                        <RadioGroup
-                                            value={formData.vehicleType}
-                                            onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}
-                                            className="flex items-center gap-6"
-                                            data-testid="radio-vehicle-type"
-                                        >
-                                            <div className="flex items-center space-x-2">
-                                                <RadioGroupItem value="regular" id="regular" data-testid="radio-regular" />
-                                                <Label htmlFor="regular" className="font-normal">Regular</Label>
+                                                <div className="space-y-2">
+                                                    <Label className="text-red-500">Transaction Sub Type*</Label>
+                                                    <Select
+                                                        value={formData.transactionSubType}
+                                                        onValueChange={(value) => setFormData({ ...formData, transactionSubType: value })}
+                                                        data-testid="select-transaction-sub-type"
+                                                    >
+                                                        <SelectTrigger data-testid="select-trigger-transaction-sub-type">
+                                                            <SelectValue placeholder="Select sub type" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {transactionSubTypes.map((type) => (
+                                                                <SelectItem key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center space-x-2">
-                                                <RadioGroupItem value="over_dimensional" id="over_dimensional" data-testid="radio-over-dimensional" />
-                                                <Label htmlFor="over_dimensional" className="font-normal">Over Dimensional Cargo</Label>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-red-500">Customer Name*</Label>
+                                                <Select
+                                                    value={formData.customerId}
+                                                    onValueChange={handleCustomerChange}
+                                                    data-testid="select-customer-name"
+                                                >
+                                                    <SelectTrigger data-testid="select-trigger-customer-name">
+                                                        <SelectValue placeholder="Select customer" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {customers.map((customer) => (
+                                                            <SelectItem key={customer.id} value={customer.id}>
+                                                                {customer.displayName || customer.companyName}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
-                                        </RadioGroup>
-                                    </div>
 
-                                    <div className="space-y-2">
-                                        <Label>Vehicle No</Label>
-                                        <Input
-                                            value={formData.vehicleNo}
-                                            onChange={(e) => setFormData({ ...formData, vehicleNo: e.target.value })}
-                                            placeholder="Enter vehicle number"
-                                            data-testid="input-vehicle-no"
-                                        />
-                                    </div>
+                                            {formData.documentType === 'credit_notes' && (
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Credit Note#*</Label>
+                                                        <Select
+                                                            value={formData.documentId}
+                                                            onValueChange={handleCreditNoteChange}
+                                                            data-testid="select-credit-note"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-credit-note">
+                                                                <SelectValue placeholder="Select credit note" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {creditNotes.map((cn) => (
+                                                                    <SelectItem key={cn.id} value={cn.id}>
+                                                                        {cn.creditNoteNumber}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={formData.date}
+                                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                            data-testid="input-date"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Transaction Type*</Label>
+                                                        <Select
+                                                            value={formData.transactionType}
+                                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
+                                                            data-testid="select-transaction-type"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-transaction-type">
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {transactionTypes.map((type) => (
+                                                                    <SelectItem key={type.value} value={type.value}>
+                                                                        {type.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            )}
 
-                                    <div className="space-y-2">
-                                        <Label>Transporter's Doc No</Label>
-                                        <Input
-                                            value={formData.transporterDocNo}
-                                            onChange={(e) => setFormData({ ...formData, transporterDocNo: e.target.value })}
-                                            placeholder="Enter document number"
-                                            data-testid="input-transporter-doc-no"
-                                        />
-                                    </div>
+                                            {formData.documentType === 'invoices' && (
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Invoice#*</Label>
+                                                        <Select
+                                                            value={formData.documentId}
+                                                            onValueChange={handleInvoiceChange}
+                                                            data-testid="select-invoice"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-invoice">
+                                                                <SelectValue placeholder="Select invoice" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {invoices.map((inv) => (
+                                                                    <SelectItem key={inv.id} value={inv.id}>
+                                                                        {inv.invoiceNumber}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={formData.date}
+                                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                            data-testid="input-date-invoice"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Transaction Type*</Label>
+                                                        <Select
+                                                            value={formData.transactionType}
+                                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
+                                                            data-testid="select-transaction-type-invoice"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-transaction-type-invoice">
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {transactionTypes.map((type) => (
+                                                                    <SelectItem key={type.value} value={type.value}>
+                                                                        {type.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            )}
 
-                                    <div className="space-y-2">
-                                        <Label>Transporter's Doc Date</Label>
-                                        <Input
-                                            type="date"
-                                            value={formData.transporterDocDate}
-                                            onChange={(e) => setFormData({ ...formData, transporterDocDate: e.target.value })}
-                                            placeholder="dd/MM/yyyy"
-                                            data-testid="input-transporter-doc-date"
-                                        />
+                                            {formData.documentType === 'delivery_challans' && (
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Delivery Challan#*</Label>
+                                                        <Select
+                                                            value={formData.documentId}
+                                                            onValueChange={handleDeliveryChallanChange}
+                                                            data-testid="select-delivery-challan"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-delivery-challan">
+                                                                <SelectValue placeholder="Select delivery challan" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {deliveryChallans.map((dc) => (
+                                                                    <SelectItem key={dc.id} value={dc.id}>
+                                                                        {dc.challanNumber}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={formData.date}
+                                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                            data-testid="input-date-delivery-challan"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Transaction Type*</Label>
+                                                        <Select
+                                                            value={formData.transactionType}
+                                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
+                                                            data-testid="select-transaction-type-delivery-challan"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-transaction-type-delivery-challan">
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {transactionTypes.map((type) => (
+                                                                    <SelectItem key={type.value} value={type.value}>
+                                                                        {type.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {formData.documentType === 'sales_orders' && (
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Sales Order#*</Label>
+                                                        <Select
+                                                            value={formData.documentId}
+                                                            onValueChange={handleSalesOrderChange}
+                                                            data-testid="select-sales-order"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-sales-order">
+                                                                <SelectValue placeholder="Select sales order" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {salesOrders.map((so) => (
+                                                                    <SelectItem key={so.id} value={so.id}>
+                                                                        {so.salesOrderNumber}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label>Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={formData.date}
+                                                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                            data-testid="input-date-sales-order"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-red-500">Transaction Type*</Label>
+                                                        <Select
+                                                            value={formData.transactionType}
+                                                            onValueChange={(value) => setFormData({ ...formData, transactionType: value })}
+                                                            data-testid="select-transaction-type-sales-order"
+                                                        >
+                                                            <SelectTrigger data-testid="select-trigger-transaction-type-sales-order">
+                                                                <SelectValue placeholder="Select type" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {transactionTypes.map((type) => (
+                                                                    <SelectItem key={type.value} value={type.value}>
+                                                                        {type.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="space-y-4">
+                                                <h3 className="font-medium text-sm text-muted-foreground">Address Details</h3>
+                                                <div className="grid grid-cols-4 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                                                            DISPATCH FROM <Pencil className="w-3 h-3 cursor-pointer text-blue-500" />
+                                                        </Label>
+                                                        <div className="text-sm space-y-0.5">
+                                                            {formatAddress(addressData.dispatchFrom).map((line, i) => (
+                                                                <p key={i}>{line}</p>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-medium text-muted-foreground">BILL FROM</Label>
+                                                        <div className="text-sm space-y-0.5">
+                                                            {formatAddress(addressData.billFrom).map((line, i) => (
+                                                                <p key={i}>{line}</p>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-medium text-muted-foreground">BILL TO</Label>
+                                                        <div className="text-sm space-y-0.5">
+                                                            {formatAddress(addressData.billTo).map((line, i) => (
+                                                                <p key={i}>{line}</p>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs font-medium text-muted-foreground">SHIP TO</Label>
+                                                        <div className="text-sm space-y-0.5">
+                                                            {formatAddress(addressData.shipTo).map((line, i) => (
+                                                                <p key={i}>{line}</p>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label className="text-red-500">Place of Delivery*</Label>
+                                                <Popover open={placeOfDeliveryOpen} onOpenChange={setPlaceOfDeliveryOpen}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            aria-expanded={placeOfDeliveryOpen}
+                                                            className="w-full justify-between font-normal"
+                                                            data-testid="select-trigger-place-of-delivery"
+                                                        >
+                                                            {formData.placeOfDelivery || "Select state"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-[300px] p-0" align="start">
+                                                        <Command>
+                                                            <CommandInput placeholder="Search state..." />
+                                                            <CommandList>
+                                                                <CommandEmpty>No state found.</CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {INDIAN_STATES_WITH_CODES.map((state) => (
+                                                                        <CommandItem
+                                                                            key={state.code}
+                                                                            value={`${state.code} ${state.name}`}
+                                                                            onSelect={() => {
+                                                                                setFormData({ ...formData, placeOfDelivery: `[${state.code}] - ${state.name}` });
+                                                                                setPlaceOfDeliveryOpen(false);
+                                                                            }}
+                                                                        >
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "mr-2 h-4 w-4",
+                                                                                    formData.placeOfDelivery === `[${state.code}] - ${state.name}` ? "opacity-100" : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                            [{state.code}] - {state.name}
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </div>
+
+                                            {/* Item Details Section */}
+                                            {selectedItems.length > 0 && (
+                                                <div className="border rounded-lg p-4 space-y-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setItemDetailsOpen(!itemDetailsOpen)}
+                                                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                                                        data-testid="button-toggle-item-details"
+                                                    >
+                                                        <FileText className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Item Details</span>
+                                                        <ChevronDown
+                                                            className={`w-4 h-4 transition-transform ${itemDetailsOpen ? "rotate-180" : ""
+                                                                }`}
+                                                        />
+                                                    </button>
+
+                                                    {itemDetailsOpen && (
+                                                        <div className="overflow-x-auto">
+                                                            <table className="w-full text-sm">
+                                                                <thead>
+                                                                    <tr className="border-b">
+                                                                        <th className="text-left py-2 px-3 font-semibold">#</th>
+                                                                        <th className="text-left py-2 px-3 font-semibold">Item & Description</th>
+                                                                        <th className="text-left py-2 px-3 font-semibold">HSN Code</th>
+                                                                        <th className="text-left py-2 px-3 font-semibold">Quantity</th>
+                                                                        <th className="text-right py-2 px-3 font-semibold">Taxable Amount</th>
+                                                                        <th className="text-right py-2 px-3 font-semibold">CGST</th>
+                                                                        <th className="text-right py-2 px-3 font-semibold">SGST</th>
+                                                                        <th className="text-right py-2 px-3 font-semibold">Cess</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {selectedItems.map((item, index) => {
+                                                                        const taxableAmount = (item.amount || item.total) || 0;
+                                                                        const cgst = item.cgst || 0;
+                                                                        const sgst = item.sgst || 0;
+                                                                        const cess = item.cess || 0;
+
+                                                                        return (
+                                                                            <tr key={index} className="border-b hover:bg-slate-50 dark:hover:bg-slate-800">
+                                                                                <td className="py-3 px-3">{index + 1}</td>
+                                                                                <td className="py-3 px-3">
+                                                                                    <div>
+                                                                                        <p className="font-medium">{item.itemName || item.name || '-'}</p>
+                                                                                        {item.description && (
+                                                                                            <p className="text-xs text-muted-foreground">{item.description}</p>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="py-3 px-3 text-muted-foreground">{item.hsnSac || item.hsn || '-'}</td>
+                                                                                <td className="py-3 px-3">
+                                                                                    {item.quantity} {item.unit || item.usageUnit || ''}
+                                                                                </td>
+                                                                                <td className="py-3 px-3 text-right font-medium">
+                                                                                    {formatCurrency(taxableAmount)}
+                                                                                </td>
+                                                                                <td className="py-3 px-3 text-right text-muted-foreground">
+                                                                                    {cgst ? `₹${cgst.toFixed(2)}` : '₹0.00'} {item.cgstPercent ? `(${item.cgstPercent}%)` : ''}
+                                                                                </td>
+                                                                                <td className="py-3 px-3 text-right text-muted-foreground">
+                                                                                    {sgst ? `₹${sgst.toFixed(2)}` : '₹0.00'} {item.sgstPercent ? `(${item.sgstPercent}%)` : ''}
+                                                                                </td>
+                                                                                <td className="py-3 px-3 text-right text-muted-foreground">
+                                                                                    {cess ? `₹${cess.toFixed(2)}` : '₹0.00'}
+                                                                                </td>
+                                                                            </tr>
+                                                                        );
+                                                                    })}
+                                                                </tbody>
+                                                            </table>
+
+                                                            {/* Summary Row */}
+                                                            <div className="mt-4 space-y-2 text-sm">
+                                                                <div className="flex justify-end items-center gap-8">
+                                                                    <span className="font-medium">Taxable Amount</span>
+                                                                    <span className="font-semibold min-w-[120px] text-right">
+                                                                        {formatCurrency(
+                                                                            selectedItems.reduce((sum, item) => sum + ((item.amount || item.total || 0) * (100 - (item.discount || 0)) / 100), 0)
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-end items-center gap-8 text-base font-bold border-t pt-2">
+                                                                    <span>TOTAL</span>
+                                                                    <span className="min-w-[120px] text-right text-blue-600">
+                                                                        {formatCurrency(selectedItems.reduce((sum, item) => sum + (item.amount || item.total || 0), 0))}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Total Amount Display */}
+                                            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg border p-4">
+                                                <h3 className="font-semibold text-sm text-muted-foreground mb-2">Total Amount</h3>
+                                                <p className="text-2xl font-bold text-blue-600" data-testid="text-form-total">
+                                                    {formatCurrency(selectedItems.reduce((sum, item) => sum + (item.amount || item.total || 0), 0) || formData.total)}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-4 pt-4 border-t">
+                                                <h3 className="font-semibold text-sm">TRANSPORTATION DETAILS</h3>
+
+                                                <TransporterSelect
+                                                    value={formData.transporter}
+                                                    onValueChange={(value) => setFormData({ ...formData, transporter: value })}
+                                                    placeholder="Select the transporter's name"
+                                                    data_testid="select-transporter"
+                                                />
+
+                                                <div className="space-y-2">
+                                                    <Label className="text-red-500">Distance (In Km)*</Label>
+                                                    <div className="flex items-center gap-4">
+                                                        <Input
+                                                            type="number"
+                                                            value={formData.distance}
+                                                            onChange={(e) => setFormData({ ...formData, distance: parseInt(e.target.value) || 0 })}
+                                                            placeholder="0"
+                                                            className="max-w-[200px]"
+                                                            data-testid="input-distance"
+                                                        />
+                                                        <a href="#" className="text-blue-600 text-sm hover:underline flex items-center gap-1" data-testid="link-calculate-distance">
+                                                            Calculate Distance
+                                                            <ExternalLink className="w-3 h-3" />
+                                                        </a>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        If you enter 0 as the distance, e-Way Bill system will automatically calculate it based on the dispatch and delivery locations.
+                                                    </p>
+                                                </div>
+
+                                                <div className="space-y-4 pt-4">
+                                                    <h4 className="font-medium text-sm">PART B</h4>
+
+                                                    <div className="space-y-2">
+                                                        <Label>Mode of Transportation</Label>
+                                                        <Tabs value={formData.modeOfTransportation} onValueChange={(value) => setFormData({ ...formData, modeOfTransportation: value })}>
+                                                            <TabsList className="grid grid-cols-4 w-fit" data-testid="tabs-transport-mode">
+                                                                <TabsTrigger value="road" className="flex items-center gap-1" data-testid="tab-road">
+                                                                    <Truck className="w-4 h-4" /> Road
+                                                                </TabsTrigger>
+                                                                <TabsTrigger value="rail" className="flex items-center gap-1" data-testid="tab-rail">
+                                                                    <Train className="w-4 h-4" /> Rail
+                                                                </TabsTrigger>
+                                                                <TabsTrigger value="air" className="flex items-center gap-1" data-testid="tab-air">
+                                                                    <Plane className="w-4 h-4" /> Air
+                                                                </TabsTrigger>
+                                                                <TabsTrigger value="ship" className="flex items-center gap-1" data-testid="tab-ship">
+                                                                    <Ship className="w-4 h-4" /> Ship
+                                                                </TabsTrigger>
+                                                            </TabsList>
+                                                        </Tabs>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label>Vehicle Type</Label>
+                                                        <RadioGroup
+                                                            value={formData.vehicleType}
+                                                            onValueChange={(value) => setFormData({ ...formData, vehicleType: value })}
+                                                            className="flex items-center gap-6"
+                                                            data-testid="radio-vehicle-type"
+                                                        >
+                                                            <div className="flex items-center space-x-2">
+                                                                <RadioGroupItem value="regular" id="regular" data-testid="radio-regular" />
+                                                                <Label htmlFor="regular" className="font-normal">Regular</Label>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <RadioGroupItem value="over_dimensional" id="over_dimensional" data-testid="radio-over-dimensional" />
+                                                                <Label htmlFor="over_dimensional" className="font-normal">Over Dimensional Cargo</Label>
+                                                            </div>
+                                                        </RadioGroup>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label>Vehicle No</Label>
+                                                        <Input
+                                                            value={formData.vehicleNo}
+                                                            onChange={(e) => setFormData({ ...formData, vehicleNo: e.target.value })}
+                                                            placeholder="Enter vehicle number"
+                                                            data-testid="input-vehicle-no"
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label>Transporter's Doc No</Label>
+                                                        <Input
+                                                            value={formData.transporterDocNo}
+                                                            onChange={(e) => setFormData({ ...formData, transporterDocNo: e.target.value })}
+                                                            placeholder="Enter document number"
+                                                            data-testid="input-transporter-doc-no"
+                                                        />
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label>Transporter's Doc Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={formData.transporterDocDate}
+                                                            onChange={(e) => setFormData({ ...formData, transporterDocDate: e.target.value })}
+                                                            placeholder="dd/MM/yyyy"
+                                                            data-testid="input-transporter-doc-date"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ScrollArea>
+
+                                    <div className="p-4 border-t flex items-center gap-2">
+                                        <Button onClick={handleSave} data-testid="button-save">
+                                            Save
+                                        </Button>
+                                        <Button variant="default" className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveAndGenerate} data-testid="button-save-generate">
+                                            Save and Generate
+                                        </Button>
+                                        <Button variant="outline" onClick={handleCancel} data-testid="button-cancel">
+                                            Cancel
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </ScrollArea>
-
-                    <div className="p-4 border-t flex items-center gap-2">
-                        <Button onClick={handleSave} data-testid="button-save">
-                            Save
-                        </Button>
-                        <Button variant="default" className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveAndGenerate} data-testid="button-save-generate">
-                            Save and Generate
-                        </Button>
-                        <Button variant="outline" onClick={handleCancel} data-testid="button-cancel">
-                            Cancel
-                        </Button>
-                    </div>
-                </div>
-            )}
+                        </ResizablePanel>
+                    </>
+                )}
+            </ResizablePanelGroup>
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>

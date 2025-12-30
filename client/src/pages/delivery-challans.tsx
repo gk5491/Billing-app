@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
     Plus,
     Download,
     Send,
@@ -423,370 +428,382 @@ export default function DeliveryChallans() {
     };
 
     return (
-        <div className="flex h-full">
+        <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
             {selectedChallan && (
                 <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
                     <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} />
                 </div>
             )}
 
-            <div
-                className={`flex-1 flex flex-col transition-all duration-300 ${selectedChallan ? 'w-1/2' : 'w-full'}`}>
-                <div className="flex items-center justify-between gap-4 p-4 border-b border-border/60">
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="text-lg font-semibold gap-1" data-testid="dropdown-challan-filter">
-                                    All Delivery Challans
-                                    <ChevronDown className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
-                                <DropdownMenuItem data-testid="filter-all">All Delivery Challans</DropdownMenuItem>
-                                <DropdownMenuItem data-testid="filter-draft">Draft</DropdownMenuItem>
-                                <DropdownMenuItem data-testid="filter-open">Open</DropdownMenuItem>
-                                <DropdownMenuItem data-testid="filter-delivered">Delivered</DropdownMenuItem>
-                                <DropdownMenuItem data-testid="filter-invoiced">Invoiced</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+            <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="delivery-challans-layout">
+                <ResizablePanel
+                    defaultSize={selectedChallan ? 30 : 100}
+                    minSize={20}
+                    className="flex flex-col overflow-hidden bg-white"
+                >
+                    <div className="flex flex-col h-full overflow-hidden">
+                        <div className="flex items-center justify-between gap-4 p-4 border-b border-border/60 bg-white sticky top-0 z-10">
+                            <div className="flex items-center gap-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="text-lg font-semibold gap-1" data-testid="dropdown-challan-filter">
+                                            All Delivery Challans
+                                            <ChevronDown className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start">
+                                        <DropdownMenuItem data-testid="filter-all">All Delivery Challans</DropdownMenuItem>
+                                        <DropdownMenuItem data-testid="filter-draft">Draft</DropdownMenuItem>
+                                        <DropdownMenuItem data-testid="filter-open">Open</DropdownMenuItem>
+                                        <DropdownMenuItem data-testid="filter-delivered">Delivered</DropdownMenuItem>
+                                        <DropdownMenuItem data-testid="filter-invoiced">Invoiced</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
 
-                    <div className="flex items-center gap-2">
-                        <Link href="/delivery-challans/new">
-                            <Button className="gap-1" data-testid="button-new-challan">
-                                <Plus className="h-4 w-4" />
-                                New
-                            </Button>
-                        </Link>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon" data-testid="button-more-options">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem data-testid="menu-import">Import Challans</DropdownMenuItem>
-                                <DropdownMenuItem data-testid="menu-export">Export Challans</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem data-testid="menu-preferences">Preferences</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 px-4 py-2 border-b border-border/40">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search challans..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-8 h-9"
-                            data-testid="input-search-challans"
-                        />
-                    </div>
-                    <Button variant="outline" size="sm" className="gap-1" data-testid="button-filter">
-                        <Filter className="h-4 w-4" />
-                        Filters
-                    </Button>
-                </div>
-                {selectedChallan && (
-                    <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
-                        <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} />
-                    </div>
-                )}
-
-                <div className="flex-1 overflow-hidden">
-                    <ScrollArea className="h-full">
-                        <table className="w-full">
-                            <thead className="bg-muted/30 sticky top-0">
-                                <tr className="text-left text-xs uppercase text-muted-foreground">
-                                    <th className="p-3 w-10">
-                                        <Checkbox
-                                            checked={selectedChallans.length === filteredChallans.length && filteredChallans.length > 0}
-                                            onCheckedChange={toggleSelectAll}
-                                            data-testid="checkbox-select-all"
-                                        />
-                                    </th>
-                                    <th className="p-3">Date</th>
-                                    <th className="p-3">Delivery Challan#</th>
-                                    <th className="p-3">Reference Number</th>
-                                    <th className="p-3">Customer Name</th>
-                                    <th className="p-3">Status</th>
-                                    <th className="p-3 text-right">Amount</th>
-                                    <th className="p-3 w-10"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={9} className="p-8 text-center text-muted-foreground">
-                                            Loading...
-                                        </td>
-                                    </tr>
-                                ) : filteredChallans.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={9} className="p-8 text-center text-muted-foreground">
-                                            No delivery challans found
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    paginatedItems.map((challan) => (
-                                        <tr
-                                            key={challan.id}
-                                            className={`border-b border-border/40 hover-elevate cursor-pointer ${selectedChallan?.id === challan.id ? 'bg-primary/5' : ''}`}
-                                            onClick={() => handleSelectChallan(challan)}
-                                            data-testid={`row-challan-${challan.id}`}
-                                        >
-                                            <td className="p-3" onClick={(e) => e.stopPropagation()}>
-                                                <Checkbox
-                                                    checked={selectedChallans.includes(challan.id)}
-                                                    onCheckedChange={() => toggleSelectChallan(challan.id)}
-                                                    data-testid={`checkbox-challan-${challan.id}`}
-                                                />
-                                            </td>
-                                            <td className="p-3 text-sm">{formatDate(challan.date)}</td>
-                                            <td className="p-3">
-                                                <span className="text-primary font-medium text-sm" data-testid={`text-challan-number-${challan.id}`}>
-                                                    {challan.challanNumber}
-                                                </span>
-                                            </td>
-                                            <td className="p-3 text-sm text-muted-foreground">
-                                                {challan.referenceNumber || '-'}
-                                            </td>
-                                            <td className="p-3 text-sm font-medium">{challan.customerName}</td>
-                                            <td className="p-3">
-                                                <Badge
-                                                    variant="outline"
-                                                    className={`text-xs ${getStatusColor(challan.status)}`}
-                                                    data-testid={`badge-status-${challan.id}`}
-                                                >
-                                                    {challan.status}
-                                                </Badge>
-                                            </td>
-                                            <td className="p-3 text-right text-sm font-medium">
-                                                {formatCurrency(challan.amount)}
-                                            </td>
-                                            <td className="p-3" onClick={(e) => e.stopPropagation()}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`button-actions-${challan.id}`}>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => setLocation(`/delivery-challans/${challan.id}/edit`)} data-testid={`action-edit-${challan.id}`}>
-                                                            <Pencil className="h-4 w-4 mr-2" />
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => handleConvertToInvoice(challan.id)} data-testid={`action-convert-${challan.id}`}>
-                                                            <ArrowRight className="h-4 w-4 mr-2" />
-                                                            Convert to Invoice
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            className="text-destructive"
-                                                            onClick={() => {
-                                                                setChallanToDelete(challan.id);
-                                                                setDeleteDialogOpen(true);
-                                                            }}
-                                                            data-testid={`action-delete-${challan.id}`}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 mr-2" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                        <TablePagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            totalItems={totalItems}
-                            itemsPerPage={itemsPerPage}
-                            onPageChange={goToPage}
-                        />
-                    </ScrollArea>
-                </div>
-            </div>
-
-            {selectedChallan && (
-                <div className="w-1/2 border-l border-border/60 flex flex-col bg-background">
-                    <div className="flex items-center justify-between gap-2 p-3 border-b border-border/60">
-                        <h2 className="font-semibold text-lg" data-testid="text-selected-challan-number">
-                            {selectedChallan.challanNumber}
-                        </h2>
-                        <div className="flex items-center gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => setLocation(`/delivery-challans/${selectedChallan.id}/edit`)} data-testid="button-edit-detail">
-                                <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" data-testid="button-comment">
-                                <MessageSquare className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={handleCloseDetail} data-testid="button-close-detail">
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 p-3 border-b border-border/60">
-                        <Button variant="outline" size="sm" className="gap-1" onClick={() => setLocation(`/delivery-challans/${selectedChallan.id}/edit`)} data-testid="button-edit-challan">
-                            <Pencil className="h-4 w-4" />
-                            Edit
-                        </Button>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="gap-1" data-testid="button-pdf-print">
-                                    <FileText className="h-4 w-4" />
-                                    PDF/Print
-                                    <ChevronDown className="h-3 w-3" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuItem onClick={handleGeneratePDF} data-testid="action-download-pdf">
-                                    <Download className="h-4 w-4 mr-2" />
-                                    Download PDF
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handlePrint} data-testid="action-print">
-                                    <Printer className="h-4 w-4 mr-2" />
-                                    Print
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                        {!selectedChallan.invoiceStatus && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="gap-1"
-                                onClick={() => handleConvertToInvoice(selectedChallan.id)}
-                                data-testid="button-convert-to-invoice"
-                            >
-                                <ArrowRight className="h-4 w-4" />
-                                Convert to Invoice
-                            </Button>
-                        )}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" data-testid="button-more-actions">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {!selectedChallan.invoiceId && (
-                                    <DropdownMenuItem
-                                        onClick={() => handleConvertToInvoice(selectedChallan.id)}
-                                        className="text-primary font-medium"
-                                        data-testid="action-convert-invoice"
-                                    >
-                                        Convert to Invoice
-                                    </DropdownMenuItem>
-                                )}
-                                {selectedChallan.status === 'DELIVERED' && (
-                                    <DropdownMenuItem
-                                        onClick={() => handleStatusChange(selectedChallan.id, 'OPEN')}
-                                        data-testid="action-revert-open"
-                                    >
-                                        Revert to Open
-                                    </DropdownMenuItem>
-                                )}
-                                {selectedChallan.status === 'OPEN' && (
-                                    <DropdownMenuItem
-                                        onClick={() => handleStatusChange(selectedChallan.id, 'DELIVERED')}
-                                        data-testid="action-mark-delivered"
-                                    >
-                                        Mark as Delivered
-                                    </DropdownMenuItem>
-                                )}
-                                {selectedChallan.status === 'DRAFT' && (
-                                    <DropdownMenuItem
-                                        onClick={() => handleStatusChange(selectedChallan.id, 'OPEN')}
-                                        data-testid="action-mark-open"
-                                    >
-                                        Mark as Open
-                                    </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem data-testid="action-eway-bill">
-                                    Add e-Way Bill Details
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => handleCloneChallan(selectedChallan.id)}
-                                    data-testid="action-clone"
-                                >
-                                    <Copy className="h-4 w-4 mr-2" />
-                                    Clone
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() => {
-                                        setChallanToDelete(selectedChallan.id);
-                                        setDeleteDialogOpen(true);
-                                    }}
-                                    data-testid="action-delete-selected"
-                                >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-
-                    <ScrollArea className="flex-1">
-                        <div className="p-6">
-                            <div className="bg-white dark:bg-slate-900 border border-border/60 rounded-lg shadow-sm overflow-hidden">
-                                <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} isPreview={true} />
+                            <div className="flex items-center gap-2">
+                                <Link href="/delivery-challans/new">
+                                    <Button className="gap-1" data-testid="button-new-challan">
+                                        <Plus className="h-4 w-4" />
+                                        New
+                                    </Button>
+                                </Link>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon" data-testid="button-more-options">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem data-testid="menu-import">Import Challans</DropdownMenuItem>
+                                        <DropdownMenuItem data-testid="menu-export">Export Challans</DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem data-testid="menu-preferences">Preferences</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
 
-                        <div className="px-6 pb-6">
-                            <Tabs value={activeTab} onValueChange={setActiveTab}>
-                                <TabsList className="w-full justify-start">
-                                    <TabsTrigger value="whats-next" data-testid="tab-whats-next">What's Next</TabsTrigger>
-                                    <TabsTrigger value="activity" data-testid="tab-activity">Activity</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="whats-next" className="mt-4">
-                                    <div className="space-y-3">
-                                        <Button variant="outline" className="w-full justify-start gap-2" data-testid="button-send-email">
-                                            <Send className="h-4 w-4" />
-                                            Send Delivery Challan via Email
-                                        </Button>
-                                        {!selectedChallan.invoiceStatus && (
-                                            <Button
-                                                variant="outline"
-                                                className="w-full justify-start gap-2"
-                                                onClick={() => handleConvertToInvoice(selectedChallan.id)}
-                                                data-testid="button-create-invoice"
-                                            >
-                                                <FileText className="h-4 w-4" />
-                                                Create Invoice from Challan
-                                            </Button>
-                                        )}
-                                    </div>
-                                </TabsContent>
-                                <TabsContent value="activity" className="mt-4">
-                                    <div className="space-y-4">
-                                        {selectedChallan.activityLogs?.map((log) => (
-                                            <div key={log.id} className="flex gap-3">
-                                                <div className="mt-1.5">{getActivityIcon(log.action)}</div>
-                                                <div className="flex-1">
-                                                    <p className="text-sm">{log.description}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {formatDateTime(log.timestamp)} by {log.user}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
+                        <div className="flex items-center gap-2 px-4 py-2 border-b border-border/40">
+                            <div className="relative flex-1 max-w-sm">
+                                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search challans..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-8 h-9"
+                                    data-testid="input-search-challans"
+                                />
+                            </div>
+                            <Button variant="outline" size="sm" className="gap-1" data-testid="button-filter">
+                                <Filter className="h-4 w-4" />
+                                Filters
+                            </Button>
                         </div>
-                    </ScrollArea>
-                </div>
-            )}
+                        {selectedChallan && (
+                            <div id="challan-pdf-content" className="fixed" style={{ left: '-9999px', top: 0 }}>
+                                <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} />
+                            </div>
+                        )}
+
+                        <div className="flex-1 overflow-hidden">
+                            <ScrollArea className="h-full">
+                                <table className="w-full">
+                                    <thead className="bg-muted/30 sticky top-0">
+                                        <tr className="text-left text-xs uppercase text-muted-foreground">
+                                            <th className="p-3 w-10">
+                                                <Checkbox
+                                                    checked={selectedChallans.length === filteredChallans.length && filteredChallans.length > 0}
+                                                    onCheckedChange={toggleSelectAll}
+                                                    data-testid="checkbox-select-all"
+                                                />
+                                            </th>
+                                            <th className="p-3">Date</th>
+                                            <th className="p-3">Delivery Challan#</th>
+                                            <th className="p-3">Reference Number</th>
+                                            <th className="p-3">Customer Name</th>
+                                            <th className="p-3">Status</th>
+                                            <th className="p-3 text-right">Amount</th>
+                                            <th className="p-3 w-10"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {loading ? (
+                                            <tr>
+                                                <td colSpan={9} className="p-8 text-center text-muted-foreground">
+                                                    Loading...
+                                                </td>
+                                            </tr>
+                                        ) : filteredChallans.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={9} className="p-8 text-center text-muted-foreground">
+                                                    No delivery challans found
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            paginatedItems.map((challan) => (
+                                                <tr
+                                                    key={challan.id}
+                                                    className={`border-b border-border/40 hover-elevate cursor-pointer ${selectedChallan?.id === challan.id ? 'bg-primary/5' : ''}`}
+                                                    onClick={() => handleSelectChallan(challan)}
+                                                    data-testid={`row-challan-${challan.id}`}
+                                                >
+                                                    <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                                        <Checkbox
+                                                            checked={selectedChallans.includes(challan.id)}
+                                                            onCheckedChange={() => toggleSelectChallan(challan.id)}
+                                                            data-testid={`checkbox-challan-${challan.id}`}
+                                                        />
+                                                    </td>
+                                                    <td className="p-3 text-sm">{formatDate(challan.date)}</td>
+                                                    <td className="p-3">
+                                                        <span className="text-primary font-medium text-sm" data-testid={`text-challan-number-${challan.id}`}>
+                                                            {challan.challanNumber}
+                                                        </span>
+                                                    </td>
+                                                    <td className="p-3 text-sm text-muted-foreground">
+                                                        {challan.referenceNumber || '-'}
+                                                    </td>
+                                                    <td className="p-3 text-sm font-medium">{challan.customerName}</td>
+                                                    <td className="p-3">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={`text-xs ${getStatusColor(challan.status)}`}
+                                                            data-testid={`badge-status-${challan.id}`}
+                                                        >
+                                                            {challan.status}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="p-3 text-right text-sm font-medium">
+                                                        {formatCurrency(challan.amount)}
+                                                    </td>
+                                                    <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`button-actions-${challan.id}`}>
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem onClick={() => setLocation(`/delivery-challans/${challan.id}/edit`)} data-testid={`action-edit-${challan.id}`}>
+                                                                    <Pencil className="h-4 w-4 mr-2" />
+                                                                    Edit
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleConvertToInvoice(challan.id)} data-testid={`action-convert-${challan.id}`}>
+                                                                    <ArrowRight className="h-4 w-4 mr-2" />
+                                                                    Convert to Invoice
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    className="text-destructive"
+                                                                    onClick={() => {
+                                                                        setChallanToDelete(challan.id);
+                                                                        setDeleteDialogOpen(true);
+                                                                    }}
+                                                                    data-testid={`action-delete-${challan.id}`}
+                                                                >
+                                                                    <Trash2 className="h-4 w-4 mr-2" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                                <TablePagination
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    totalItems={totalItems}
+                                    itemsPerPage={itemsPerPage}
+                                    onPageChange={goToPage}
+                                />
+                            </ScrollArea>
+                        </div>
+                    </div>
+                </ResizablePanel>
+
+                {selectedChallan && (
+                    <>
+                        <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+                        <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+                            <div className="w-full border-l border-border/60 flex flex-col bg-background h-full">
+                                <div className="flex items-center justify-between gap-2 p-3 border-b border-border/60">
+                                    <h2 className="font-semibold text-lg" data-testid="text-selected-challan-number">
+                                        {selectedChallan.challanNumber}
+                                    </h2>
+                                    <div className="flex items-center gap-1">
+                                        <Button variant="ghost" size="icon" onClick={() => setLocation(`/delivery-challans/${selectedChallan.id}/edit`)} data-testid="button-edit-detail">
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" data-testid="button-comment">
+                                            <MessageSquare className="h-4 w-4" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" onClick={handleCloseDetail} data-testid="button-close-detail">
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 p-3 border-b border-border/60">
+                                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setLocation(`/delivery-challans/${selectedChallan.id}/edit`)} data-testid="button-edit-challan">
+                                        <Pencil className="h-4 w-4" />
+                                        Edit
+                                    </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="sm" className="gap-1" data-testid="button-pdf-print">
+                                                <FileText className="h-4 w-4" />
+                                                PDF/Print
+                                                <ChevronDown className="h-3 w-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={handleGeneratePDF} data-testid="action-download-pdf">
+                                                <Download className="h-4 w-4 mr-2" />
+                                                Download PDF
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handlePrint} data-testid="action-print">
+                                                <Printer className="h-4 w-4 mr-2" />
+                                                Print
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    {!selectedChallan.invoiceStatus && (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-1"
+                                            onClick={() => handleConvertToInvoice(selectedChallan.id)}
+                                            data-testid="button-convert-to-invoice"
+                                        >
+                                            <ArrowRight className="h-4 w-4" />
+                                            Convert to Invoice
+                                        </Button>
+                                    )}
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="sm" data-testid="button-more-actions">
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {!selectedChallan.invoiceId && (
+                                                <DropdownMenuItem
+                                                    onClick={() => handleConvertToInvoice(selectedChallan.id)}
+                                                    className="text-primary font-medium"
+                                                    data-testid="action-convert-invoice"
+                                                >
+                                                    Convert to Invoice
+                                                </DropdownMenuItem>
+                                            )}
+                                            {selectedChallan.status === 'DELIVERED' && (
+                                                <DropdownMenuItem
+                                                    onClick={() => handleStatusChange(selectedChallan.id, 'OPEN')}
+                                                    data-testid="action-revert-open"
+                                                >
+                                                    Revert to Open
+                                                </DropdownMenuItem>
+                                            )}
+                                            {selectedChallan.status === 'OPEN' && (
+                                                <DropdownMenuItem
+                                                    onClick={() => handleStatusChange(selectedChallan.id, 'DELIVERED')}
+                                                    data-testid="action-mark-delivered"
+                                                >
+                                                    Mark as Delivered
+                                                </DropdownMenuItem>
+                                            )}
+                                            {selectedChallan.status === 'DRAFT' && (
+                                                <DropdownMenuItem
+                                                    onClick={() => handleStatusChange(selectedChallan.id, 'OPEN')}
+                                                    data-testid="action-mark-open"
+                                                >
+                                                    Mark as Open
+                                                </DropdownMenuItem>
+                                            )}
+                                            <DropdownMenuItem data-testid="action-eway-bill">
+                                                Add e-Way Bill Details
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={() => handleCloneChallan(selectedChallan.id)}
+                                                data-testid="action-clone"
+                                            >
+                                                <Copy className="h-4 w-4 mr-2" />
+                                                Clone
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                className="text-destructive"
+                                                onClick={() => {
+                                                    setChallanToDelete(selectedChallan.id);
+                                                    setDeleteDialogOpen(true);
+                                                }}
+                                                data-testid="action-delete-selected"
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+
+                                <ScrollArea className="flex-1">
+                                    <div className="p-6">
+                                        <div className="bg-white dark:bg-slate-900 border border-border/60 rounded-lg shadow-sm overflow-hidden">
+                                            <UnifiedDeliveryChallan challan={selectedChallan} branding={branding} organization={currentOrganization || undefined} isPreview={true} />
+                                        </div>
+                                    </div>
+
+                                    <div className="px-6 pb-6">
+                                        <Tabs value={activeTab} onValueChange={setActiveTab}>
+                                            <TabsList className="w-full justify-start">
+                                                <TabsTrigger value="whats-next" data-testid="tab-whats-next">What's Next</TabsTrigger>
+                                                <TabsTrigger value="activity" data-testid="tab-activity">Activity</TabsTrigger>
+                                            </TabsList>
+                                            <TabsContent value="whats-next" className="mt-4">
+                                                <div className="space-y-3">
+                                                    <Button variant="outline" className="w-full justify-start gap-2" data-testid="button-send-email">
+                                                        <Send className="h-4 w-4" />
+                                                        Send Delivery Challan via Email
+                                                    </Button>
+                                                    {!selectedChallan.invoiceStatus && (
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full justify-start gap-2"
+                                                            onClick={() => handleConvertToInvoice(selectedChallan.id)}
+                                                            data-testid="button-create-invoice"
+                                                        >
+                                                            <FileText className="h-4 w-4" />
+                                                            Create Invoice from Challan
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TabsContent>
+                                            <TabsContent value="activity" className="mt-4">
+                                                <div className="space-y-4">
+                                                    {selectedChallan.activityLogs?.map((log) => (
+                                                        <div key={log.id} className="flex gap-3">
+                                                            <div className="mt-1.5">{getActivityIcon(log.action)}</div>
+                                                            <div className="flex-1">
+                                                                <p className="text-sm">{log.description}</p>
+                                                                <p className="text-xs text-muted-foreground">
+                                                                    {formatDateTime(log.timestamp)} by {log.user}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </TabsContent>
+                                        </Tabs>
+                                    </div>
+                                </ScrollArea>
+                            </div>
+                        </ResizablePanel>
+                    </>
+                )}
+            </ResizablePanelGroup>
 
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>

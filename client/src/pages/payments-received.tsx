@@ -20,6 +20,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -1167,149 +1172,162 @@ export default function PaymentsReceived() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedPayment ? 'flex-1 min-w-[400px]' : 'flex-1'}`}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900">All Received Payments</h1>
-            <ChevronDown className="h-4 w-4 text-slate-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                setEditPayment(null);
-                setCreateDialogOpen(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-payment"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" /> Export
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={fetchPayments}>
-                  Refresh List
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {!selectedPayment && (
-          <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search in Payments Received ( / )"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-                data-testid="input-search"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading payments...</div>
-          ) : filteredPayments.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
-              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <FileText className="h-8 w-8 text-slate-400" />
+    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="payments-received-layout">
+        <ResizablePanel
+          defaultSize={selectedPayment ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-slate-900">All Received Payments</h1>
+                <ChevronDown className="h-4 w-4 text-slate-500" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No payments found</h3>
-              <p className="text-slate-500 mb-4">
-                {searchTerm ? 'Try adjusting your search criteria' : 'Record your first payment to get started'}
-              </p>
-              {!searchTerm && (
-                <Button onClick={() => setCreateDialogOpen(true)} className="gap-2" data-testid="button-create-first-payment">
-                  <Plus className="h-4 w-4" /> Record Payment
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => {
+                    setEditPayment(null);
+                    setCreateDialogOpen(true);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                  data-testid="button-new-payment"
+                >
+                  <Plus className="h-4 w-4" /> New
                 </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Download className="mr-2 h-4 w-4" /> Export
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={fetchPayments}>
+                      Refresh List
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            {!selectedPayment && (
+              <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200 bg-white">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Search in Payments Received ( / )"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                    data-testid="input-search"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-auto">
+              {loading ? (
+                <div className="p-8 text-center text-slate-500">Loading payments...</div>
+              ) : filteredPayments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                  <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <FileText className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">No payments found</h3>
+                  <p className="text-slate-500 mb-4">
+                    {searchTerm ? 'Try adjusting your search criteria' : 'Record your first payment to get started'}
+                  </p>
+                  {!searchTerm && (
+                    <Button onClick={() => setCreateDialogOpen(true)} className="gap-2" data-testid="button-create-first-payment">
+                      <Plus className="h-4 w-4" /> Record Payment
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-slate-50">
+                        <TableHead className="w-10"></TableHead>
+                        <TableHead className="text-xs">DATE</TableHead>
+                        <TableHead className="text-xs">PAYMENT #</TableHead>
+                        <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
+                        <TableHead className="text-xs">CUSTOMER NAME</TableHead>
+                        <TableHead className="text-xs">INVOICE#</TableHead>
+                        <TableHead className="text-xs">MODE</TableHead>
+                        <TableHead className="text-xs text-right">AMOUNT</TableHead>
+                        <TableHead className="text-xs text-right">UNUSED AMOUNT</TableHead>
+                        <TableHead className="text-xs">STATUS</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedItems.map((payment) => (
+                        <TableRow
+                          key={payment.id}
+                          onClick={() => handlePaymentClick(payment)}
+                          className={`cursor-pointer hover-elevate ${selectedPayment?.id === payment.id ? 'bg-blue-50' : ''}`}
+                          data-testid={`row-payment-${payment.id}`}
+                        >
+                          <TableCell onClick={(e) => e.stopPropagation()}>
+                            <Checkbox
+                              checked={selectedPayments.includes(payment.id)}
+                              onClick={(e) => toggleSelectPayment(payment.id, e)}
+                            />
+                          </TableCell>
+                          <TableCell className="text-sm">{formatDate(payment.date)}</TableCell>
+                          <TableCell className="text-sm text-blue-600 font-medium">{payment.paymentNumber}</TableCell>
+                          <TableCell className="text-sm">{payment.referenceNumber || '-'}</TableCell>
+                          <TableCell className="text-sm">{payment.customerName}</TableCell>
+                          <TableCell className="text-sm">
+                            {payment.invoices?.length > 0
+                              ? payment.invoices.map((inv: any) => inv.invoiceNumber).join(', ')
+                              : '-'
+                            }
+                          </TableCell>
+                          <TableCell className="text-sm">{payment.mode}</TableCell>
+                          <TableCell className="text-sm text-right">{formatCurrency(payment.amount)}</TableCell>
+                          <TableCell className="text-sm text-right">{formatCurrency(payment.unusedAmount)}</TableCell>
+                          <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </>
               )}
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-50">
-                    <TableHead className="w-10"></TableHead>
-                    <TableHead className="text-xs">DATE</TableHead>
-                    <TableHead className="text-xs">PAYMENT #</TableHead>
-                    <TableHead className="text-xs">REFERENCE NUMBER</TableHead>
-                    <TableHead className="text-xs">CUSTOMER NAME</TableHead>
-                    <TableHead className="text-xs">INVOICE#</TableHead>
-                    <TableHead className="text-xs">MODE</TableHead>
-                    <TableHead className="text-xs text-right">AMOUNT</TableHead>
-                    <TableHead className="text-xs text-right">UNUSED AMOUNT</TableHead>
-                    <TableHead className="text-xs">STATUS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedItems.map((payment) => (
-                    <TableRow
-                      key={payment.id}
-                      onClick={() => handlePaymentClick(payment)}
-                      className={`cursor-pointer hover-elevate ${selectedPayment?.id === payment.id ? 'bg-blue-50' : ''}`}
-                      data-testid={`row-payment-${payment.id}`}
-                    >
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={selectedPayments.includes(payment.id)}
-                          onClick={(e) => toggleSelectPayment(payment.id, e)}
-                        />
-                      </TableCell>
-                      <TableCell className="text-sm">{formatDate(payment.date)}</TableCell>
-                      <TableCell className="text-sm text-blue-600 font-medium">{payment.paymentNumber}</TableCell>
-                      <TableCell className="text-sm">{payment.referenceNumber || '-'}</TableCell>
-                      <TableCell className="text-sm">{payment.customerName}</TableCell>
-                      <TableCell className="text-sm">
-                        {payment.invoices?.length > 0
-                          ? payment.invoices.map((inv: any) => inv.invoiceNumber).join(', ')
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell className="text-sm">{payment.mode}</TableCell>
-                      <TableCell className="text-sm text-right">{formatCurrency(payment.amount)}</TableCell>
-                      <TableCell className="text-sm text-right">{formatCurrency(payment.unusedAmount)}</TableCell>
-                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={goToPage}
-              />
-            </>
-          )}
-        </div>
-      </div>
+          </div>
+        </ResizablePanel>
 
-      {selectedPayment && (
-        <div className="w-full max-w-[600px] lg:w-[600px] flex-shrink-0 border-l border-slate-200">
-          <PaymentDetailPanel
-            payment={selectedPayment}
-            branding={branding}
-            organization={currentOrganization || undefined}
-            onClose={handleClosePanel}
-            onEdit={handleEditPayment}
-            onDelete={() => handleDelete(selectedPayment.id)}
-            onRefund={handleRefund}
-          />
-        </div>
-      )}
+        {selectedPayment && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <div className="h-full flex flex-col overflow-hidden bg-white border-l border-slate-200">
+                <PaymentDetailPanel
+                  payment={selectedPayment}
+                  branding={branding}
+                  organization={currentOrganization || undefined}
+                  onClose={handleClosePanel}
+                  onEdit={handleEditPayment}
+                  onDelete={() => handleDelete(selectedPayment.id)}
+                  onRefund={handleRefund}
+                />
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <PaymentCreateDialog
         open={createDialogOpen}

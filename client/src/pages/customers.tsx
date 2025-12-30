@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  Pencil, 
-  Trash2, 
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
   ChevronDown,
   ChevronRight,
   X,
@@ -45,6 +45,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -207,7 +212,7 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
-  
+
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [transactions, setTransactions] = useState<Record<string, Transaction[]>>({
@@ -225,7 +230,7 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
   });
   const [mails, setMails] = useState<SystemMail[]>([]);
   const [activities, setActivities] = useState<ActivityItem[]>([]);
-  
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     invoices: true,
     customerPayments: true,
@@ -239,7 +244,7 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
     bills: false,
     creditNotes: false
   });
-  
+
   const [statementPeriod, setStatementPeriod] = useState("this-month");
   const [statementFilter, setStatementFilter] = useState("all");
 
@@ -255,7 +260,7 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
         fetch(`/api/customers/${customer.id}/mails`),
         fetch(`/api/customers/${customer.id}/activities`)
       ]);
-      
+
       if (commentsRes.ok) {
         const data = await commentsRes.json();
         setComments(data.data || []);
@@ -311,10 +316,10 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
       expense: `/expenses?customerId=${customer.id}`,
     };
     const unavailableTypes = ["recurring-invoice", "journal", "project"];
-    
+
     if (unavailableTypes.includes(type)) {
-      toast({ 
-        title: "Feature coming soon", 
+      toast({
+        title: "Feature coming soon",
         description: "This feature is not yet available. Please check back later.",
       });
       return;
@@ -427,36 +432,36 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
         <div className="flex items-center px-6 border-b border-slate-200 dark:border-slate-700">
           <TabsList className="h-auto p-0 bg-transparent">
-            <TabsTrigger 
-              value="overview" 
+            <TabsTrigger
+              value="overview"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent px-4 py-3"
               data-testid="tab-overview"
             >
               Overview
             </TabsTrigger>
-            <TabsTrigger 
-              value="comments" 
+            <TabsTrigger
+              value="comments"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent px-4 py-3"
               data-testid="tab-comments"
             >
               Comments
             </TabsTrigger>
-            <TabsTrigger 
-              value="transactions" 
+            <TabsTrigger
+              value="transactions"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent px-4 py-3"
               data-testid="tab-transactions"
             >
               Transactions
             </TabsTrigger>
-            <TabsTrigger 
-              value="mails" 
+            <TabsTrigger
+              value="mails"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent px-4 py-3"
               data-testid="tab-mails"
             >
               Mails
             </TabsTrigger>
-            <TabsTrigger 
-              value="statement" 
+            <TabsTrigger
+              value="statement"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent px-4 py-3"
               data-testid="tab-statement"
             >
@@ -703,9 +708,9 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
                 data-testid="input-comment"
               />
               <div className="p-2 border-t border-slate-200 dark:border-slate-700">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleAddComment}
                   disabled={!newComment.trim()}
                   data-testid="button-add-comment"
@@ -776,9 +781,9 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
                           Status: All
                           <ChevronDown className="h-3 w-3" />
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           className="text-blue-600 gap-1"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1183,7 +1188,7 @@ export default function CustomersPage() {
 
   const applyFilter = (customerList: CustomerListItem[]) => {
     let filtered = customerList;
-    
+
     switch (activeFilter) {
       case "active":
         filtered = customerList.filter(c => c.status === "active" || !c.status);
@@ -1210,7 +1215,7 @@ export default function CustomersPage() {
           if (c.email) emailCounts[c.email] = (emailCounts[c.email] || 0) + 1;
           if (c.phone) phoneCounts[c.phone] = (phoneCounts[c.phone] || 0) + 1;
         });
-        filtered = customerList.filter(c => 
+        filtered = customerList.filter(c =>
           (c.email && emailCounts[c.email] > 1) ||
           (c.phone && phoneCounts[c.phone] > 1)
         );
@@ -1221,11 +1226,11 @@ export default function CustomersPage() {
       default:
         filtered = customerList;
     }
-    
+
     return filtered;
   };
 
-  const filteredCustomers = applyFilter(customers).filter(customer => 
+  const filteredCustomers = applyFilter(customers).filter(customer =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -1233,190 +1238,200 @@ export default function CustomersPage() {
   const { currentPage, totalPages, totalItems, itemsPerPage, paginatedItems, goToPage } = usePagination(filteredCustomers, 10);
 
   return (
-    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300">
-      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${selectedCustomer ? 'w-80' : 'w-full'}`}>
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <DropdownMenu open={filterDropdownOpen} onOpenChange={setFilterDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  className="gap-1.5 text-xl font-semibold text-slate-900 dark:text-white p-0 h-auto"
-                  data-testid="button-filter-dropdown"
-                >
-                  {getFilterLabel()}
-                  <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${filterDropdownOpen ? 'rotate-180' : ''}`} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                {CUSTOMER_FILTERS.map((filter) => (
-                  <DropdownMenuItem 
-                    key={filter.id}
-                    className={`flex items-center justify-between ${activeFilter === filter.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                    onClick={() => {
-                      setActiveFilter(filter.id);
-                      setFilterDropdownOpen(false);
-                    }}
-                    data-testid={`filter-${filter.id}`}
-                  >
-                    <span className={activeFilter === filter.id ? 'font-medium text-blue-600' : ''}>
-                      {filter.label}
-                    </span>
-                    <button
-                      className="ml-2 text-slate-400 hover:text-yellow-500"
-                      onClick={(e) => toggleFavorite(filter.id, e)}
-                      data-testid={`favorite-${filter.id}`}
+    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="customers-layout">
+        <ResizablePanel
+          defaultSize={selectedCustomer ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <DropdownMenu open={filterDropdownOpen} onOpenChange={setFilterDropdownOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="gap-1.5 text-xl font-semibold text-slate-900 dark:text-white p-0 h-auto"
+                      data-testid="button-filter-dropdown"
                     >
-                      {favoriteFilters.includes(filter.id) ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
-                          <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                        </svg>
-                      )}
-                    </button>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-blue-600" data-testid="filter-new-custom-view">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Custom View
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              onClick={() => setLocation("/customers/new")} 
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-customer"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading customers...</div>
-          ) : filteredCustomers.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              <p>No customers found.</p>
-              <Button 
-                onClick={() => setLocation("/customers/new")} 
-                className="mt-4 bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Create your first customer
-              </Button>
+                      {getFilterLabel()}
+                      <ChevronDown className={`h-4 w-4 text-slate-500 transition-transform ${filterDropdownOpen ? 'rotate-180' : ''}`} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64">
+                    {CUSTOMER_FILTERS.map((filter) => (
+                      <DropdownMenuItem
+                        key={filter.id}
+                        className={`flex items-center justify-between ${activeFilter === filter.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                        onClick={() => {
+                          setActiveFilter(filter.id);
+                          setFilterDropdownOpen(false);
+                        }}
+                        data-testid={`filter-${filter.id}`}
+                      >
+                        <span className={activeFilter === filter.id ? 'font-medium text-blue-600' : ''}>
+                          {filter.label}
+                        </span>
+                        <button
+                          className="ml-2 text-slate-400 hover:text-yellow-500"
+                          onClick={(e) => toggleFavorite(filter.id, e)}
+                          data-testid={`favorite-${filter.id}`}
+                        >
+                          {favoriteFilters.includes(filter.id) ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
+                              <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                            </svg>
+                          )}
+                        </button>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-blue-600" data-testid="filter-new-custom-view">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Custom View
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setLocation("/customers/new")}
+                  className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                  data-testid="button-new-customer"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-9 w-9">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          ) : (
-            <>
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
-                <tr className="border-b border-slate-200 dark:border-slate-700">
-                  <th className="w-10 px-3 py-3 text-left">
-                    <Checkbox 
-                      checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (selectedCustomers.length === filteredCustomers.length) {
-                          setSelectedCustomers([]);
-                        } else {
-                          setSelectedCustomers(filteredCustomers.map(c => c.id));
-                        }
-                      }}
-                    />
-                  </th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Name</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Work Phone</th>
-                  <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Place of Supply</th>
-                  <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Receivables (BCY)</th>
-                  <th className="w-10 px-3 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
-                {paginatedItems.map((customer) => (
-                  <tr 
-                    key={customer.id} 
-                    className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${
-                      selectedCustomer?.id === customer.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                    }`}
-                    onClick={() => handleCustomerClick(customer)}
-                    data-testid={`row-customer-${customer.id}`}
-                  >
-                    <td className="px-3 py-3">
-                      <Checkbox 
-                        checked={selectedCustomers.includes(customer.id)}
-                        onClick={(e) => toggleSelectCustomer(customer.id, e)}
-                      />
-                    </td>
-                    <td className="px-3 py-3">
-                      <span className="font-medium text-blue-600 dark:text-blue-400">{customer.name}</span>
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {customer.companyName || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {customer.email || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {customer.phone || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
-                      {customer.placeOfSupply || '-'}
-                    </td>
-                    <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
-                      {formatCurrency(customer.outstandingReceivables || 0)}
-                    </td>
-                    <td className="px-3 py-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Search className="h-4 w-4 text-slate-400" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCustomerClick(customer); }}>
-                            View Details
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-            </>
-          )}
-        </div>
-      </div>
 
-      {selectedCustomer && (
-        <div className="flex-1 min-w-0">
-          <CustomerDetailPanel
-            customer={selectedCustomer}
-            onClose={handleClosePanel}
-            onEdit={handleEditCustomer}
-            onClone={handleClone}
-            onToggleStatus={handleToggleStatus}
-            onDelete={handleDeleteClick}
-          />
-        </div>
-      )}
+            <div className="flex-1 overflow-auto">
+              {loading ? (
+                <div className="p-8 text-center text-slate-500">Loading customers...</div>
+              ) : filteredCustomers.length === 0 ? (
+                <div className="p-8 text-center text-slate-500">
+                  <p>No customers found.</p>
+                  <Button
+                    onClick={() => setLocation("/customers/new")}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Create your first customer
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
+                      <tr className="border-b border-slate-200 dark:border-slate-700">
+                        <th className="w-10 px-3 py-3 text-left">
+                          <Checkbox
+                            checked={selectedCustomers.length === filteredCustomers.length && filteredCustomers.length > 0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (selectedCustomers.length === filteredCustomers.length) {
+                                setSelectedCustomers([]);
+                              } else {
+                                setSelectedCustomers(filteredCustomers.map(c => c.id));
+                              }
+                            }}
+                          />
+                        </th>
+                        <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                        <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Name</th>
+                        <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</th>
+                        <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Work Phone</th>
+                        <th className="px-3 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Place of Supply</th>
+                        <th className="px-3 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Receivables (BCY)</th>
+                        <th className="w-10 px-3 py-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                      {paginatedItems.map((customer) => (
+                        <tr
+                          key={customer.id}
+                          className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedCustomer?.id === customer.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                            }`}
+                          onClick={() => handleCustomerClick(customer)}
+                          data-testid={`row-customer-${customer.id}`}
+                        >
+                          <td className="px-3 py-3">
+                            <Checkbox
+                              checked={selectedCustomers.includes(customer.id)}
+                              onClick={(e) => toggleSelectCustomer(customer.id, e)}
+                            />
+                          </td>
+                          <td className="px-3 py-3">
+                            <span className="font-medium text-blue-600 dark:text-blue-400">{customer.name}</span>
+                          </td>
+                          <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                            {customer.companyName || '-'}
+                          </td>
+                          <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                            {customer.email || '-'}
+                          </td>
+                          <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                            {customer.phone || '-'}
+                          </td>
+                          <td className="px-3 py-3 text-slate-600 dark:text-slate-400">
+                            {customer.placeOfSupply || '-'}
+                          </td>
+                          <td className="px-3 py-3 text-right text-slate-600 dark:text-slate-400">
+                            {formatCurrency(customer.outstandingReceivables || 0)}
+                          </td>
+                          <td className="px-3 py-3">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <Search className="h-4 w-4 text-slate-400" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCustomerClick(customer); }}>
+                                  View Details
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </ResizablePanel>
+
+        {selectedCustomer && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <CustomerDetailPanel
+                customer={selectedCustomer}
+                onClose={handleClosePanel}
+                onEdit={handleEditCustomer}
+                onClone={handleClone}
+                onToggleStatus={handleToggleStatus}
+                onDelete={handleDeleteClick}
+              />
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

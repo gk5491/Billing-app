@@ -27,6 +27,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -142,7 +147,7 @@ const getStatusBadgeStyles = (status: string) => {
   return 'bg-slate-100 text-slate-600 border-slate-200';
 };
 
-function CreditNotePdfPreview({ creditNote, branding }: { creditNote: CreditNoteDetail; branding?: any }) {
+function CreditNotePdfPreview({ creditNote, branding, organization }: { creditNote: CreditNoteDetail; branding?: any; organization?: any }) {
   return (
     <div id="pdf-content" className="bg-white p-8 text-black min-h-full" style={{ fontFamily: 'Arial, sans-serif' }}>
       <div className="max-w-3xl mx-auto">
@@ -153,7 +158,7 @@ function CreditNotePdfPreview({ creditNote, branding }: { creditNote: CreditNote
             </div>
           )}
           <SalesPDFHeader
-            organization={currentOrganization || undefined}
+            organization={organization}
             logo={branding?.logo}
             documentTitle="CREDIT NOTE"
             documentNumber={creditNote.creditNoteNumber}
@@ -274,12 +279,13 @@ function CreditNotePdfPreview({ creditNote, branding }: { creditNote: CreditNote
 interface CreditNoteDetailPanelProps {
   creditNote: CreditNoteDetail;
   branding?: any;
+  organization?: any;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete }: CreditNoteDetailPanelProps) {
+function CreditNoteDetailPanel({ creditNote, branding, organization, onClose, onEdit, onDelete }: CreditNoteDetailPanelProps) {
   const [showPdfPreview, setShowPdfPreview] = useState(true);
 
   const handleDownloadPDF = async () => {
@@ -505,7 +511,7 @@ function CreditNoteDetailPanel({ creditNote, branding, onClose, onEdit, onDelete
       <div className="flex-1 overflow-auto">
         <div className="bg-slate-100 dark:bg-slate-800 p-4">
           <div className="bg-white rounded-md shadow-sm p-2">
-            <CreditNotePdfPreview creditNote={creditNote} branding={branding} />
+            <CreditNotePdfPreview creditNote={creditNote} branding={branding} organization={organization} />
           </div>
         </div>
 
@@ -674,126 +680,140 @@ export default function CreditNotes() {
   };
 
   return (
-    <div className="h-full flex">
-      <div className={`flex-1 flex flex-col min-w-0 ${selectedCreditNote ? 'hidden lg:flex lg:w-1/2' : ''}`}>
-        <div className="flex items-center justify-between gap-4 p-4 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="gap-2 text-lg font-semibold" data-testid="dropdown-filter">
-                  All Credit Notes
-                  <ChevronDown className="h-4 w-4" />
+    <div className="h-full flex w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="credit-notes-layout">
+        <ResizablePanel
+          defaultSize={selectedCreditNote ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between gap-4 p-4 border-b border-slate-200 dark:border-slate-700 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="gap-2 text-lg font-semibold" data-testid="dropdown-filter">
+                      All Credit Notes
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem onClick={() => setActiveFilter("all")}>All Credit Notes</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setActiveFilter("open")}>Open</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setActiveFilter("closed")}>Closed</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setActiveFilter("void")}>Void</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button onClick={() => setLocation('/credit-notes/create')} className="gap-2" data-testid="button-new-credit-note">
+                  <Plus className="h-4 w-4" /> New
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem onClick={() => setActiveFilter("all")}>All Credit Notes</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("open")}>Open</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("closed")}>Closed</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setActiveFilter("void")}>Void</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => setLocation('/credit-notes/create')} className="gap-2" data-testid="button-new-credit-note">
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <Button variant="ghost" size="icon" data-testid="button-more-actions">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+                <Button variant="ghost" size="icon" data-testid="button-more-actions">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
 
-        <div className="overflow-auto flex-1">
-          <table className="w-full">
-            <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0">
-              <tr className="text-left text-xs font-medium text-slate-500 uppercase">
-                <th className="px-4 py-3 w-10">
-                  <Checkbox
-                    checked={selectedIds.size === filteredCreditNotes.length && filteredCreditNotes.length > 0}
-                    onCheckedChange={toggleSelectAll}
-                    data-testid="checkbox-select-all"
-                  />
-                </th>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Credit Note#</th>
-                <th className="px-4 py-3">Reference Number</th>
-                <th className="px-4 py-3">Customer Name</th>
-                <th className="px-4 py-3">Invoice#</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Amount</th>
-                <th className="px-4 py-3 text-right">Balance</th>
-                <th className="px-4 py-3 w-10">
-                  <Search className="h-4 w-4 text-slate-400" />
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-slate-500">Loading...</td>
-                </tr>
-              ) : filteredCreditNotes.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-8 text-center text-slate-500">No credit notes found</td>
-                </tr>
-              ) : (
-                paginatedItems.map((cn) => (
-                  <tr
-                    key={cn.id}
-                    className={`hover-elevate cursor-pointer ${selectedCreditNote?.id === cn.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                    onClick={() => fetchCreditNoteDetail(cn.id)}
-                    data-testid={`row-credit-note-${cn.id}`}
-                  >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+            <div className="overflow-auto flex-1">
+              <table className="w-full">
+                <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0">
+                  <tr className="text-left text-xs font-medium text-slate-500 uppercase">
+                    <th className="px-4 py-3 w-10">
                       <Checkbox
-                        checked={selectedIds.has(cn.id)}
-                        onCheckedChange={() => toggleSelect(cn.id)}
+                        checked={selectedIds.size === filteredCreditNotes.length && filteredCreditNotes.length > 0}
+                        onCheckedChange={toggleSelectAll}
+                        data-testid="checkbox-select-all"
                       />
-                    </td>
-                    <td className="px-4 py-3 text-sm">{formatDate(cn.date)}</td>
-                    <td className="px-4 py-3 text-sm text-blue-600 font-medium">{cn.creditNoteNumber}</td>
-                    <td className="px-4 py-3 text-sm">{cn.referenceNumber || '-'}</td>
-                    <td className="px-4 py-3 text-sm">{cn.customerName}</td>
-                    <td className="px-4 py-3 text-sm">{cn.invoiceNumber || '-'}</td>
-                    <td className="px-4 py-3">
-                      <Badge className={getStatusBadgeStyles(cn.status)}>
-                        {cn.status}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right">{formatCurrency(cn.total)}</td>
-                    <td className="px-4 py-3 text-sm text-right">{formatCurrency(cn.creditsRemaining)}</td>
-                    <td className="px-4 py-3"></td>
+                    </th>
+                    <th className="px-4 py-3">Date</th>
+                    <th className="px-4 py-3">Credit Note#</th>
+                    <th className="px-4 py-3">Reference Number</th>
+                    <th className="px-4 py-3">Customer Name</th>
+                    <th className="px-4 py-3">Invoice#</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-4 py-3 text-right">Balance</th>
+                    <th className="px-4 py-3 w-10">
+                      <Search className="h-4 w-4 text-slate-400" />
+                    </th>
                   </tr>
-                ))
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={10} className="px-4 py-8 text-center text-slate-500">Loading...</td>
+                    </tr>
+                  ) : filteredCreditNotes.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="px-4 py-8 text-center text-slate-500">No credit notes found</td>
+                    </tr>
+                  ) : (
+                    paginatedItems.map((cn) => (
+                      <tr
+                        key={cn.id}
+                        className={`hover-elevate cursor-pointer ${selectedCreditNote?.id === cn.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                        onClick={() => fetchCreditNoteDetail(cn.id)}
+                        data-testid={`row-credit-note-${cn.id}`}
+                      >
+                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedIds.has(cn.id)}
+                            onCheckedChange={() => toggleSelect(cn.id)}
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm">{formatDate(cn.date)}</td>
+                        <td className="px-4 py-3 text-sm text-blue-600 font-medium">{cn.creditNoteNumber}</td>
+                        <td className="px-4 py-3 text-sm">{cn.referenceNumber || '-'}</td>
+                        <td className="px-4 py-3 text-sm">{cn.customerName}</td>
+                        <td className="px-4 py-3 text-sm">{cn.invoiceNumber || '-'}</td>
+                        <td className="px-4 py-3">
+                          <Badge className={getStatusBadgeStyles(cn.status)}>
+                            {cn.status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(cn.total)}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(cn.creditsRemaining)}</td>
+                        <td className="px-4 py-3"></td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+              {filteredCreditNotes.length > 0 && (
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={goToPage}
+                />
               )}
-            </tbody>
-          </table>
-          {filteredCreditNotes.length > 0 && (
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          )}
-        </div>
-      </div>
+            </div>
+          </div>
+        </ResizablePanel>
 
-      {selectedCreditNote && (
-        <div className="w-full lg:w-1/2 border-l border-slate-200 dark:border-slate-700">
-          <CreditNoteDetailPanel
-            creditNote={selectedCreditNote}
-            branding={branding}
-            onClose={() => setSelectedCreditNote(null)}
-            onEdit={() => setLocation(`/credit-notes/${selectedCreditNote.id}/edit`)}
-            onDelete={() => {
-              setCreditNoteToDelete(selectedCreditNote.id);
-              setDeleteDialogOpen(true);
-            }}
-          />
-        </div>
-      )}
+        {selectedCreditNote && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <div className="h-full flex flex-col overflow-hidden bg-white border-l border-slate-200 dark:border-slate-700">
+                <CreditNoteDetailPanel
+                  creditNote={selectedCreditNote}
+                  branding={branding}
+                  organization={currentOrganization}
+                  onClose={() => setSelectedCreditNote(null)}
+                  onEdit={() => setLocation(`/credit-notes/${selectedCreditNote.id}/edit`)}
+                  onDelete={() => {
+                    setCreditNoteToDelete(selectedCreditNote.id);
+                    setDeleteDialogOpen(true);
+                  }}
+                />
+              </div>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>

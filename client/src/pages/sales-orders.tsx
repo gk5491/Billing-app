@@ -35,6 +35,11 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -978,214 +983,225 @@ export default function SalesOrdersPage() {
   const { currentPage, totalPages, totalItems, itemsPerPage, paginatedItems, goToPage } = usePagination(filteredOrders, 10);
 
   return (
-    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 -m-4 lg:-m-6">
-      <div className={`flex-1 flex flex-col overflow-hidden ${selectedOrder ? 'max-w-md' : ''}`}>
-        <div className="flex items-center justify-between p-4 gap-4">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-white">All Sales Orders</h1>
-            <ChevronDown className="h-4 w-4 text-slate-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setLocation("/sales-orders/create")}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5"
-              data-testid="button-new-order"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" data-testid="button-menu">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Sort</DropdownMenuItem>
-                <DropdownMenuItem>Import Sales Orders</DropdownMenuItem>
-                <DropdownMenuItem>Export Sales Orders</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Preferences</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {!selectedOrder && (
-          <div className="px-4 pb-3 flex items-center gap-2 flex-wrap">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search sales orders..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-                data-testid="input-search"
-              />
-            </div>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Filter className="h-4 w-4" />
-              Filter
-            </Button>
-          </div>
-        )}
-
-        <div className="flex-1 overflow-auto border-t border-slate-200 dark:border-slate-700">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading sales orders...</div>
-          ) : filteredOrders.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              <Package className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-              <p className="font-medium">No sales orders found</p>
-              <p className="text-sm text-slate-400 mt-1">Create your first sales order to get started</p>
-              <Button
-                onClick={() => setLocation("/sales-orders/create")}
-                className="mt-4 bg-blue-600 hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Create Sales Order
-              </Button>
-            </div>
-          ) : selectedOrder ? (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {filteredOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className={`p-4 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedOrder?.id === order.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-2 border-l-blue-600' : ''
-                    }`}
-                  onClick={() => handleOrderClick(order)}
-                  data-testid={`card-order-${order.id}`}
+    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 -m-4 lg:-m-6 w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="sales-orders-layout">
+        <ResizablePanel
+          defaultSize={selectedOrder ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 gap-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-slate-900 dark:text-white">All Sales Orders</h1>
+                <ChevronDown className="h-4 w-4 text-slate-500" />
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setLocation("/sales-orders/create")}
+                  className="bg-blue-600 hover:bg-blue-700 gap-1.5"
+                  data-testid="button-new-order"
                 >
-                  <div className="flex items-start justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedOrders.includes(order.id)}
-                        onClick={(e) => toggleSelectOrder(order.id, e)}
-                      />
-                      <span className="font-medium text-slate-900 dark:text-white truncate">{order.customerName}</span>
-                    </div>
-                    <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(order.total)}</span>
-                  </div>
-                  <div className="ml-6 flex items-center gap-2 text-sm flex-wrap">
-                    <span className="text-slate-500">{order.salesOrderNumber}</span>
-                    <span className="text-slate-300">|</span>
-                    <span className="text-slate-500">{formatDate(order.date)}</span>
-                  </div>
-                  <div className="ml-6 mt-2 flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className={getStatusBadgeStyles(order.orderStatus)}>
-                      {order.orderStatus}
-                    </Badge>
-                    <Badge variant="outline" className={getStatusBadgeStyles(order.invoiceStatus)}>
-                      {order.invoiceStatus}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+                  <Plus className="h-4 w-4" /> New
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" data-testid="button-menu">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Sort</DropdownMenuItem>
+                    <DropdownMenuItem>Import Sales Orders</DropdownMenuItem>
+                    <DropdownMenuItem>Export Sales Orders</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Preferences</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          ) : (
-            <>
-              <table className="w-full">
-                <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
-                  <tr>
-                    <th className="w-12 px-4 py-3">
-                      <Checkbox />
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Sales Order#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reference#</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoiced</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Amount</th>
-                    <th className="w-10 px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {paginatedItems.map((order) => (
-                    <tr
+
+            {!selectedOrder && (
+              <div className="px-4 pb-3 flex items-center gap-2 flex-wrap">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Search sales orders..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                    data-testid="input-search"
+                  />
+                </div>
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <Filter className="h-4 w-4" />
+                  Filter
+                </Button>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-auto border-t border-slate-200 dark:border-slate-700">
+              {loading ? (
+                <div className="p-8 text-center text-slate-500">Loading sales orders...</div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="p-8 text-center text-slate-500">
+                  <Package className="h-12 w-12 mx-auto mb-4 text-slate-300" />
+                  <p className="font-medium">No sales orders found</p>
+                  <p className="text-sm text-slate-400 mt-1">Create your first sales order to get started</p>
+                  <Button
+                    onClick={() => setLocation("/sales-orders/create")}
+                    className="mt-4 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Create Sales Order
+                  </Button>
+                </div>
+              ) : selectedOrder ? (
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {filteredOrders.map((order) => (
+                    <div
                       key={order.id}
-                      className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                      className={`p-4 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedOrder?.id === order.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-2 border-l-blue-600' : ''
+                        }`}
                       onClick={() => handleOrderClick(order)}
-                      data-testid={`row-order-${order.id}`}
+                      data-testid={`card-order-${order.id}`}
                     >
-                      <td className="px-4 py-3">
-                        <Checkbox
-                          checked={selectedOrders.includes(order.id)}
-                          onClick={(e) => toggleSelectOrder(order.id, e)}
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{formatDate(order.date)}</td>
-                      <td className="px-4 py-3">
-                        <span className="text-blue-600 font-medium">{order.salesOrderNumber}</span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{order.referenceNumber || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-slate-900 dark:text-white font-medium">{order.customerName}</td>
-                      <td className="px-4 py-3">
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            checked={selectedOrders.includes(order.id)}
+                            onClick={(e) => toggleSelectOrder(order.id, e)}
+                          />
+                          <span className="font-medium text-slate-900 dark:text-white truncate">{order.customerName}</span>
+                        </div>
+                        <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(order.total)}</span>
+                      </div>
+                      <div className="ml-6 flex items-center gap-2 text-sm flex-wrap">
+                        <span className="text-slate-500">{order.salesOrderNumber}</span>
+                        <span className="text-slate-300">|</span>
+                        <span className="text-slate-500">{formatDate(order.date)}</span>
+                      </div>
+                      <div className="ml-6 mt-2 flex items-center gap-2 flex-wrap">
                         <Badge variant="outline" className={getStatusBadgeStyles(order.orderStatus)}>
                           {order.orderStatus}
                         </Badge>
-                      </td>
-                      <td className="px-4 py-3">
                         <Badge variant="outline" className={getStatusBadgeStyles(order.invoiceStatus)}>
                           {order.invoiceStatus}
                         </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge variant="outline" className={getStatusBadgeStyles(order.paymentStatus)}>
-                          {order.paymentStatus}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold text-slate-900 dark:text-white">{formatCurrency(order.total)}</td>
-                      <td className="px-4 py-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setLocation(`/sales-orders/${order.id}/edit`); }}>
-                              <Pencil className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={goToPage}
-              />
-            </>
-          )}
-        </div>
-      </div>
+                </div>
+              ) : (
+                <>
+                  <table className="w-full">
+                    <thead className="bg-slate-50 dark:bg-slate-800 sticky top-0 z-10">
+                      <tr>
+                        <th className="w-12 px-4 py-3">
+                          <Checkbox />
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Sales Order#</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reference#</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoiced</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Amount</th>
+                        <th className="w-10 px-4 py-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                      {paginatedItems.map((order) => (
+                        <tr
+                          key={order.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                          onClick={() => handleOrderClick(order)}
+                          data-testid={`row-order-${order.id}`}
+                        >
+                          <td className="px-4 py-3">
+                            <Checkbox
+                              checked={selectedOrders.includes(order.id)}
+                              onClick={(e) => toggleSelectOrder(order.id, e)}
+                            />
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{formatDate(order.date)}</td>
+                          <td className="px-4 py-3">
+                            <span className="text-blue-600 font-medium">{order.salesOrderNumber}</span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">{order.referenceNumber || '-'}</td>
+                          <td className="px-4 py-3 text-sm text-slate-900 dark:text-white font-medium">{order.customerName}</td>
+                          <td className="px-4 py-3">
+                            <Badge variant="outline" className={getStatusBadgeStyles(order.orderStatus)}>
+                              {order.orderStatus}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge variant="outline" className={getStatusBadgeStyles(order.invoiceStatus)}>
+                              {order.invoiceStatus}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3">
+                            <Badge variant="outline" className={getStatusBadgeStyles(order.paymentStatus)}>
+                              {order.paymentStatus}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-3 text-right font-semibold text-slate-900 dark:text-white">{formatCurrency(order.total)}</td>
+                          <td className="px-4 py-3">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setLocation(`/sales-orders/${order.id}/edit`); }}>
+                                  <Pencil className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Receipt className="mr-2 h-4 w-4" /> Convert to Invoice
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive">
+                                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </ResizablePanel>
 
-      {selectedOrder && (
-        <div className="flex-1 min-w-0">
-          <SalesOrderDetailPanel
-            order={selectedOrder}
-            branding={branding}
-            organization={currentOrganization || undefined}
-            onClose={handleClosePanel}
-            onEdit={handleEditOrder}
-            onDelete={handleDeleteClick}
-            onConvertToInvoice={handleConvertToInvoice}
-            onConvertSelectedItems={handleConvertSelectedItems}
-          />
-        </div>
-      )}
+        {selectedOrder && (
+          <>
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <SalesOrderDetailPanel
+                order={selectedOrder}
+                branding={branding}
+                organization={currentOrganization || undefined}
+                onClose={handleClosePanel}
+                onEdit={handleEditOrder}
+                onDelete={handleDeleteClick}
+                onConvertToInvoice={handleConvertToInvoice}
+                onConvertSelectedItems={handleConvertSelectedItems}
+              />
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
