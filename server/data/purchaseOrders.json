@@ -898,7 +898,7 @@
       "billedStatus": "BILLED",
       "pdfTemplate": "Standard Template",
       "createdAt": "2025-12-18T09:57:40.049Z",
-      "updatedAt": "2025-12-24T05:05:10.984Z",
+      "updatedAt": "2025-12-30T07:30:26.786Z",
       "createdBy": "Admin User",
       "activityLogs": [
         {
@@ -932,6 +932,13 @@
         {
           "id": "5",
           "timestamp": "2025-12-24T05:05:10.984Z",
+          "action": "converted_to_bill",
+          "description": "Purchase Order converted to Bill",
+          "user": "Admin User"
+        },
+        {
+          "id": "6",
+          "timestamp": "2025-12-30T07:30:26.786Z",
           "action": "converted_to_bill",
           "description": "Purchase Order converted to Bill",
           "user": "Admin User"
