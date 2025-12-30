@@ -74,14 +74,17 @@ interface CollapsibleNavItemProps {
   icon: React.ElementType;
   label: string;
   children: React.ReactNode;
+  openMenu: string | null;
+  onMenuChange: (id: string | null) => void;
 }
 
-const CollapsibleNavItem = ({ id, icon: Icon, label, children }: CollapsibleNavItemProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [location] = useLocation();
+const CollapsibleNavItem = ({ id, icon: Icon, label, children, openMenu, onMenuChange }: CollapsibleNavItemProps) => {
+  const isOpen = openMenu === id;
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-0.5">
+    <Collapsible open={isOpen} onOpenChange={(open) => {
+      onMenuChange(open ? id : null);
+    }} className="space-y-0.5">
       <CollapsibleTrigger asChild>
         <div
           className={cn(
@@ -167,11 +170,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="px-2 space-y-0.5">
           <NavItem href="/" icon={Home} label="Home" />
 
-          <CollapsibleNavItem id="items" icon={Package} label="Items">
+          <CollapsibleNavItem id="items" icon={Package} label="Items" openMenu={openMenu} onMenuChange={setOpenMenu}>
             <NavItem href="/items" label="Items" indent />
           </CollapsibleNavItem>
 
-          <CollapsibleNavItem id="sales" icon={ShoppingCart} label="Sales">
+          <CollapsibleNavItem id="sales" icon={ShoppingCart} label="Sales" openMenu={openMenu} onMenuChange={setOpenMenu}>
             <NavItem href="/customers" label="Customers" indent />
             <NavItem href="/estimates" label="Quotes" indent />
             <NavItem href="/sales-orders" label="Sales Orders" indent />
@@ -182,7 +185,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <NavItem href="/eway-bills" label="e-Way Bills" indent />
           </CollapsibleNavItem>
 
-          <CollapsibleNavItem id="purchases" icon={ShoppingBag} label="Purchases">
+          <CollapsibleNavItem id="purchases" icon={ShoppingBag} label="Purchases" openMenu={openMenu} onMenuChange={setOpenMenu}>
             <NavItem href="/vendors" label="Vendors" indent />
             <NavItem href="/expenses" label="Expenses" indent />
             <NavItem href="/purchase-orders" label="Purchase Orders" indent />
@@ -195,11 +198,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           <NavItem href="/banking" icon={Building2} label="Banking (TBD)" />
 
-          <CollapsibleNavItem id="filing" icon={FileCheck} label="Filing & Compliance (TBD)">
+          <CollapsibleNavItem id="filing" icon={FileCheck} label="Filing & Compliance (TBD)" openMenu={openMenu} onMenuChange={setOpenMenu}>
             <NavItem href="/filing-compliance" label="GST Filing" indent />
           </CollapsibleNavItem>
 
-          <CollapsibleNavItem id="accountant" icon={UserCog} label="Accountant (TBD)">
+          <CollapsibleNavItem id="accountant" icon={UserCog} label="Accountant (TBD)" openMenu={openMenu} onMenuChange={setOpenMenu}>
             <NavItem href="/manual-journals" label="Manual Journals" indent />
             <NavItem href="/bulk-update" label="Bulk Update" indent />
             <NavItem href="/chart-of-accounts" label="Chart of Accounts" indent />
