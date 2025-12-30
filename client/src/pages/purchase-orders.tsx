@@ -3,6 +3,11 @@ import { useLocation } from "wouter";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
   Plus, Search, ChevronDown, MoreHorizontal, Pencil, Trash2,
   X, Mail, FileText, Printer, ArrowRight, Filter, Download,
   ClipboardList, Eye, Check, Calendar, XCircle, Copy, Archive
@@ -966,203 +971,214 @@ export default function PurchaseOrders() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full">
-      <div className={`flex flex-col overflow-hidden transition-all duration-300 ${selectedPO ? 'w-[350px] min-w-[350px] shrink-0' : 'flex-1 w-full'}`}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-semibold text-slate-900">All Purchase Orders</h1>
-            <ChevronDown className="h-4 w-4 text-slate-500" />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => setLocation("/purchase-orders/new")}
-              className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
-              data-testid="button-new-po"
-            >
-              <Plus className="h-4 w-4" /> New
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" /> Export
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={fetchPurchaseOrders}>
-                  Refresh List
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-
-        {!selectedPO && (
-          <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search purchase orders..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-                data-testid="input-search"
-              />
-            </div>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" /> Filter
-            </Button>
-          </div>
-        )}
-
-        <div className="flex-1 overflow-auto">
-          {loading ? (
-            <div className="p-8 text-center text-slate-500">Loading purchase orders...</div>
-          ) : filteredPOs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <ClipboardList className="h-8 w-8 text-slate-400" />
+    <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+        <ResizablePanel
+          defaultSize={selectedPO ? 30 : 100}
+          minSize={20}
+          className="flex flex-col overflow-hidden bg-white"
+        >
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-slate-900">All Purchase Orders</h1>
+                <ChevronDown className="h-4 w-4 text-slate-500" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No purchase orders yet</h3>
-              <p className="text-slate-500 mb-4 max-w-sm">
-                Create purchase orders to formalize orders with your vendors and track deliveries.
-              </p>
-              <Button
-                onClick={() => setLocation("/purchase-orders/new")}
-                className="bg-blue-600 hover:bg-blue-700"
-                data-testid="button-create-first-po"
-              >
-                <Plus className="h-4 w-4 mr-2" /> Create Your First Purchase Order
-              </Button>
-            </div>
-          ) : selectedPO ? (
-            <div className="divide-y divide-slate-100">
-              {paginatedItems.map((po) => (
-                <div
-                  key={po.id}
-                  className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${selectedPO?.id === po.id ? 'bg-blue-50 border-l-2 border-l-blue-600' : ''
-                    }`}
-                  onClick={() => handlePOClick(po)}
-                  data-testid={`card-po-${po.id}`}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setLocation("/purchase-orders/new")}
+                  className="bg-blue-600 hover:bg-blue-700 gap-1.5 h-9"
+                  data-testid="button-new-po"
                 >
-                  <div className="flex items-start justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={selectedPOs.includes(po.id)}
-                        onClick={(e) => toggleSelectPO(po.id, e)}
-                      />
-                      <span className="font-medium text-blue-600">{po.purchaseOrderNumber}</span>
-                    </div>
-                    {getStatusBadge(po.status)}
-                  </div>
-                  <div className="ml-6 text-sm text-slate-500">
-                    <p>{po.vendorName}</p>
-                    <p className="font-medium text-slate-900">{formatCurrency(po.total)}</p>
-                  </div>
-                </div>
-              ))}
+                  <Plus className="h-4 w-4" /> New
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" className="h-9 w-9" data-testid="button-more-options">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Download className="mr-2 h-4 w-4" /> Export
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={fetchPurchaseOrders}>
+                      Refresh List
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-          ) : (
-            <Table>
-              <TableHeader className="bg-slate-50 sticky top-0">
-                <TableRow>
-                  <TableHead className="w-12">
-                    <Checkbox />
-                  </TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Date</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Purchase Order#</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Reference#</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Vendor Name</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Status</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Billed Status</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase text-right">Amount</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase">Delivery Date</TableHead>
-                  <TableHead className="text-xs font-medium text-slate-500 uppercase w-12">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedItems.map((po) => (
-                  <TableRow
-                    key={po.id}
-                    className="cursor-pointer hover:bg-slate-50"
-                    onClick={() => handlePOClick(po)}
-                    data-testid={`row-po-${po.id}`}
-                  >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedPOs.includes(po.id)}
-                        onClick={(e) => toggleSelectPO(po.id, e)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-sm">{formatDate(po.date)}</TableCell>
-                    <TableCell className="text-sm font-medium text-blue-600">{po.purchaseOrderNumber}</TableCell>
-                    <TableCell className="text-sm text-slate-500">{po.referenceNumber || '-'}</TableCell>
-                    <TableCell className="text-sm">{po.vendorName}</TableCell>
-                    <TableCell>{getStatusBadge(po.status)}</TableCell>
-                    <TableCell>
-                      <span className="text-xs text-slate-500">{po.billedStatus || 'YET TO BE BILLED'}</span>
-                    </TableCell>
-                    <TableCell className="text-sm text-right font-medium">{formatCurrency(po.total)}</TableCell>
-                    <TableCell className="text-sm text-slate-500">{formatDate(po.deliveryDate || '')}</TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {getActionsForStatus(po.status, po.id).map((action, index) => (
-                            <DropdownMenuItem
-                              key={index}
-                              onClick={action.onClick}
-                              className={action.className || ""}
-                            >
-                              <action.icon className="mr-2 h-4 w-4" />
-                              {action.label}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-          {filteredPOs.length > 0 && (
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
-            />
-          )}
-        </div>
-      </div>
 
-      {selectedPO && (
-        <div className="flex-1 min-w-0 border-l border-slate-200 overflow-hidden">
-          <PurchaseOrderDetailPanel
-            purchaseOrder={selectedPO}
-            onClose={handleClosePanel}
-            onEdit={handleEditPO}
-            onDelete={() => handleDelete(selectedPO.id)}
-            onConvertToBill={handleConvertToBill}
-            onMarkAsIssued={() => handleMarkAsIssued(selectedPO.id)}
-            onMarkAsReceived={() => handleMarkAsReceived(selectedPO.id)}
-            onMarkAsCancelled={() => handleMarkAsCancelled(selectedPO.id)}
-            onClone={() => handleClone(selectedPO.id)}
-            onSetDeliveryDate={() => handleSetDeliveryDate(selectedPO.id)}
-            onCancelItems={() => handleCancelItems(selectedPO.id)}
-            branding={branding}
-            organization={organization || undefined}
-          />
-        </div>
-      )}
+            {!selectedPO && (
+              <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-200 bg-white">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Search purchase orders..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9"
+                    data-testid="input-search"
+                  />
+                </div>
+                <Button variant="outline" className="gap-2">
+                  <Filter className="h-4 w-4" /> Filter
+                </Button>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-auto">
+              {loading ? (
+                <div className="p-8 text-center text-slate-500">Loading purchase orders...</div>
+              ) : filteredPOs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+                    <ClipboardList className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">No purchase orders yet</h3>
+                  <p className="text-slate-500 mb-4 max-w-sm">
+                    Create purchase orders to formalize orders with your vendors and track deliveries.
+                  </p>
+                  <Button
+                    onClick={() => setLocation("/purchase-orders/new")}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    data-testid="button-create-first-po"
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Create Your First Purchase Order
+                  </Button>
+                </div>
+              ) : selectedPO ? (
+                <div className="divide-y divide-slate-100">
+                  {paginatedItems.map((po) => (
+                    <div
+                      key={po.id}
+                      className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${selectedPO?.id === po.id ? 'bg-blue-50 border-l-2 border-l-blue-600' : ''
+                        }`}
+                      onClick={() => handlePOClick(po)}
+                      data-testid={`card-po-${po.id}`}
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            checked={selectedPOs.includes(po.id)}
+                            onClick={(e) => toggleSelectPO(po.id, e)}
+                          />
+                          <span className="font-medium text-blue-600">{po.purchaseOrderNumber}</span>
+                        </div>
+                        {getStatusBadge(po.status)}
+                      </div>
+                      <div className="ml-6 text-sm text-slate-500">
+                        <p>{po.vendorName}</p>
+                        <p className="font-medium text-slate-900">{formatCurrency(po.total)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader className="bg-slate-50 sticky top-0 z-10">
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox />
+                      </TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Date</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Purchase Order#</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Reference#</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Vendor Name</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Status</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Billed Status</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase text-right">Amount</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Delivery Date</TableHead>
+                      <TableHead className="text-xs font-medium text-slate-500 uppercase w-12">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedItems.map((po) => (
+                      <TableRow
+                        key={po.id}
+                        className="cursor-pointer hover:bg-slate-50"
+                        onClick={() => handlePOClick(po)}
+                        data-testid={`row-po-${po.id}`}
+                      >
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedPOs.includes(po.id)}
+                            onClick={(e) => toggleSelectPO(po.id, e)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-sm">{formatDate(po.date)}</TableCell>
+                        <TableCell className="text-sm font-medium text-blue-600">{po.purchaseOrderNumber}</TableCell>
+                        <TableCell className="text-sm text-slate-500">{po.referenceNumber || '-'}</TableCell>
+                        <TableCell className="text-sm">{po.vendorName}</TableCell>
+                        <TableCell>{getStatusBadge(po.status)}</TableCell>
+                        <TableCell>
+                          <span className="text-xs text-slate-500">{po.billedStatus || 'YET TO BE BILLED'}</span>
+                        </TableCell>
+                        <TableCell className="text-sm text-right font-medium">{formatCurrency(po.total)}</TableCell>
+                        <TableCell className="text-sm text-slate-500">{formatDate(po.deliveryDate || '')}</TableCell>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {getActionsForStatus(po.status, po.id).map((action, index) => (
+                                <DropdownMenuItem
+                                  key={index}
+                                  onClick={action.onClick}
+                                  className={action.className || ""}
+                                >
+                                  <action.icon className="mr-2 h-4 w-4" />
+                                  {action.label}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+              {filteredPOs.length > 0 && (
+                <TablePagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={goToPage}
+                />
+              )}
+            </div>
+          </div>
+        </ResizablePanel>
+
+        {selectedPO && (
+          <>
+            <ResizableHandle withHandle className="w-1.5 bg-slate-200 hover:bg-blue-300 transition-colors" />
+            <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
+              <PurchaseOrderDetailPanel
+                purchaseOrder={selectedPO}
+                onClose={handleClosePanel}
+                onEdit={handleEditPO}
+                onDelete={() => handleDelete(selectedPO.id)}
+                onConvertToBill={handleConvertToBill}
+                onMarkAsIssued={() => handleMarkAsIssued(selectedPO.id)}
+                onMarkAsReceived={() => handleMarkAsReceived(selectedPO.id)}
+                onMarkAsCancelled={() => handleMarkAsCancelled(selectedPO.id)}
+                onClone={() => handleClone(selectedPO.id)}
+                onSetDeliveryDate={() => handleSetDeliveryDate(selectedPO.id)}
+                onCancelItems={() => handleCancelItems(selectedPO.id)}
+                branding={branding}
+                organization={organization || undefined}
+              />
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
