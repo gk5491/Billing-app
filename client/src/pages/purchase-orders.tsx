@@ -972,7 +972,7 @@ export default function PurchaseOrders() {
 
   return (
     <div className="flex h-[calc(100vh-80px)] animate-in fade-in duration-300 w-full overflow-hidden bg-slate-50">
-      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full" autoSaveId="purchase-orders-layout">
         <ResizablePanel
           defaultSize={selectedPO ? 30 : 100}
           minSize={20}
@@ -1048,7 +1048,7 @@ export default function PurchaseOrders() {
                     <Plus className="h-4 w-4 mr-2" /> Create Your First Purchase Order
                   </Button>
                 </div>
-              ) : selectedPO ? (
+              ) : (
                 <div className="divide-y divide-slate-100">
                   {paginatedItems.map((po) => (
                     <div
@@ -1075,73 +1075,6 @@ export default function PurchaseOrders() {
                     </div>
                   ))}
                 </div>
-              ) : (
-                <Table>
-                  <TableHeader className="bg-slate-50 sticky top-0 z-10">
-                    <TableRow>
-                      <TableHead className="w-12">
-                        <Checkbox />
-                      </TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Date</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Purchase Order#</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Reference#</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Vendor Name</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Status</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Billed Status</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase text-right">Amount</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase">Delivery Date</TableHead>
-                      <TableHead className="text-xs font-medium text-slate-500 uppercase w-12">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedItems.map((po) => (
-                      <TableRow
-                        key={po.id}
-                        className="cursor-pointer hover:bg-slate-50"
-                        onClick={() => handlePOClick(po)}
-                        data-testid={`row-po-${po.id}`}
-                      >
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <Checkbox
-                            checked={selectedPOs.includes(po.id)}
-                            onClick={(e) => toggleSelectPO(po.id, e)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-sm">{formatDate(po.date)}</TableCell>
-                        <TableCell className="text-sm font-medium text-blue-600">{po.purchaseOrderNumber}</TableCell>
-                        <TableCell className="text-sm text-slate-500">{po.referenceNumber || '-'}</TableCell>
-                        <TableCell className="text-sm">{po.vendorName}</TableCell>
-                        <TableCell>{getStatusBadge(po.status)}</TableCell>
-                        <TableCell>
-                          <span className="text-xs text-slate-500">{po.billedStatus || 'YET TO BE BILLED'}</span>
-                        </TableCell>
-                        <TableCell className="text-sm text-right font-medium">{formatCurrency(po.total)}</TableCell>
-                        <TableCell className="text-sm text-slate-500">{formatDate(po.deliveryDate || '')}</TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {getActionsForStatus(po.status, po.id).map((action, index) => (
-                                <DropdownMenuItem
-                                  key={index}
-                                  onClick={action.onClick}
-                                  className={action.className || ""}
-                                >
-                                  <action.icon className="mr-2 h-4 w-4" />
-                                  {action.label}
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
               )}
               {filteredPOs.length > 0 && (
                 <TablePagination
@@ -1158,7 +1091,7 @@ export default function PurchaseOrders() {
 
         {selectedPO && (
           <>
-            <ResizableHandle withHandle className="w-1.5 bg-slate-200 hover:bg-blue-300 transition-colors" />
+            <ResizableHandle withHandle className="w-1 bg-slate-200 hover:bg-blue-400 hover:w-1.5 transition-all cursor-col-resize" />
             <ResizablePanel defaultSize={70} minSize={30} className="bg-white">
               <PurchaseOrderDetailPanel
                 purchaseOrder={selectedPO}
