@@ -386,7 +386,9 @@ export default function CreditNoteEdit() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-red-500">Customer Name*</Label>
+            <Label className="text-black">Customer Name
+              <span className="text-red-500">*</span>
+            </Label>
             <div className="flex gap-2">
               <Select value={customerId} onValueChange={handleCustomerChange}>
                 <SelectTrigger className="flex-1" data-testid="select-customer">
@@ -424,7 +426,7 @@ export default function CreditNoteEdit() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-red-500">Credit Note#*</Label>
+            <Label className="text-black">Credit Note#</Label>
             <div className="flex items-center gap-2">
               <Input value={creditNoteNumber} onChange={(e) => setCreditNoteNumber(e.target.value)} data-testid="input-credit-note-number" />
               <Button variant="ghost" size="icon">
@@ -440,7 +442,7 @@ export default function CreditNoteEdit() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-red-500">Credit Note Date*</Label>
+            <Label className="text-black">Credit Note Date</Label>
             <Input type="date" value={creditNoteDate} onChange={(e) => setCreditNoteDate(e.target.value)} data-testid="input-credit-note-date" />
           </div>
           <div>
@@ -552,6 +554,7 @@ export default function CreditNoteEdit() {
                         type="number"
                         value={item.quantity}
                         onChange={(e) => updateLineItem(item.id, { quantity: parseFloat(e.target.value) || 0 })}
+                        
                         className="w-20 text-right"
                         data-testid={`input-quantity-${index}`}
                       />
@@ -561,6 +564,7 @@ export default function CreditNoteEdit() {
                         type="number"
                         value={item.rate}
                         onChange={(e) => updateLineItem(item.id, { rate: parseFloat(e.target.value) || 0 })}
+                        
                         className="w-24 text-right"
                         data-testid={`input-rate-${index}`}
                       />
@@ -571,6 +575,7 @@ export default function CreditNoteEdit() {
                           type="number"
                           value={item.discount}
                           onChange={(e) => updateLineItem(item.id, { discount: parseFloat(e.target.value) || 0 })}
+                          
                           className="w-16 text-right"
                           data-testid={`input-discount-${index}`}
                         />
@@ -647,6 +652,7 @@ export default function CreditNoteEdit() {
                   type="number"
                   value={shippingCharges}
                   onChange={(e) => setShippingCharges(parseFloat(e.target.value) || 0)}
+                  
                   className="w-24 text-right"
                   data-testid="input-shipping-charges"
                 />
@@ -683,6 +689,7 @@ export default function CreditNoteEdit() {
                   type="number"
                   value={adjustment}
                   onChange={(e) => setAdjustment(parseFloat(e.target.value) || 0)}
+                  
                   className="w-24 text-right"
                   data-testid="input-adjustment"
                 />

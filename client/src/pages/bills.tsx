@@ -1290,6 +1290,7 @@ function RecordPaymentDialog({
               type="number"
               value={paymentAmount}
               onChange={(e) => setPaymentAmount(e.target.value)}
+              
               className="max-w-xs"
               data-testid="input-payment-amount"
             />

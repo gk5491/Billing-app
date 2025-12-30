@@ -172,7 +172,9 @@ export default function InvoiceEdit() {
             description: item.description || '',
             quantity: item.quantity,
             rate: item.rate,
-            discount: item.discount || 0,
+            discount: item.discountType === 'percentage'
+              ? (item.rate && item.quantity ? (item.discount / (item.rate * item.quantity)) * 100 : 0)
+              : (item.discount || 0),
             discountType: item.discountType || 'flat',
             tax: knownTax ? storedTaxName : 'custom',
             originalTaxName: storedTaxName,
@@ -326,7 +328,7 @@ export default function InvoiceEdit() {
           quantity: item.quantity,
           unit: 'pcs',
           rate: item.rate,
-          discount: item.discount,
+          discount: lineCalc.discountAmount,
           discountType: item.discountType,
           tax: lineCalc.taxAmount,
           taxName: effectiveTaxName,

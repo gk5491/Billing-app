@@ -487,7 +487,9 @@ export default function VendorCreditCreate() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           <div className="md:col-span-2">
-            <Label className="text-red-500">Vendor Name*</Label>
+            <Label className="text-black">Vendor Name
+              <span className="text-red-600">*</span>
+            </Label>
             <div className="flex gap-2">
               <Select
                 value={formData.vendorId}
@@ -519,7 +521,9 @@ export default function VendorCreditCreate() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-red-500">Credit Note#*</Label>
+            <Label className="text-black">Credit Note#
+              <span className="text-red-600">*</span>
+            </Label>
             <div className="relative">
               <Input
                 value={formData.creditNoteNumber}

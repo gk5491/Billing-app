@@ -978,7 +978,7 @@ export default function Expenses() {
               <div className="lg:col-span-2 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">
+                    <Label className="text-black font-medium">
                       Date
                       <span className="text-red-500 ml-0.5">*</span>
                     </Label>
@@ -991,7 +991,7 @@ export default function Expenses() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">
+                    <Label className="text-black font-medium">
                       Expense Account
                       <span className="text-red-500 ml-0.5">*</span>
                     </Label>
@@ -1008,7 +1008,7 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700">
+                    <Label className="text-black font-medium">
                       Amount
                       <span className="text-red-600">*</span>
                     </Label>
@@ -1031,12 +1031,13 @@ export default function Expenses() {
                         placeholder="0.00"
                         value={expenseForm.amount}
                         onChange={(e) => setExpenseForm(prev => ({ ...prev, amount: e.target.value }))}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         data-testid="input-expense-amount"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700">
+                    <Label className="text-black font-medium">
                       Paid Through
                       <span className="text-red-600">*</span>
                     </Label>
@@ -1102,7 +1103,7 @@ export default function Expenses() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-700 font-medium">
+                  <Label className="text-black font-medium">
                     Expense Type
                     <span className="text-red-500 ml-0.5">*</span>
                   </Label>
@@ -1144,7 +1145,7 @@ export default function Expenses() {
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">Vendor</Label>
+                    <Label className="text-black font-medium">Vendor</Label>
                     <Select
                       value={expenseForm.vendorId}
                       onValueChange={(value) => {
@@ -1172,7 +1173,7 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">
+                    <Label className="text-black font-medium">
                       GST Treatment
                       <span className="text-red-500 ml-0.5">*</span>
                     </Label>
@@ -1221,7 +1222,7 @@ export default function Expenses() {
                     </Popover>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">
+                    <Label className="text-black font-medium">
                       Source of Supply
                       <span className="text-red-500 ml-0.5">*</span>
                     </Label>
@@ -1273,7 +1274,7 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700 font-medium">
+                    <Label className="text-black font-medium">
                       Destination of Supply
                       <span className="text-red-500 ml-0.5">*</span>
                     </Label>
@@ -1358,7 +1359,7 @@ export default function Expenses() {
                   </div>
                   {expenseForm.reverseCharge && (
                     <div className="space-y-2">
-                      <Label className="text-slate-700">Amount Is</Label>
+                      <Label className="text-black font-medium">Amount Is</Label>
                       <RadioGroup
                         value={expenseForm.amountIs}
                         onValueChange={(value) => setExpenseForm(prev => ({ ...prev, amountIs: value }))}
@@ -1379,7 +1380,9 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-red-500">Invoice#*</Label>
+                    <Label className="text-black font-medium">Invoice#
+                      <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       value={expenseForm.invoiceNumber}
                       onChange={(e) => setExpenseForm(prev => ({ ...prev, invoiceNumber: e.target.value }))}
@@ -1400,7 +1403,7 @@ export default function Expenses() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-slate-700 font-medium">Customer Name</Label>
+                  <Label className="text-black font-medium">Customer Name</Label>
                   <Select
                     value={expenseForm.customerId}
                     onValueChange={(value) => {
@@ -1451,7 +1454,9 @@ export default function Expenses() {
               <div className="lg:col-span-2 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-red-500">Date*</Label>
+                    <Label className="text-black font-medium">Date
+                      <span className="text-red-500 ml-0.5">*</span>
+                    </Label>
                     <Input
                       type="date"
                       value={mileageForm.date}
@@ -1460,7 +1465,7 @@ export default function Expenses() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Employee</Label>
+                    <Label className="text-black font-medium">Employee</Label>
                     <Input
                       value={mileageForm.employee}
                       onChange={(e) => setMileageForm(prev => ({ ...prev, employee: e.target.value }))}
@@ -1490,16 +1495,19 @@ export default function Expenses() {
                 {mileageForm.calculationMethod === "distance_travelled" ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-red-500">Distance*</Label>
+                      <Label className="text-black font-medium">Distance
+                        <span className="text-red-500 ml-0.5">*</span>
+                      </Label>
                       <Input
                         type="number"
                         value={mileageForm.distance}
                         onChange={(e) => setMileageForm(prev => ({ ...prev, distance: e.target.value }))}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         data-testid="input-distance"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Unit</Label>
+                      <Label className="text-black font-medium">Unit</Label>
                       <RadioGroup
                         value={mileageForm.unit}
                         onValueChange={(value) => setMileageForm(prev => ({ ...prev, unit: value }))}
@@ -1519,20 +1527,22 @@ export default function Expenses() {
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-red-500">Start Odometer*</Label>
+                      <Label className="text-black font-medium">Start Odometer <span className="text-red-500">*</span></Label>
                       <Input
                         type="number"
                         value={mileageForm.startOdometer}
                         onChange={(e) => setMileageForm(prev => ({ ...prev, startOdometer: e.target.value }))}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         data-testid="input-start-odometer"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-red-500">End Odometer*</Label>
+                      <Label className="text-black font-medium">End Odometer <span className="text-red-500">*</span></Label>
                       <Input
                         type="number"
                         value={mileageForm.endOdometer}
                         onChange={(e) => setMileageForm(prev => ({ ...prev, endOdometer: e.target.value }))}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         data-testid="input-end-odometer"
                       />
                     </div>
@@ -1541,7 +1551,7 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-slate-700">
+                    <Label className="text-black font-medium">
                       Amount
                       <span className="text-red-600">*</span>
                     </Label>
@@ -1563,6 +1573,7 @@ export default function Expenses() {
                         placeholder="0.00"
                         value={mileageForm.amount}
                         onChange={(e) => setMileageForm(prev => ({ ...prev, amount: e.target.value }))}
+                        onWheel={(e) => (e.target as HTMLInputElement).blur()}
                         data-testid="input-mileage-amount"
                       />
                     </div>
@@ -1575,7 +1586,7 @@ export default function Expenses() {
                     </button>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-slate-700">
+                    <Label className="text-black font-medium">
                       Paid Through
                       <span className="text-red-600">*</span>
                     </Label>
@@ -1639,7 +1650,7 @@ export default function Expenses() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Vendor</Label>
+                    <Label className="text-black font-medium">Vendor</Label>
                     <Select
                       value={mileageForm.vendorId}
                       onValueChange={(value) => {
@@ -1664,7 +1675,7 @@ export default function Expenses() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Invoice#</Label>
+                    <Label className="text-black font-medium">Invoice#</Label>
                     <Input
                       value={mileageForm.invoiceNumber}
                       onChange={(e) => setMileageForm(prev => ({ ...prev, invoiceNumber: e.target.value }))}
@@ -1685,7 +1696,7 @@ export default function Expenses() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Customer Name</Label>
+                  <Label className="text-black font-medium">Customer Name</Label>
                   <div className="flex gap-2">
                     <Select
                       value={mileageForm.customerId}
@@ -1716,7 +1727,7 @@ export default function Expenses() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Reporting Tags</Label>
+                  <Label className="text-black font-medium">Reporting Tags</Label>
                   <button className="text-indigo-600 text-sm flex items-center gap-1" data-testid="button-mileage-associate-tags">
                     <Tag className="h-4 w-4" /> Associate Tags
                   </button>
@@ -1784,7 +1795,7 @@ export default function Expenses() {
                 }))}
                 data-testid="checkbox-associate-employees"
               />
-              <Label>Associate employees to expenses</Label>
+              <Label className="text-black font-medium">Associate employees to expenses</Label>
             </div>
 
             <div className="space-y-4 border-t pt-4">
@@ -1792,7 +1803,7 @@ export default function Expenses() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Default Mileage Category</Label>
+                  <Label className="text-black font-medium">Default Mileage Category</Label>
                   <Select
                     value={mileageSettingsForm.defaultMileageCategory}
                     onValueChange={(value) => setMileageSettingsForm(prev => ({
@@ -1811,7 +1822,7 @@ export default function Expenses() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Default Unit</Label>
+                  <Label className="text-black font-medium">Default Unit</Label>
                   <RadioGroup
                     value={mileageSettingsForm.defaultUnit}
                     onValueChange={(value) => setMileageSettingsForm(prev => ({
@@ -1843,7 +1854,7 @@ export default function Expenses() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>START DATE</Label>
+                  <Label className="text-black font-medium">START DATE</Label>
                   <Input
                     type="date"
                     placeholder="dd/MM/yyyy"
@@ -1856,7 +1867,7 @@ export default function Expenses() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>MILEAGE RATE</Label>
+                  <Label className="text-black font-medium">MILEAGE RATE</Label>
                   <div className="flex gap-2">
                     <Input
                       type="number"
@@ -1866,6 +1877,7 @@ export default function Expenses() {
                         ...prev,
                         newRateValue: e.target.value
                       }))}
+                      onWheel={(e) => (e.target as HTMLInputElement).blur()}
                       data-testid="input-mileage-rate-value"
                     />
                     <span className="flex items-center text-sm text-muted-foreground">INR</span>

@@ -273,6 +273,12 @@ export default function PurchaseOrderEdit() {
         const data = await poRes.json();
         const po = data.data;
 
+        const vendor = vendorsList.find((v: Vendor) => v.id === po.vendorId);
+        if (vendor) setSelectedVendor(vendor);
+
+        const hasSavedBilling = po.vendorBillingAddress && (po.vendorBillingAddress.street1 || po.vendorBillingAddress.city || po.vendorBillingAddress.state);
+        const hasSavedShipping = po.vendorShippingAddress && (po.vendorShippingAddress.street1 || po.vendorShippingAddress.city || po.vendorShippingAddress.state);
+
         setPurchaseOrderNumber(po.purchaseOrderNumber);
         setFormData({
           vendorId: po.vendorId || "",
@@ -280,8 +286,8 @@ export default function PurchaseOrderEdit() {
           gstTreatment: po.gstTreatment || "Unregistered Business",
           sourceOfSupply: po.sourceOfSupply || "MH - Maharashtra",
           destinationOfSupply: po.destinationOfSupply || "MH - Maharashtra",
-          vendorBillingAddress: po.vendorBillingAddress || { street1: "", street2: "", city: "", state: "", pinCode: "", countryRegion: "India" },
-          vendorShippingAddress: po.vendorShippingAddress || { street1: "", street2: "", city: "", state: "", pinCode: "", countryRegion: "India" },
+          vendorBillingAddress: hasSavedBilling ? po.vendorBillingAddress : (vendor?.billingAddress || { street1: "", street2: "", city: "", state: "", pinCode: "", countryRegion: "India" }),
+          vendorShippingAddress: hasSavedShipping ? po.vendorShippingAddress : ((vendor as any)?.shippingAddress || { street1: "", street2: "", city: "", state: "", pinCode: "", countryRegion: "India" }),
           deliveryAddressType: po.deliveryAddressType || "organization",
           deliveryAddress: po.deliveryAddress || {},
           organizationDetails: po.organizationDetails || {
@@ -319,9 +325,6 @@ export default function PurchaseOrderEdit() {
           taxAmount: 0,
           amount: 0
         }]);
-
-        const vendor = vendorsList.find((v: Vendor) => v.id === po.vendorId);
-        if (vendor) setSelectedVendor(vendor);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -585,7 +588,7 @@ export default function PurchaseOrderEdit() {
           <div className="p-6 space-y-5">
             {/* Vendor Section with Action Buttons */}
             <div className="flex items-center gap-4">
-              <Label className="text-blue-600 font-medium w-28 shrink-0">Vendor Name<span className="text-red-500">*</span></Label>
+              <Label className="text-black font-medium w-28 shrink-0">Vendor Name<span className="text-red-500">*</span></Label>
               <div className="flex-1 flex gap-2">
                 <Popover open={vendorDropdownOpen} onOpenChange={setVendorDropdownOpen}>
                   <PopoverTrigger asChild>
@@ -783,7 +786,7 @@ export default function PurchaseOrderEdit() {
 
             {/* Delivery Address Section */}
             <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
-              <Label className="text-blue-600 pt-2.5">Delivery Address<span className="text-red-500">*</span></Label>
+              <Label className="text-black pt-2.5">Delivery Address<span className="text-red-500">*</span></Label>
               <div className="space-y-3">
                 <RadioGroup
                   value={formData.deliveryAddressType}
@@ -915,7 +918,7 @@ export default function PurchaseOrderEdit() {
             {/* Form Fields Row */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-blue-600 font-medium text-sm">Purchase Order#<span className="text-red-500">*</span></Label>
+                <Label className="text-black font-medium text-sm">Purchase Order#<span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
                     value={purchaseOrderNumber}
@@ -1389,7 +1392,7 @@ export default function PurchaseOrderEdit() {
       {/* Address Modals */}
       <VendorAddressModal
         open={billingAddressModalOpen}
-        onOpenChange={setBillingAddressModalOpen}
+        onClose={() => setBillingAddressModalOpen(false)}
         title="Edit Billing Address"
         initialAddress={formData.vendorBillingAddress}
         onSave={handleBillingAddressUpdate}
@@ -1397,7 +1400,7 @@ export default function PurchaseOrderEdit() {
 
       <VendorAddressModal
         open={shippingAddressModalOpen}
-        onOpenChange={setShippingAddressModalOpen}
+        onClose={() => setShippingAddressModalOpen(false)}
         title="Edit Shipping Address"
         initialAddress={formData.vendorShippingAddress}
         onSave={handleShippingAddressUpdate}

@@ -1,6 +1,119 @@
 {
   "purchaseOrders": [
     {
+      "id": "1767096295222",
+      "purchaseOrderNumber": "PO-2025-0015",
+      "referenceNumber": "",
+      "date": "2025-12-30",
+      "deliveryDate": "",
+      "vendorId": "6",
+      "vendorName": "Sharma Traders Pvt Ltd",
+      "vendorAddress": {},
+      "deliveryAddress": {
+        "attention": "",
+        "street1": "",
+        "street2": "",
+        "city": "",
+        "state": "",
+        "pinCode": "",
+        "countryRegion": "India"
+      },
+      "deliveryAddressType": "organization",
+      "paymentTerms": "Due on Receipt",
+      "shipmentPreference": "",
+      "reverseCharge": false,
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1766056260714",
+          "itemName": "Rice (Copy)",
+          "description": "Premium quality rice sourced from local farms. Ideal for daily cooking, delivers consistent taste and texture.\n",
+          "account": "",
+          "quantity": 1,
+          "rate": 50,
+          "tax": "gst_18",
+          "taxAmount": 9,
+          "amount": 59
+        },
+        {
+          "id": "1767096266186",
+          "itemId": "1766469453909",
+          "itemName": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "account": "",
+          "quantity": 1,
+          "rate": 40000,
+          "tax": "gst_18",
+          "taxAmount": 7200,
+          "amount": 47200
+        }
+      ],
+      "subTotal": 40050,
+      "discountType": "percent",
+      "discountValue": 0,
+      "discountAmount": 0,
+      "taxType": "TDS",
+      "taxCategory": "",
+      "taxAmount": 7209,
+      "adjustment": 0,
+      "adjustmentDescription": "",
+      "total": 47259,
+      "notes": "",
+      "termsAndConditions": "",
+      "attachments": [],
+      "status": "ISSUED",
+      "receiveStatus": "YET TO BE RECEIVED",
+      "billedStatus": "YET TO BE BILLED",
+      "pdfTemplate": "Standard Template",
+      "createdAt": "2025-12-30T12:04:55.221Z",
+      "updatedAt": "2025-12-30T12:10:20.566Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T12:04:55.221Z",
+          "action": "created",
+          "description": "Purchase Order created for ₹47,259",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2025-12-30T12:10:20.566Z",
+          "action": "updated",
+          "description": "Purchase Order has been updated",
+          "user": "Admin User"
+        }
+      ],
+      "gstTreatment": "Unregistered Business",
+      "sourceOfSupply": "MH - Maharashtra",
+      "destinationOfSupply": "MH - Maharashtra",
+      "vendorBillingAddress": {
+        "street1": "",
+        "street2": "",
+        "city": "",
+        "state": "",
+        "pinCode": "",
+        "countryRegion": "India"
+      },
+      "vendorShippingAddress": {
+        "street1": "",
+        "street2": "",
+        "city": "",
+        "state": "",
+        "pinCode": "",
+        "countryRegion": "India"
+      },
+      "organizationDetails": {
+        "name": "Ganesh Kale",
+        "address": "Hinjewadi - Wakad road\nHinjewadi\nPune, Maharashtra\nIndia, 411057"
+      },
+      "selectedCustomer": null,
+      "customerSearchQuery": "",
+      "emailCommunications": [
+        "accounts@sharmatraders.in"
+      ]
+    },
+    {
       "id": "1766633692116",
       "purchaseOrderNumber": "PO-2025-0014",
       "referenceNumber": "",
@@ -956,5 +1069,5 @@
       "emailCommunications": []
     }
   ],
-  "nextPurchaseOrderNumber": 15
+  "nextPurchaseOrderNumber": 16
 }

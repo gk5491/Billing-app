@@ -1,6 +1,83 @@
 {
   "bills": [
     {
+      "id": "1767098489701",
+      "organizationId": "1",
+      "billNumber": "23",
+      "orderNumber": "",
+      "vendorId": "7",
+      "vendorName": "Vikas  Traders Pvt Ltd ",
+      "vendorAddress": {
+        "street1": "Plot No. 21, Industrial Area",
+        "street2": "MIDC Phase 2",
+        "city": "Pune",
+        "state": "[MH] - Maharashtra",
+        "pinCode": "411019",
+        "country": "India",
+        "gstin": ""
+      },
+      "billDate": "2025-12-30",
+      "dueDate": "2025-12-30",
+      "paymentTerms": "Due on Receipt",
+      "reverseCharge": true,
+      "subject": "",
+      "items": [
+        {
+          "id": "1767098473489",
+          "itemName": "Rice (Copy)",
+          "description": "Premium quality rice sourced from local farms. Ideal for daily cooking, delivers consistent taste and texture.\n",
+          "account": "",
+          "quantity": 1,
+          "rate": 50,
+          "tax": "",
+          "taxAmount": 0,
+          "customerDetails": "none",
+          "amount": 50
+        },
+        {
+          "id": "1767098478984",
+          "itemName": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "account": "",
+          "quantity": 1,
+          "rate": 40000,
+          "tax": "",
+          "taxAmount": 0,
+          "customerDetails": "none",
+          "amount": 40000
+        }
+      ],
+      "subTotal": 40050,
+      "discountType": "percent",
+      "discountValue": 0,
+      "discountAmount": 0,
+      "taxType": "TDS",
+      "taxCategory": "",
+      "taxAmount": 0,
+      "adjustment": 0,
+      "adjustmentDescription": "",
+      "total": 40050,
+      "amountPaid": 0,
+      "balanceDue": 40050,
+      "notes": "",
+      "attachments": [],
+      "status": "OPEN",
+      "pdfTemplate": "Standard Template",
+      "journalEntries": [],
+      "createdAt": "2025-12-30T12:41:29.701Z",
+      "updatedAt": "2025-12-30T12:41:29.701Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T12:41:29.701Z",
+          "action": "created",
+          "description": "Bill created for ₹40,050",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
       "id": "1766633708822",
       "billNumber": "22",
       "orderNumber": "PO-2025-0014",
@@ -1023,7 +1100,7 @@
       ]
     }
   ],
-  "nextBillNumber": 23,
+  "nextBillNumber": 24,
   "accounts": [
     {
       "id": "1",

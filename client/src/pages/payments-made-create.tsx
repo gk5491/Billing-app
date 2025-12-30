@@ -451,7 +451,9 @@ export default function PaymentsMadeCreate() {
           <TabsContent value="bill_payment" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <Label className="text-red-500">Vendor Name*</Label>
+                <Label className="text-black">Vendor Name
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.vendorId}
                   onValueChange={handleVendorChange}
@@ -504,7 +506,8 @@ export default function PaymentsMadeCreate() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Payment #*</Label>
+                <Label className="text-black">Payment #
+                </Label>
                 <div className="relative">
                   <Input
                     value={formData.paymentNumber}
@@ -521,7 +524,9 @@ export default function PaymentsMadeCreate() {
               </div>
 
               <div>
-                <Label className="text-red-500">Payment Made*</Label>
+                <Label className="text-black">Payment Made
+                  <span className="text-red-600">*</span>
+                </Label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 border border-r-0 rounded-l-md bg-slate-50 text-sm text-slate-500">
                     INR
@@ -558,7 +563,9 @@ export default function PaymentsMadeCreate() {
  */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Payment Date*</Label>
+                <Label className="text-black">Payment Date
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Input
                   type="date"
                   value={formData.paymentDate}
@@ -594,7 +601,9 @@ export default function PaymentsMadeCreate() {
               </div>
 
               <div>
-                <Label className="text-red-500">Paid Through*</Label>
+                <Label className="text-black">Paid Through
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.paidThrough}
                   onValueChange={(v) =>
@@ -831,7 +840,9 @@ export default function PaymentsMadeCreate() {
           <TabsContent value="vendor_advance" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Vendor Name*</Label>
+                <Label className="text-black">Vendor Name
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.vendorId}
                   onValueChange={handleVendorChange}
@@ -868,7 +879,9 @@ export default function PaymentsMadeCreate() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Source of Supply*</Label>
+                <Label className="text-black">Source of Supply
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.sourceOfSupply}
                   onValueChange={(v) =>
@@ -892,7 +905,9 @@ export default function PaymentsMadeCreate() {
               </div>
 
               <div>
-                <Label className="text-red-500">Destination of Supply*</Label>
+                <Label className="text-black">Destination of Supply
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.destinationOfSupply}
                   onValueChange={(v) =>
@@ -918,7 +933,9 @@ export default function PaymentsMadeCreate() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Payment #*</Label>
+                <Label className="text-black">Payment #
+                  <span className="text-red-600">*</span>
+                </Label>
                 <div className="relative">
                   <Input
                     value={formData.paymentNumber}
@@ -954,7 +971,9 @@ export default function PaymentsMadeCreate() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Payment Made*</Label>
+                <Label className="text-black">Payment Made
+                  <span className="text-red-600">*</span>
+                </Label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 border border-r-0 rounded-l-md bg-slate-50 text-sm text-slate-500">
                     INR
@@ -1014,7 +1033,9 @@ export default function PaymentsMadeCreate() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-500">Payment Date*</Label>
+                <Label className="text-black">Payment Date
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Input
                   type="date"
                   value={formData.paymentDate}
@@ -1050,7 +1071,9 @@ export default function PaymentsMadeCreate() {
               </div>
 
               <div>
-                <Label className="text-red-500">Paid Through*</Label>
+                <Label className="text-black">Paid Through
+                  <span className="text-red-600">*</span>
+                </Label>
                 <Select
                   value={formData.paidThrough}
                   onValueChange={(v) =>

@@ -508,7 +508,56 @@
       "amountInWords": "Indian Rupee Twenty Only",
       "journalEntries": [],
       "createdAt": "2025-12-29T09:19:26.921Z"
+    },
+    {
+      "id": "pr-1767094216200",
+      "organizationId": "1",
+      "paymentNumber": "",
+      "customerId": "2",
+      "customerName": "Ashtvinayak Education Society",
+      "customerEmail": "ganeshkale030303@gmail.com",
+      "amount": 10,
+      "bankCharges": 0,
+      "tax": "",
+      "date": "2025-12-30",
+      "mode": "Cash",
+      "depositTo": "Petty Cash",
+      "referenceNumber": "",
+      "taxDeducted": "no",
+      "notes": "",
+      "sendThankYou": true,
+      "placeOfSupply": "",
+      "descriptionOfSupply": "",
+      "paymentType": "invoice_payment",
+      "status": "PAID",
+      "unusedAmount": 0,
+      "invoices": [
+        {
+          "invoiceId": "1765538132481",
+          "invoiceNumber": "INV-00012",
+          "invoiceDate": "2025-12-12",
+          "invoiceAmount": 620,
+          "balanceDue": 10,
+          "paymentAmount": 10,
+          "paymentReceivedDate": "2025-12-30"
+        }
+      ],
+      "attachments": [],
+      "journalEntries": [
+        {
+          "account": "Petty Cash",
+          "debit": 10,
+          "credit": 0
+        },
+        {
+          "account": "Unearned Revenue",
+          "debit": 0,
+          "credit": 10
+        }
+      ],
+      "amountInWords": "Indian Rupee Ten Only",
+      "createdAt": "2025-12-30T11:30:16.200Z"
     }
   ],
-  "nextPaymentNumber": 57
+  "nextPaymentNumber": 58
 }

@@ -23,37 +23,37 @@
         "pincode": "411057"
       },
       "placeOfSupply": "",
-      "gstin": "",
+      "gstin": "27AAGCA4900Q1ZE",
       "items": [
         {
           "id": "1",
           "itemId": "1",
-          "name": "Cloud Server",
-          "description": "",
-          "hsnSac": "998315",
+          "name": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "hsnSac": "847150",
           "quantity": 1,
           "unit": "pcs",
-          "rate": 500,
+          "rate": 45000,
           "discount": 0,
           "discountType": "percentage",
-          "tax": 90,
+          "tax": 8100,
           "taxName": "GST18",
-          "amount": 590
+          "amount": 53100
         }
       ],
-      "subTotal": 500,
-      "cgst": 45,
-      "sgst": 45,
+      "subTotal": 45000,
+      "cgst": 4050,
+      "sgst": 4050,
       "igst": 0,
       "adjustment": 0,
-      "total": 590,
+      "total": 53100,
       "customerNotes": "",
       "termsAndConditions": "",
       "status": "DELIVERED",
       "invoiceStatus": "INVOICED",
       "invoiceId": "1765512535378",
       "createdAt": "2025-12-18T10:00:00.000Z",
-      "updatedAt": "2025-12-19T08:42:27.646Z",
+      "updatedAt": "2025-12-30T11:40:30.053Z",
       "activityLogs": [
         {
           "id": "1",
@@ -110,6 +110,13 @@
           "action": "status_changed",
           "description": "Status changed to DELIVERED",
           "user": "Admin User"
+        },
+        {
+          "id": "9",
+          "timestamp": "2025-12-30T11:40:30.053Z",
+          "action": "updated",
+          "description": "Delivery challan updated",
+          "user": "Admin User"
         }
       ]
     },
@@ -118,22 +125,22 @@
       "challanNumber": "DC-00002",
       "referenceNumber": "",
       "date": "2025-12-22",
-      "customerId": "8",
-      "customerName": "CYBAEM TECH PRIVATE LIMITED ",
+      "customerId": "2",
+      "customerName": "Ashtvinayak Education Society",
       "challanType": "supply_on_approval",
       "billingAddress": {
-        "street": "Hinjewadi",
+        "street": "",
         "city": "Pune",
         "state": "Maharashtra",
         "country": "India",
-        "pincode": "411057"
+        "pincode": ""
       },
       "shippingAddress": {
-        "street": "Hinjewadi",
+        "street": "",
         "city": "Pune",
         "state": "Maharashtra",
         "country": "India",
-        "pincode": "411057"
+        "pincode": ""
       },
       "placeOfSupply": "",
       "gstin": "",
@@ -156,7 +163,7 @@
         {
           "id": "2",
           "itemId": "2",
-          "name": "Rice",
+          "name": "Rice (Copy)",
           "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
           "hsnSac": "1006",
           "quantity": 1,
@@ -181,7 +188,7 @@
       "invoiceStatus": "INVOICED",
       "invoiceId": "1766379779207",
       "createdAt": "2025-12-22T04:59:14.480Z",
-      "updatedAt": "2025-12-23T05:11:32.111Z",
+      "updatedAt": "2025-12-30T11:40:50.771Z",
       "activityLogs": [
         {
           "id": "1",
@@ -207,6 +214,13 @@
         {
           "id": "4",
           "timestamp": "2025-12-23T05:11:32.111Z",
+          "action": "updated",
+          "description": "Delivery challan updated",
+          "user": "Admin User"
+        },
+        {
+          "id": "5",
+          "timestamp": "2025-12-30T11:40:50.771Z",
           "action": "updated",
           "description": "Delivery challan updated",
           "user": "Admin User"
@@ -291,7 +305,199 @@
           "user": "Admin User"
         }
       ]
+    },
+    {
+      "id": "1767093704188",
+      "challanNumber": "DC-00004",
+      "referenceNumber": "",
+      "date": "2025-12-30",
+      "customerId": "2",
+      "customerName": "Ashtvinayak Education Society",
+      "challanType": "supply_on_approval",
+      "billingAddress": {
+        "street": "",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": ""
+      },
+      "placeOfSupply": "",
+      "gstin": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "hsnSac": "847150",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 45000,
+          "discount": 4500,
+          "discountType": "percentage",
+          "tax": 7290,
+          "taxName": "GST18",
+          "amount": 47790
+        }
+      ],
+      "subTotal": 40500,
+      "cgst": 3645,
+      "sgst": 3645,
+      "igst": 0,
+      "adjustment": 20,
+      "total": 47810,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "DRAFT",
+      "invoiceStatus": "",
+      "invoiceId": null,
+      "createdAt": "2025-12-30T11:21:44.188Z",
+      "updatedAt": "2025-12-30T11:21:44.188Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T11:21:44.188Z",
+          "action": "created",
+          "description": "Delivery challan DC-00004 created",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
+      "id": "1767093753896",
+      "challanNumber": "DC-00005",
+      "referenceNumber": "",
+      "date": "2025-12-30",
+      "customerId": "6",
+      "customerName": "Ganesh kale",
+      "challanType": "supply_on_approval",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "placeOfSupply": "",
+      "gstin": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "hsnSac": "847150",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 45000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 8100,
+          "taxName": "GST18",
+          "amount": 53100
+        }
+      ],
+      "subTotal": 45000,
+      "cgst": 4050,
+      "sgst": 4050,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 53100,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "DRAFT",
+      "invoiceStatus": "",
+      "invoiceId": null,
+      "createdAt": "2025-12-30T11:22:33.896Z",
+      "updatedAt": "2025-12-30T11:22:33.896Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T11:22:33.896Z",
+          "action": "created",
+          "description": "Delivery challan DC-00005 created",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
+      "id": "1767094866235",
+      "challanNumber": "DC-00006",
+      "referenceNumber": "",
+      "date": "2025-12-30",
+      "customerId": "2",
+      "customerName": "Ashtvinayak Education Society",
+      "challanType": "supply_for_job_work",
+      "billingAddress": {
+        "street": "",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "country": "India",
+        "pincode": ""
+      },
+      "placeOfSupply": "",
+      "gstin": "",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1",
+          "name": "Rice (Copy)",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "hsnSac": "1006",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 10.799999999999999,
+          "taxName": "GST18",
+          "amount": 70.8
+        }
+      ],
+      "subTotal": 60,
+      "cgst": 5.3999999999999995,
+      "sgst": 5.3999999999999995,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 70.8,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "DRAFT",
+      "invoiceStatus": "",
+      "invoiceId": null,
+      "createdAt": "2025-12-30T11:41:06.235Z",
+      "updatedAt": "2025-12-30T11:41:06.235Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T11:41:06.235Z",
+          "action": "created",
+          "description": "Delivery challan DC-00006 created",
+          "user": "Admin User"
+        }
+      ]
     }
   ],
-  "nextChallanNumber": 4
+  "nextChallanNumber": 7
 }

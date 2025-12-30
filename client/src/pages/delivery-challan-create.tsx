@@ -190,8 +190,8 @@ export default function DeliveryChallanCreate() {
       } else if (typeof inventoryItem.rate === 'number') {
         itemRate = inventoryItem.rate;
       } else if (inventoryItem.sellingPrice) {
-        itemRate = typeof inventoryItem.sellingPrice === 'string'
-          ? parseFloat(inventoryItem.sellingPrice.replace(/,/g, '')) || 0
+        itemRate = typeof (inventoryItem.sellingPrice as any) === 'string'
+          ? parseFloat((inventoryItem.sellingPrice as any).replace(/,/g, '')) || 0
           : inventoryItem.sellingPrice;
       }
 
@@ -374,7 +374,7 @@ export default function DeliveryChallanCreate() {
         quantity: item.qty,
         unit: 'pcs',
         rate: item.rate,
-        discount: lineCalc.discountAmount,
+        discount: item.discountValue,
         discountType: item.discountType,
         tax: lineCalc.taxAmount,
         taxName: item.gstRate > 0 ? `GST${item.gstRate}` : 'Non-taxable',
@@ -452,7 +452,9 @@ export default function DeliveryChallanCreate() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-destructive">Customer Name*</Label>
+                <Label className="text-sm font-medium text-black">Customer Name
+                  <span className="text-red-600 ml-0.5">*</span>
+                </Label>
                 <Select value={selectedCustomerId} onValueChange={handleCustomerChange}>
                   <SelectTrigger className="w-full" data-testid="select-customer">
                     <SelectValue placeholder="Select or add a customer" />
@@ -477,7 +479,9 @@ export default function DeliveryChallanCreate() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-destructive">Delivery Challan#*</Label>
+                <Label className="text-sm font-medium text-black">Delivery Challan#
+                  <span className="text-red-600 ml-0.5">*</span>
+                </Label>
                 <div className="flex items-center">
                   <span className="bg-muted border border-r-0 border-border rounded-l-md px-3 py-2 text-sm text-muted-foreground">DC-</span>
                   <Input
@@ -503,7 +507,9 @@ export default function DeliveryChallanCreate() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-destructive">Delivery Challan Date*</Label>
+                <Label className="text-sm font-medium text-black">Delivery Challan Date
+                  <span className="text-red-600 ml-0.5">*</span>
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -527,7 +533,9 @@ export default function DeliveryChallanCreate() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-destructive">Challan Type*</Label>
+                <Label className="text-sm font-medium text-black">Challan Type
+                  <span className="text-red-600 ml-0.5">*</span>
+                </Label>
                 <Select value={challanType} onValueChange={setChallanType}>
                   <SelectTrigger className="w-full" data-testid="select-challan-type">
                     <SelectValue placeholder="Choose a proper challan type." />
@@ -589,6 +597,7 @@ export default function DeliveryChallanCreate() {
                           type="number"
                           value={item.qty}
                           onChange={(e) => updateItem(item.id, 'qty', parseFloat(e.target.value) || 0)}
+                          
                           className="w-20 text-center"
                           data-testid={`input-qty-${index}`}
                         />
@@ -598,6 +607,7 @@ export default function DeliveryChallanCreate() {
                           type="number"
                           value={item.rate}
                           onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                          
                           className="w-24 text-right"
                           data-testid={`input-rate-${index}`}
                         />
@@ -608,6 +618,7 @@ export default function DeliveryChallanCreate() {
                             type="number"
                             value={item.discountValue}
                             onChange={(e) => updateItem(item.id, 'discountValue', parseFloat(e.target.value) || 0)}
+                            
                             className="w-16 text-right"
                             data-testid={`input-discount-${index}`}
                           />
@@ -701,6 +712,7 @@ export default function DeliveryChallanCreate() {
                     type="number"
                     value={adjustment}
                     onChange={(e) => setAdjustment(parseFloat(e.target.value) || 0)}
+                    
                     className="w-28 text-right"
                     data-testid="input-adjustment"
                   />
@@ -732,7 +744,7 @@ export default function DeliveryChallanCreate() {
         </CardContent>
       </Card>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4">
+      <div className="fixed bottom-0 left-15 right-0 bg-background border-t border-border p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button

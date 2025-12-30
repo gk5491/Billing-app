@@ -1,6 +1,99 @@
 {
   "invoices": [
     {
+      "id": "1767093238706",
+      "organizationId": "1",
+      "invoiceNumber": "INV-00041",
+      "referenceNumber": "",
+      "date": "2025-12-30",
+      "dueDate": "2026-01-14",
+      "customerId": "2",
+      "customerName": "Ashtvinayak Education Society",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "salesperson": "1",
+      "placeOfSupply": "",
+      "paymentTerms": "Net 15",
+      "items": [
+        {
+          "id": "0.940226254441376",
+          "itemId": "0.940226254441376",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 10.799999999999999,
+          "taxName": "GST18",
+          "amount": 70.8
+        },
+        {
+          "id": "0.37297247170791425",
+          "itemId": "0.37297247170791425",
+          "name": "HP ProDesk Desktop",
+          "description": "HP ProDesk desktop computer for office and professional use.\n",
+          "quantity": 1,
+          "unit": "pcs",
+          "rate": 45000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 8100,
+          "taxName": "GST18",
+          "amount": 53100
+        }
+      ],
+      "subTotal": 45060,
+      "shippingCharges": 0,
+      "cgst": 4055.4,
+      "sgst": 4055.4,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 53170.8,
+      "amountPaid": 0,
+      "balanceDue": 53170.8,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "PENDING",
+      "sourceType": null,
+      "sourceId": null,
+      "sourceNumber": null,
+      "pdfTemplate": "Standard Template",
+      "createdAt": "2025-12-30T11:13:58.706Z",
+      "updatedAt": "2025-12-30T11:15:58.157Z",
+      "createdBy": "Admin User",
+      "payments": [],
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2025-12-30T11:13:58.706Z",
+          "action": "created",
+          "description": "Invoice created for ₹53,170.8",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2025-12-30T11:15:58.157Z",
+          "action": "updated",
+          "description": "Invoice has been updated",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
       "id": "1766636627252",
       "invoiceNumber": "INV-00040",
       "referenceNumber": "",
@@ -3071,17 +3164,17 @@
       "igst": 0,
       "adjustment": 0.5,
       "total": 620,
-      "amountPaid": 610,
-      "balanceDue": 10,
+      "amountPaid": 620,
+      "balanceDue": 0,
       "customerNotes": "Looking forward for your business.",
       "termsAndConditions": "make payment for 45 days",
-      "status": "PARTIALLY_PAID",
+      "status": "PAID",
       "sourceType": "quote",
       "sourceId": "1765538032483",
       "sourceNumber": "QT-000010",
       "pdfTemplate": "Standard Template",
       "createdAt": "2025-12-12T11:15:32.481Z",
-      "updatedAt": "2025-12-12T11:21:57.018Z",
+      "updatedAt": "2025-12-30T11:30:16.200Z",
       "createdBy": "Admin User",
       "payments": [
         {
@@ -3137,6 +3230,14 @@
           "date": "2025-12-12",
           "amount": 260,
           "paymentMode": "credit_card",
+          "reference": "",
+          "notes": ""
+        },
+        {
+          "id": "pr-1767094216200",
+          "date": "2025-12-30",
+          "amount": 10,
+          "paymentMode": "Cash",
           "reference": "",
           "notes": ""
         }
@@ -4168,5 +4269,5 @@
       ]
     }
   ],
-  "nextInvoiceNumber": 41
+  "nextInvoiceNumber": 42
 }

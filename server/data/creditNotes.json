@@ -241,9 +241,23 @@
           "tax": 18,
           "taxName": "GST18",
           "amount": 34770
+        },
+        {
+          "id": "1767094980114",
+          "itemId": "1765535400204",
+          "name": "Rice",
+          "description": "Bulk purchase of raw rice directly from vendors. High-grade grains with minimal impurities.",
+          "account": "sales",
+          "quantity": 1,
+          "rate": 60,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 0,
+          "taxName": "none",
+          "amount": 60
         }
       ],
-      "subTotal": 34770,
+      "subTotal": 34830,
       "shippingCharges": 1000,
       "tdsType": "TDS",
       "tdsAmount": 0,
@@ -251,14 +265,14 @@
       "sgst": 0,
       "igst": 0,
       "adjustment": 0,
-      "total": 35770,
+      "total": 35830,
       "creditsRemaining": 0,
       "customerNotes": "",
       "termsAndConditions": "",
       "status": "OPEN",
       "pdfTemplate": "Standard Template",
       "createdAt": "2025-12-12T06:07:57.707Z",
-      "updatedAt": "2025-12-23T05:10:07.831Z",
+      "updatedAt": "2025-12-30T11:43:13.534Z",
       "createdBy": "Admin User",
       "activityLogs": [
         {
@@ -285,6 +299,13 @@
         {
           "id": "4",
           "timestamp": "2025-12-23T05:10:07.831Z",
+          "action": "updated",
+          "description": "Credit Note has been updated",
+          "user": "Admin User"
+        },
+        {
+          "id": "5",
+          "timestamp": "2025-12-30T11:43:13.534Z",
           "action": "updated",
           "description": "Credit Note has been updated",
           "user": "Admin User"

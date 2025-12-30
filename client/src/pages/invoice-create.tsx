@@ -329,7 +329,9 @@ export default function InvoiceCreate() {
             qty: item.quantity,
             rate: item.rate,
             discountType: item.discountType || 'percentage',
-            discountValue: item.discount || 0,
+            discountValue: item.discountType === 'percentage'
+              ? (item.rate && item.quantity ? (item.discount / (item.rate * item.quantity)) * 100 : 0)
+              : (item.discount || 0),
             gstRate: item.tax && item.tax > 0 ? (item.tax / (item.rate * item.quantity - (item.discount || 0))) * 100 : 18
           }));
           setItems(clonedItems);
@@ -384,7 +386,9 @@ export default function InvoiceCreate() {
             qty: item.quantity - (item.invoicedQty || 0), // Only uninvoiced quantity
             rate: item.rate,
             discountType: item.discountType || 'percentage',
-            discountValue: item.discount || 0,
+            discountValue: item.discountType === 'percentage'
+              ? (item.rate && item.quantity ? (item.discount / (item.rate * item.quantity)) * 100 : 0)
+              : (item.discount || 0),
             gstRate: item.tax && item.tax > 0 ? (item.tax / (item.rate * item.quantity - (item.discount || 0))) * 100 : 18
           })).filter(item => item.qty > 0); // Only include items with remaining quantity
 

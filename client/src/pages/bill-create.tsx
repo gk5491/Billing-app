@@ -36,6 +36,9 @@ import {
 interface Vendor {
   id: string;
   name: string;
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
   companyName?: string;
   email?: string;
   phone?: string;
@@ -173,7 +176,7 @@ export default function BillCreate() {
         setFormData(prev => ({
           ...prev,
           vendorId: vendor.id,
-          vendorName: vendor.displayName || `${vendor.firstName} ${vendor.lastName}`.trim() || vendor.companyName || "",
+          vendorName: vendor.displayName || `${(vendor as any).firstName} ${(vendor as any).lastName}`.trim() || vendor.companyName || "",
           vendorAddress: {
             street1: vendor.billingAddress?.street1 || "",
             street2: vendor.billingAddress?.street2 || "",
@@ -217,7 +220,7 @@ export default function BillCreate() {
   };
 
   const filteredVendors = vendors.filter(vendor => {
-    const vendorName = vendor.displayName || `${vendor.firstName} ${vendor.lastName}`.trim() || vendor.companyName || "";
+    const vendorName = vendor.displayName || `${(vendor as any).firstName} ${(vendor as any).lastName}`.trim() || vendor.companyName || "";
     return vendorName.toLowerCase().includes(vendorSearchTerm.toLowerCase());
   });
 
@@ -347,7 +350,7 @@ export default function BillCreate() {
       setFormData(prev => ({
         ...prev,
         vendorId: vendor.id,
-        vendorName: vendor.displayName || `${vendor.firstName} ${vendor.lastName}`.trim() || vendor.companyName || "",
+        vendorName: vendor.displayName || `${(vendor as any).firstName} ${(vendor as any).lastName}`.trim() || vendor.companyName || "",
         vendorAddress: {
           street1: vendor.billingAddress?.street1 || "",
           street2: vendor.billingAddress?.street2 || "",
@@ -567,7 +570,9 @@ export default function BillCreate() {
           <div className="grid gap-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-600">Vendor Name*</Label>
+                <Label className="text-black">Vendor Name
+                  <span className="text-red-500">*</span>
+                </Label>
                 <div className="flex gap-2 mt-1">
                   <Select onValueChange={handleVendorChange} value={formData.vendorId}>
                     <SelectTrigger className="flex-1" data-testid="select-vendor">
@@ -587,7 +592,7 @@ export default function BillCreate() {
                       </div>
                       {filteredVendors.map(vendor => (
                         <SelectItem key={vendor.id} value={vendor.id}>
-                          {vendor.displayName || `${vendor.firstName} ${vendor.lastName}`.trim() || vendor.companyName}
+                          {vendor.displayName || `${(vendor as any).firstName} ${(vendor as any).lastName}`.trim() || vendor.companyName}
                         </SelectItem>
                       ))}
                       <div className="border-t mt-1 pt-1">
@@ -615,7 +620,9 @@ export default function BillCreate() {
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-600">Bill#*</Label>
+                <Label className="text-black">Bill#
+                  <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   value={formData.billNumber}
                   onChange={(e) => setFormData(prev => ({ ...prev, billNumber: e.target.value }))}
@@ -636,7 +643,9 @@ export default function BillCreate() {
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <Label className="text-red-600">Bill Date*</Label>
+                <Label className="text-black">Bill Date
+                  <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   type="date"
                   value={formData.billDate}
@@ -782,6 +791,7 @@ export default function BillCreate() {
                             type="number"
                             value={item.quantity}
                             onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                            
                             className="text-sm text-center"
                             min={0}
                             step={0.01}
@@ -793,6 +803,7 @@ export default function BillCreate() {
                             type="number"
                             value={item.rate}
                             onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                            
                             className="text-sm text-right"
                             min={0}
                             step={0.01}
@@ -888,6 +899,7 @@ export default function BillCreate() {
                       type="number"
                       value={formData.discountValue}
                       onChange={(e) => handleDiscountChange(formData.discountType, parseFloat(e.target.value) || 0)}
+                      
                       className="w-16 text-sm text-right"
                       min={0}
                       data-testid="input-discount"
@@ -962,6 +974,7 @@ export default function BillCreate() {
                       type="number"
                       value={formData.adjustment}
                       onChange={(e) => handleAdjustmentChange(parseFloat(e.target.value) || 0)}
+                      
                       className="w-24 text-sm text-right"
                       data-testid="input-adjustment"
                     />

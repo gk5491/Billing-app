@@ -581,7 +581,7 @@ export default function PurchaseOrderCreate() {
           <div className="p-6 space-y-6">
             {/* Vendor Section */}
             <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
-              <Label className="text-blue-600 pt-2.5">Vendor Name<span className="text-red-500">*</span></Label>
+              <Label className="text-black pt-2.5">Vendor Name<span className="text-red-500">*</span></Label>
               <div className="flex gap-2">
                 <Popover open={vendorDropdownOpen} onOpenChange={setVendorDropdownOpen}>
                   <PopoverTrigger asChild>
@@ -742,7 +742,7 @@ export default function PurchaseOrderCreate() {
 
             {/* Delivery Address Section */}
             <div className="grid grid-cols-[140px_1fr] gap-4 items-start">
-              <Label className="text-blue-600 pt-2.5">Delivery Address<span className="text-red-500">*</span></Label>
+              <Label className="text-black pt-2.5">Delivery Address<span className="text-red-500">*</span></Label>
               <div className="space-y-3">
                 <RadioGroup
                   value={formData.deliveryAddressType}
@@ -874,7 +874,7 @@ export default function PurchaseOrderCreate() {
             {/* Form Fields Row */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-blue-600 font-medium text-sm">Purchase Order#<span className="text-red-500">*</span></Label>
+                <Label className="text-black font-medium text-sm">Purchase Order#<span className="text-red-500">*</span></Label>
                 <div className="relative">
                   <Input
                     value={purchaseOrderNumber}
