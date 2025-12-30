@@ -766,10 +766,13 @@ export default function CustomerCreate() {
                   name="displayName"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <FormLabel className="text-red-500 after:content-['*'] after:ml-0.5">Display Name</FormLabel>
-                        <Info className="h-3.5 w-3.5 text-slate-400" />
-                      </div>
+                   <div className="flex items-center gap-1">
+  <FormLabel className="text-black after:content-['*'] after:ml-0.5 after:text-red-500">
+    Display Name
+  </FormLabel>
+  <Info className="h-3.5 w-3.5 text-slate-400" />
+</div>
+
                       <Popover open={displayNameOpen} onOpenChange={setDisplayNameOpen}>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -910,8 +913,9 @@ export default function CustomerCreate() {
               <TabsTrigger value="other" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-other-details">Other Details</TabsTrigger>
               <TabsTrigger value="address" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-address">Address</TabsTrigger>
               <TabsTrigger value="contact" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-contact">Contact Persons</TabsTrigger>
-              <TabsTrigger value="custom" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-custom">Custom Fields</TabsTrigger>
+              {/* <TabsTrigger value="custom" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-custom">Custom Fields</TabsTrigger>
               <TabsTrigger value="tags" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-tags">Reporting Tags</TabsTrigger>
+               */}
               <TabsTrigger value="remarks" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-700 px-0 py-2" data-testid="tab-remarks">Remarks</TabsTrigger>
             </TabsList>
 
