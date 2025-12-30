@@ -1028,9 +1028,11 @@ export default function PurchaseOrders() {
               </div>
             )}
 
-            <div className="flex-1 overflow-auto">
+            <div className="flex-1 overflow-auto p-4">
               {loading ? (
-                <div className="p-8 text-center text-slate-500">Loading purchase orders...</div>
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
               ) : filteredPOs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
@@ -1049,41 +1051,117 @@ export default function PurchaseOrders() {
                   </Button>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
-                  {paginatedItems.map((po) => (
-                    <div
-                      key={po.id}
-                      className={`p-4 hover:bg-slate-50 cursor-pointer transition-colors ${selectedPO?.id === po.id ? 'bg-blue-50 border-l-2 border-l-blue-600' : ''
-                        }`}
-                      onClick={() => handlePOClick(po)}
-                      data-testid={`card-po-${po.id}`}
-                    >
-                      <div className="flex items-start justify-between mb-1">
-                        <div className="flex items-center gap-2">
-                          <Checkbox
-                            checked={selectedPOs.includes(po.id)}
-                            onClick={(e) => toggleSelectPO(po.id, e)}
-                          />
-                          <span className="font-medium text-blue-600">{po.purchaseOrderNumber}</span>
-                        </div>
-                        {getStatusBadge(po.status)}
-                      </div>
-                      <div className="ml-6 text-sm text-slate-500">
-                        <p>{po.vendorName}</p>
-                        <p className="font-medium text-slate-900">{formatCurrency(po.total)}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-10">
+                            <Checkbox 
+                              checked={selectedPOs.length === paginatedItems.length && paginatedItems.length > 0}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedPOs(paginatedItems.map(po => po.id));
+                                } else {
+                                  setSelectedPOs([]);
+                                }
+                              }}
+                              data-testid="checkbox-select-all" 
+                            />
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Purchase Order#</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Reference#</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vendor Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Billed Status</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Delivery Date</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                        {paginatedItems.map((po) => (
+                          <tr
+                            key={po.id}
+                            className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedPO?.id === po.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                            onClick={() => handlePOClick(po)}
+                            data-testid={`row-po-${po.id}`}
+                          >
+                            <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                              <Checkbox
+                                checked={selectedPOs.includes(po.id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedPOs([...selectedPOs, po.id]);
+                                  } else {
+                                    setSelectedPOs(selectedPOs.filter(id => id !== po.id));
+                                  }
+                                }}
+                                data-testid={`checkbox-po-${po.id}`}
+                              />
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                              {formatDate(po.date)}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-medium text-blue-600 hover:underline">
+                              {po.purchaseOrderNumber}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">
+                              {po.referenceNumber || '-'}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-medium text-slate-900 dark:text-white">
+                              {po.vendorName}
+                            </td>
+                            <td className="px-4 py-4">
+                              {getStatusBadge(po.status)}
+                            </td>
+                            <td className="px-4 py-4 text-xs font-medium text-slate-500 uppercase tracking-tight">
+                              {po.billedStatus || 'YET TO BE BILLED'}
+                            </td>
+                            <td className="px-4 py-4 text-sm font-semibold text-right text-slate-900 dark:text-white">
+                              {formatCurrency(po.total)}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-300">
+                              {formatDate(po.deliveryDate || '')}
+                            </td>
+                            <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover-elevate">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setLocation(`/purchase-orders/${po.id}/edit`)}>
+                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-600"
+                                    onClick={() => handleDelete(po.id)}
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
               {filteredPOs.length > 0 && (
-                <TablePagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalItems={totalItems}
-                  itemsPerPage={itemsPerPage}
-                  onPageChange={goToPage}
-                />
+                <div className="mt-4">
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </div>
               )}
             </div>
           </div>

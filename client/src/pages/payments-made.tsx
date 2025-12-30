@@ -549,83 +549,90 @@ export default function PaymentsMade() {
               </Card>
             ) : (
               <div className="border rounded-lg overflow-hidden bg-white dark:bg-slate-900">
-                <table className="w-full">
-                  <thead className="bg-slate-50 dark:bg-slate-800">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
-                        <Checkbox data-testid="checkbox-select-all" />
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment #</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Reference#</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Vendor Name</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Bill#</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Mode</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Amount</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Unused Amount</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase">
-                        <Search className="h-4 w-4 mx-auto" />
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {paginatedItems.map((payment) => (
-                      <tr
-                        key={payment.id}
-                        className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedPayment?.id === payment.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
-                        onClick={() => handleRowClick(payment)}
-                        data-testid={`row-payment-${payment.id}`}
-                      >
-                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                          <Checkbox data-testid={`checkbox-payment-${payment.id}`} />
-                        </td>
-                        <td className="px-4 py-3 text-sm">{formatDate(payment.paymentDate)}</td>
-                        <td className="px-4 py-3 text-sm font-medium text-primary">{getPaymentNumberString(payment.paymentNumber)}</td>
-                        <td className="px-4 py-3 text-sm">{payment.reference || '-'}</td>
-                        <td className="px-4 py-3 text-sm">{payment.vendorName}</td>
-                        <td className="px-4 py-3 text-sm">{getBillNumbers(payment)}</td>
-                        <td className="px-4 py-3 text-sm capitalize">{getPaymentModeLabel(payment.paymentMode)}</td>
-                        <td className="px-4 py-3 text-sm">{getStatusBadge(payment.status)}</td>
-                        <td className="px-4 py-3 text-sm text-right font-medium">
-                          {formatCurrency(payment.paymentAmount)}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-right">
-                          {formatCurrency(calculateUnusedAmount(payment))}
-                        </td>
-                        <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" data-testid={`button-payment-actions-${payment.id}`}>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleRowClick(payment)} data-testid={`action-view-${payment.id}`}>View</DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setLocation(`/payments-made/edit/${payment.id}`)} data-testid={`action-edit-${payment.id}`}>Edit</DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => handleDelete(payment.id)}
-                                data-testid={`action-delete-${payment.id}`}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-10">
+                          <Checkbox 
+                            checked={paginatedItems.length > 0 && paginatedItems.every(p => false)} // Logic for bulk select if needed
+                            data-testid="checkbox-select-all" 
+                          />
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Date</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Payment #</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Reference#</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Vendor Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Bill#</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Mode</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Status</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Unused Amount</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider w-10">
+                          <Search className="h-4 w-4 mx-auto" />
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <TablePagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalItems={totalItems}
-                  itemsPerPage={itemsPerPage}
-                  onPageChange={goToPage}
-                />
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                      {paginatedItems.map((payment) => (
+                        <tr
+                          key={payment.id}
+                          className={`hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${selectedPayment?.id === payment.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                          onClick={() => handleRowClick(payment)}
+                          data-testid={`row-payment-${payment.id}`}
+                        >
+                          <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                            <Checkbox data-testid={`checkbox-payment-${payment.id}`} />
+                          </td>
+                          <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">{formatDate(payment.paymentDate)}</td>
+                          <td className="px-4 py-4 text-sm font-medium text-blue-600 hover:underline whitespace-nowrap">{getPaymentNumberString(payment.paymentNumber)}</td>
+                          <td className="px-4 py-4 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">{payment.reference || '-'}</td>
+                          <td className="px-4 py-4 text-sm font-medium text-slate-900 dark:text-white whitespace-nowrap">{payment.vendorName}</td>
+                          <td className="px-4 py-4 text-sm text-slate-600 dark:text-slate-300 whitespace-nowrap">{getBillNumbers(payment)}</td>
+                          <td className="px-4 py-4 text-sm capitalize text-slate-600 dark:text-slate-300 whitespace-nowrap">{getPaymentModeLabel(payment.paymentMode)}</td>
+                          <td className="px-4 py-4 text-sm whitespace-nowrap">{getStatusBadge(payment.status)}</td>
+                          <td className="px-4 py-4 text-sm text-right font-semibold text-slate-900 dark:text-white whitespace-nowrap">
+                            {formatCurrency(payment.paymentAmount)}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-right text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                            {formatCurrency(calculateUnusedAmount(payment))}
+                          </td>
+                          <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover-elevate" data-testid={`button-payment-actions-${payment.id}`}>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleRowClick(payment)} data-testid={`action-view-${payment.id}`}>View</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setLocation(`/payments-made/edit/${payment.id}`)} data-testid={`action-edit-${payment.id}`}>Edit</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() => handleDelete(payment.id)}
+                                  data-testid={`action-delete-${payment.id}`}
+                                >
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+                  <TablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={goToPage}
+                  />
+                </div>
               </div>
             )}
           </div>
